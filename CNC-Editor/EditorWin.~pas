@@ -1,0 +1,25 @@
+unit EditorWin;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, CHILDWIN, AdvMemo;
+
+type
+  TMDIEditor = class(TMDIChild)
+    AdvMemo1: TAdvMemo;
+  private
+    { Déclarations privées }
+  public
+    { Déclarations publiques }
+  end;
+
+var
+  MDIEditor: TMDIEditor;
+
+implementation
+
+{$R *.dfm}
+
+end.

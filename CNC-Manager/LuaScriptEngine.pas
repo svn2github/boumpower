@@ -1,0 +1,61 @@
+unit LuaScriptEngine;
+
+interface
+
+uses
+  SysUtils, Classes, Lua, pLua, LuaWrapper;
+
+type
+  TScriptModule = class(TDataModule)
+    procedure DataModuleCreate(Sender: TObject);
+  private
+    procedure LoadLibs(LuaWrapper : TLua);
+    procedure ScriptExceptionHandler( Title: ansistring; Line: Integer; Msg: ansistring;
+                                      var handled : Boolean);
+  public
+    Lua : TLua;
+    procedure Execute(Source : AnsiString);
+  end;
+
+var
+  ScriptModule: TScriptModule;
+
+implementation
+
+{$R *.dfm}
+
+procedure TScriptEngine.DataModuleCreate(Sender: TObject);
+begin
+  Lua := TLua.Create(self);
+  Lua.LibName := 'Script';
+  Lua.OnLoadLibs := @LoadLibs;
+  Lua.OnException := @ScriptExceptionHandler;
+end;
+
+procedure TScriptEngine.LoadLibs(LuaWrapper : TLua);
+begin
+  LuaWrapper.RegisterLuaMethod('Clear', @lua_Clear);
+  LuaWrapper.RegisterLuaMethod('print', @lua_print);
+  LuaWrapper.RegisterLuaMethod('HexToInt', @lua_HexToInt);
+  LuaWrapper.RegisterLuaMethod('SetCanvasSize', @lua_SetCanvasSize);
+  RegisterTurtle(LuaWrapper);
+end;
+
+procedure TScriptEngine.ScriptExceptionHandler(Title: ansistring;
+  Line: Integer; Msg: ansistring; var handled: Boolean);
+begin
+  Handled := true;
+  frmMain.memOutput.Lines.Add(format('%s (%d): %s', [Title, Line, msg]));
+end;
+
+procedure TScriptEngine.Execute(Source: AnsiString);
+begin
+  TurtleCanvas := Canvas;
+  Lua.LoadScript(Source);
+  Lua.Execute;
+end;
+
+initialization
+
+
+end.

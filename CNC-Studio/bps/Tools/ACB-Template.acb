@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding = "UTF-8"?>
+<colorBook>
+  <bookName>ACB Template</bookName>
+  <colorPage>
+    <pageColor>  <RGB8> <red>100</red> <green>100</green> <blue>100</blue> </RGB8> </pageColor>
+    <colorEntry>  <colorName>Test 100,100,100</colorName> <RGB8> <red>100</red> <green>100</green> <blue>100</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 102,102,102</colorName> <RGB8> <red>100</red> <green>102</green> <blue>102</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 104,104,104</colorName> <RGB8> <red>100</red> <green>104</green> <blue>104</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 106,106,106</colorName> <RGB8> <red>100</red> <green>106</green> <blue>106</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 108,108,108</colorName> <RGB8> <red>100</red> <green>108</green> <blue>108</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 110,110,110</colorName> <RGB8> <red>100</red> <green>110</green> <blue>110</blue> </RGB8> </colorEntry>
+  </colorPage>
+  <colorPage>
+    <pageColor>  <RGB8> <red>150</red> <green>150</green> <blue>150</blue> </RGB8> </pageColor>
+    <colorEntry>  <colorName>Test 150,150,150</colorName> <RGB8> <red>150</red> <green>150</green> <blue>150</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 152,152,152</colorName> <RGB8> <red>152</red> <green>152</green> <blue>152</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 154,154,154</colorName> <RGB8> <red>154</red> <green>154</green> <blue>154</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 156,156,156</colorName> <RGB8> <red>156</red> <green>156</green> <blue>156</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 158,158,158</colorName> <RGB8> <red>158</red> <green>158</green> <blue>158</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 160,160,160</colorName> <RGB8> <red>160</red> <green>160</green> <blue>160</blue> </RGB8> </colorEntry>
+  </colorPage>
+  <colorPage>
+    <pageColor>  <RGB8> <red>200</red> <green>200</green> <blue>200</blue> </RGB8> </pageColor>
+    <colorEntry>  <colorName>Test 200,200,200</colorName> <RGB8> <red>200</red> <green>200</green> <blue>200</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 202,202,202</colorName> <RGB8> <red>202</red> <green>202</green> <blue>202</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 204,204,204</colorName> <RGB8> <red>204</red> <green>204</green> <blue>204</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 206,206,206</colorName> <RGB8> <red>206</red> <green>206</green> <blue>206</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 208,208,208</colorName> <RGB8> <red>208</red> <green>208</green> <blue>208</blue> </RGB8> </colorEntry>
+    <colorEntry>  <colorName>Test 210,210,210</colorName> <RGB8> <red>210</red> <green>210</green> <blue>210</blue> </RGB8> </colorEntry>
+  </colorPage>
+</colorBook>

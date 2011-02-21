@@ -1,0 +1,42 @@
+(setq app_install_path "d:\\bps\\tools")
+(setq app_install_path_local "d:\\bps\\tools")
+;
+;;;---------- ENSURE PROPER PATH SETTINGS (UNC) -------------
+(if (not strlen app_install_path) (setq app_install_path ""))
+(if (> (strlen app_install_path) 0) (if (= (substr app_install_path (strlen app_install_path) 1) "\\") (setq app_install_path (substr app_install_path 1 (1- (strlen app_install_path))))))
+(if (> (strlen app_install_path) 0) (if (= (substr app_install_path (strlen app_install_path) 1) "/")  (setq app_install_path (substr app_install_path 1 (1- (strlen app_install_path))))))
+(if (> (strlen app_install_path) 0)
+  (setq app_install_path (strcat app_install_path "\\"))
+)
+;;;---------- ENSURE PROPER PATH SETTINGS (LOCAL) -------------
+(if (not app_install_path_local) (setq app_install_path_local ""))
+(if (> (strlen app_install_path_local) 0) (if (= (substr app_install_path_local (strlen app_install_path_local) 1) "\\") (setq app_install_path_local (substr app_install_path_local 1 (1- (strlen app_install_path_local))))))
+(if (> (strlen app_install_path_local) 0) (if (= (substr app_install_path_local (strlen app_install_path_local) 1) "/")  (setq app_install_path_local (substr app_install_path_local 1 (1- (strlen app_install_path_local))))))
+(if (> (strlen app_install_path_local) 0)
+  (setq app_install_path_local (strcat app_install_path_local "\\"))
+)
+;;;---------- SELECT WETHER TO USE UNC OR LOCAL PATH --------
+(setq my_application_path NIL)
+(if (findfile (strcat app_install_path       "application.arx")) (setq my_application_path app_install_path))
+(if (findfile (strcat app_install_path_local "application.arx")) (setq my_application_path app_install_path_local))
+(if (not my_application_path) (setq my_application_path ""))
+;
+;------------- APPLICATION ALERT-MESSAGE ---------------
+(defun myapp_alert (/) (alert "<My Application> wurde nicht korrekt installiert !?\n\n<My Application> is not correctly installed !?\n"))
+;
+;------------- LOAD APPLICATIONS MAIN CODE -------------
+(setq myarxfile (findfile (strcat my_application_path "application.arx")))
+(if (and (not c:myappcmd) myarxfile) (arxload myarxfile))
+(if (not myarxfile)  (myapp_alert))
+(if (not c:myappcmd) (defun c:myappcmd (/) (myapp_alert)))
+;
+;
+;============== INSERT YOUR BOOT CODE HERE =============
+;
+;
+;============== INSERT YOUR BOOT CODE HERE =============
+;
+;------------------ Display Popup ------------------------
+;;;(if c:myappcmd (menucmd "p16=+Sample.pop1"))
+;
+(princ)

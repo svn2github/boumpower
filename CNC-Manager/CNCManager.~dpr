@@ -1,0 +1,15 @@
+program CNCManager;
+
+uses
+  Forms,
+  Main in 'Main.pas' {MainForm},
+  LuaScriptEngine in 'LuaScriptEngine.pas' {ScriptModule: TDataModule};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(TScriptModule, ScriptModule);
+  Application.Run;
+end.

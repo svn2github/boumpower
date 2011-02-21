@@ -1,0 +1,164 @@
+unit CHILDWIN;
+
+interface
+
+uses Windows, Classes, Graphics, Forms, Controls, StdCtrls, Grids, ExtCtrls,
+  Buttons, SysUtils, JvSimpleXml;
+
+type
+  TMDIChild = class(TForm)
+    PanelTop: TPanel;
+    PanelBot: TPanel;
+    Panel1: TPanel;
+    StringGrid1: TStringGrid;
+    EditNO: TEdit;
+    EditOP: TEdit;
+    BtnOK: TBitBtn;
+    XMLData: TJvSimpleXML;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
+    procedure BtnOKClick(Sender: TObject);
+    procedure StringGrid1Click(Sender: TObject);
+  private
+    procedure AddEmptyRow;
+  public
+    procedure LoadFromFile(FileName : TFileName);
+    procedure SaveToFile(FileName : TFileName);
+  end;
+
+implementation
+
+{$R *.dfm}
+
+procedure TMDIChild.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TMDIChild.FormCreate(Sender: TObject);
+begin
+  with StringGrid1 do begin
+    ColCount := 13;
+    ColWidths[4] := 2 * ColWidths[4];
+    ColWidths[12] := 2 * ColWidths[12];
+    Cells[ 0,  0] := 'NO';
+    Cells[ 1,  0] := 'OP';
+    Cells[ 2,  0] := 'DECAL';
+    Cells[ 3,  0] := 'AUX';
+    Cells[ 4,  0] := 'D-TOT  HAUTEUR';
+    Cells[ 5,  0] := 'COURSE';
+    Cells[ 6,  0] := 'CAME';
+    Cells[ 7,  0] := 'COPEAU';
+    Cells[ 8,  0] := 'TOURS';
+    Cells[ 9,  0] := 'DEGRES';
+    Cells[10,  0] := 'DU T.';
+    Cells[11,  0] := 'AU T.';
+    Cells[12,  0] := 'REMARQUE';
+
+    Cells[0, 1] := 'Nouveau';
+    Row := 1;
+  end;
+  EditNO.Width := StringGrid1.ColWidths[0];
+  EditNO.Text := '1';
+  EditOP.Left := EditNO.Left + EditNO.Width +3;
+  XMLData.Root.Name := 'Calcam';
+  XMLData.Root.Items.Add('Program');
+  with XMLData.Root.Items.ItemNamed['Program'] do begin
+    Items.AddComment('Calcam', '(c) 2008, O. Baumgartner');
+    Items.Add('cnc');
+  end;
+end;
+
+procedure TMDIChild.LoadFromFile(FileName : TFileName);
+var
+  i, j : integer;
+  Tr, TrFrom : Integer;
+begin
+  XMLData.LoadFromFile(FileName);
+  StringGrid1.RowCount := 2;
+  for i := 1 to XMLData.Root.Items.ItemNamed['DemoData'].Items.ItemNamed['RowCount'].IntValue-1 do begin
+    for j := 1 to StringGrid1.ColCount-1 do
+      StringGrid1.Cells[j, i] := XMLData.Root.Items.ItemNamed['DemoData'].Items[i].Items.ItemNamed[StringGrid1.Cells[j, 0]].Value;
+
+    StringGrid1.Cells[0, i] := IntToStr(i);
+    TrFrom := StrToIntDef(StringGrid1.Cells[11, i-1], 0);
+    Tr := StrToIntDef(StringGrid1.Cells[ 8, i], 0);
+    StringGrid1.Cells[ 8, i] := IntToStr(Tr);
+    StringGrid1.Cells[10, i] := IntToStr(TrFrom);
+    StringGrid1.Cells[11, i] := IntToStr(TrFrom+Tr);
+
+    StringGrid1.RowCount := StringGrid1.RowCount+1;
+  end;
+  StringGrid1.Cells[0, StringGrid1.RowCount-1] := 'Nouveau';
+end;
+
+procedure TMDIChild.SaveToFile(FileName : TFileName);
+var
+  i, j : integer;
+begin
+  XMLData.Root.Items.Add('DemoData');
+  XMLData.Root.Items.ItemNamed['DemoData'].Clear;
+  XMLData.Root.Items.ItemNamed['DemoData'].Items.Add('RowCount', StringGrid1.RowCount-1);
+
+  // Add demo data
+  for i := 1 to StringGrid1.RowCount-1 do begin
+    XMLData.Root.Items.ItemNamed['DemoData'].Items.Add('Row'+IntToStr(i));
+
+    for j := 1 to StringGrid1.ColCount-1 do begin
+      XMLData.Root.Items.ItemNamed['DemoData'].Items[i].Items.
+        Add(StringGrid1.Cells[j, 0], StringGrid1.Cells[j, i]);
+    end;
+  end;
+
+  XMLData.SaveToFile(FileName);
+end;
+
+procedure TMDIChild.AddEmptyRow;
+begin
+  with XMLData.Root.Items.ItemNamed['Program'] do
+    Items.Add('cnc');
+  with StringGrid1 do begin
+    RowCount := RowCount+1;
+    Cells[0, RowCount-1] := 'Nouveau';
+  end;
+end;
+
+
+procedure TMDIChild.BtnOKClick(Sender: TObject);
+var
+  i : integer;
+  s : string;
+  Tr, TrFrom  : integer;
+begin
+  if EditOP.Text = '' then exit;
+  i := StrToIntDef(EditNO.Text, StringGrid1.RowCount-1);
+
+  s := EditOP.Text;
+
+
+  StringGrid1.Cells[ 0, i] := IntToStr(i);
+  StringGrid1.Cells[ 1, i] := Copy(s, 1, Pos(' ', s));
+
+  TrFrom := StrToIntDef(StringGrid1.Cells[11, i-1], 0);
+  Tr := StrToIntDef(StringGrid1.Cells[ 8, i], 0);
+  StringGrid1.Cells[ 8, i] := IntToStr(Tr);
+  StringGrid1.Cells[10, i] := IntToStr(TrFrom);
+  StringGrid1.Cells[11, i] := IntToStr(TrFrom+Tr);
+
+  if Pos('--', s)>0 then StringGrid1.Cells[12, i] := Copy(s, Pos('--', s)+2, 255);
+
+  XMLData.Root.Items.ItemNamed['Program'].Items[i].Value := EditOP.Text;
+
+  If i = StringGrid1.RowCount-1 then AddEmptyRow;
+  StringGrid1.Row := StringGrid1.Row+1;
+  EditNO.Text := StringGrid1.Cells[0, StringGrid1.Row];
+  EditOP.Text := XMLData.Root.Items.ItemNamed['Program'].Items[i+1].Value;
+end;
+
+procedure TMDIChild.StringGrid1Click(Sender: TObject);
+begin
+  EditNO.Text := StringGrid1.Cells[0, StringGrid1.Row];
+  EditOP.Text := XMLData.Root.Items.ItemNamed['Program'].Items[StringGrid1.Row].Value;
+end;
+
+end.

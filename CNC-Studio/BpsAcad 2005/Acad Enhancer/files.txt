@@ -1,0 +1,20 @@
+BPS-Acad
+
+Fichiers dépendants de la version d'AutoCAD
+  LTE-Kernel/BpsACAD.lsp        fichier chargé au lancement d'AutoCAD-LT
+  LTE-Kernel/BpsKernel-2k4.lsp  BpsKernel spécifique pour LT2004-LT2005
+  LTE-Kernel/BpsKernel2000.lsp  BpsKernel spécifique pour LT2000-LT2002
+
+  R13/BpsModules.lsp		
+
+Modules
+  BpsUI.lsp         Interface pour saisie utilisateur
+  BpsDXF.lsp	    Manipulation d'entités
+  BpsClipBrd.lsp    Support du presse-papier
+  BpsAcadEnh.lsp    Interface avec AcadEnhancer
+
+Support
+  BpsSTART.lsp      Fichier de démarrage des applications
+  BpsDebug.lsp      Outils de deboggage du Kernel
+  AcadInfo.lsp	    Dump de renseignements sur l'environnement
+

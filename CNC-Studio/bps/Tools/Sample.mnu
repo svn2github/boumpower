@@ -1,0 +1,9 @@
+
+***MENUGROUP=SampleApplication
+
+***POP1
+ID_sampleapplication   [Sample Application]
+               [---]
+ID_Sample_1    [Command 1 ...]^C^CCommand_1
+               [---]
+ID_Sample_2    [Command 2 ...]^C^CCommand_1

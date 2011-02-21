@@ -1,0 +1,645 @@
+******* LTE 2000 Kernel version v.1.9.3.2 *******
+
+Fixed :
+=======
+- finally fixes some problems related to Script file processing  - now, the original _Script command is used again
+- fixes a problem with color dialog when invoked by LISP LT 2004/2005
+- fixes a minor problem with locally defined variables and defun in LISP LT 2004/2005
+
+Improved :
+==========
+- "AutoCAD Simulation" has been improved
+- updated CADvent LT-Enabler with improved installation
+
+
+
+******* LTE 2000 Kernel version v.1.9.3.1 *******
+
+Fixed :
+=======
+- fixes one more calculation error in _Align command
+- fixes a minor ARX compatibility issue (i.e. ObjectDCL was affected)
+- fixes a minor issue related to GradientHatch function
+- fixes a major issue related to (subst) function in LISP LT 2004/2005
+- fixes a problem with LISP representation of 32-Bit integer numbers in LISP LT 2004/2005
+
+Improved :
+==========
+- improved compatibility for ARX applications (MOSS-MX, MagiCAD, and more)
+- implements a workaround for a LT 2005 problem related to CECOLOR system variable
+- all vlax-ldata-xxx functions are implemented for LISP LT 2004/2005
+- MLEdit command available - not all functions currently implemented yet
+- new commands : MLModi and -MLModi to modify properties of existing MultiLines
+
+
+******* LTE 2000 Kernel version v.1.9.3.0 *******
+
+Fixed :
+=======
+- fixes a minor issue related to Image/Detach command
+- fixes a minor problem in ARX/LISP compatibility when loading, unloading and reloading ARX files which define LISP functions and commands
+
+Improved :
+==========
+- all vlax-curve-xxx functions are implemented for LISP LT 2004/2005
+- GradientHatches are implemented in BHATCH and HATCHEDIT commands
+
+
+
+******* LTE 2000 Kernel version v.1.9.2.9 *******
+
+Fixed :
+=======
+- fixes several issues related to LISP and ARX compatibility
+- fixes some problems with -VPORTS/MVIEW command in non-English LT versions
+
+Improved :
+==========
+
+
+
+******* LTE 2000 Kernel version v.1.9.2.8 *******
+
+Fixed :
+=======
+- fixes an ARX compatibility problem with "SendStringToExecute" when sending Lisp expression in LT 2004/2005
+- fixes a stability problem with Lisp reactors in LISP LT 2004/2005
+- fixes missing HEIGHT command prompt in BOX command
+- fixes some issues in VLR LISP reactor functions (command and dwg reactors)
+- fixes an issue with command recognition, introduced in previous LTE Kernel build, unfortunately
+- fixes an error in ALIGN calculation
+
+Improved :
+==========
+
+
+
+******* LTE 2000 Kernel version v.1.9.2.7 *******
+
+Fixed :
+=======
+- fixes several compatibility issues related to ARX and LISP LT 2004
+- fixes keyboard input on ACI color page in color dialog
+- fixes a problem related to (grread) Lisp function
+- fixes an inactive icon in LTE toolbar
+- fixes an issue in LTE "AutoStart Application" list
+
+Improved :
+==========
+
+
+
+******* LTE 2000 Kernel version v.1.9.2.6 *******
+
+Fixed :
+=======
+- fixes an issue with (mapcar 'set ...) function in LISP LT 2004/2005 (i.e. effected the Spanner tool)
+- fixes a problem with Align command when UCS is not set to "World"
+
+Improved :
+==========
+- AutoCAD-Simulation has been improved to support more installers
+
+
+******* LTE 2000 Kernel version v.1.9.2.5 *******
+
+Fixed :
+=======
+- fixes a problem with callback function in (vlr-object-reactor) to LISP LT 2004/2005
+- fixes a problem with DIESEL expressions in ConvertMNU.exe tool
+- added ACI color index 9 to color dialog (forgotten before)
+- fixes a problem in command repetition when commands were started from menu
+
+Improved :
+==========
+- several compatibility improvements for LISP and ARX interfaces
+- added undocumented LISP function (fnsplitl) for LISP LT 2004/2005
+- added SETENV/GETENV commands for LISP compatibility
+- UCSVP command and systemvariable are redesigned to provide UCS-per-Viewport feature
+- MLSTYLE command has been added
+
+
+******* LTE 2000 Kernel version v.1.9.2.4 *******
+
+Fixed :
+=======
+- fixes several issues related to LISP LT 2004/2005
+- fixes some problems related to script file processing
+
+Improved :
+==========
+- several compatibility improvements for LISP and ARX interfaces
+- EAttEdit now offers Visibility switch for attributes
+- -VPorts and MView commands re-implemented to provide polygonal and entity-based viewports
+
+
+******* LTE 2000 Kernel version v.1.9.2.3 *******
+
+Fixed :
+=======
+- fixes a calculation issue in _Slice command
+- fixes several issues related to LISP LT 2004/2005
+
+Improved :
+==========
+- several performance improvements and better compatibility for LISP LT 2004/2005
+- LTE now provides full TrueColor support for LT 2004/2005, including CMYK color space and custom color books
+- CECOLOR system variable and command updated for TrueColor support
+
+
+******* LTE 2000 Kernel version v.1.9.2.2 *******
+
+Fixed :
+=======
+- fixes a minor issue related to union, subtract, interesect commands
+- fixes a minor issue related to synchronisation of 3dClip dialog within 3dOrbitView
+- fixes a rare instability bug related to special kind of autoloading Lisp and Arx programs
+- fixes a crash related to trim and other commands, when editing in a new, unsaved drawing
+- fixes a DCL management issue related to predefined OK/CANCEL/HELP buttons
+- fixes some minor issues with LISP LT 2004/2005
+- fixes some problems with Script command
+- fixes a problem with RefEdit
+
+Improved :
+==========
+- (vl-catch-all-xxxx) functions now behave exactly as original AutoLisp functions
+- "external" Lisp functions (align), (mirror3d), (rotate3d) have been implemented
+- improved compatibility for command "arx" and Lisp function (arx)
+
+
+******* LTE 2000 Kernel version v.1.9.2.1 *******
+
+Fixed :
+=======
+- several technical issues related to Lisp and Arx interfaces are fixed
+- fixes a minor stability problem related to Lisp SelectionSets has been fixed
+- an ARX/Lisp data transfer problem has been fixed
+- an ARX compatibility problem with LT 2000i and LT 2002 has been fixed
+
+Improved :
+==========
+- ARX and LISP compatibility have been improved in many details
+- improved findfile for Lisp and ARX applications
+- Performance improvements for LISP LT 2004/2005
+- LISP LT 2004/2005 : running Lisp code can be cancelled by Escape now
+
+
+******* LTE 2000 Kernel version v.1.9.2.0 *******
+
+Fixed :
+=======
+- several technical issues related to Lisp and Arx interfaces are fixed
+- fixes a minor stability problem related to Lisp commands
+- fixes some problems related to startup of LT and LTE
+- fixes a calculation bug in XClip command on rotated blockx/xrefs
+- fixes a problem in 3dOrbit command, when used inside paperspace viewport
+- MLine command fixed : first segment was not drawn in ortho mode if ortho is On
+
+Improved :
+==========
+- ARX and LISP compatibility have been improved in many details
+- undocumented "_Del" (delete file) command is implemented
+- Performance improvements for LISP LT 2004/2005
+- LISP LT 2004/2005 : VL Lisp reactor functions are implemented (vlr-....);
+  will be continued with vla/vlax-... functions coming soon
+
+
+******* LTE 2000 Kernel version v.1.9.1.0 *******
+
+Fixed :
+=======
+- a major stability error has been fixed, causing LT 2002-2005 to crash
+- a major memory management error in LISP LT 2004/2005 has been fixed
+- a large number of several issues related to Lisp, Arx, and commands is fixed
+- fixes a problem with NEW/QNEW/OPEN in script files
+- some minor issues with 3dOrbit and ReferenceEdit are fixed
+
+Improved :
+==========
+- ARX and LISP compatibility have been improved
+- performance of LISP LT 2004/2005 and overall performance of LT has been improved
+- commands _undefine/_redefine for better Lisp/Arx compatibility have been implemented
+- 3dOrbit and 3dOrbitView now use preselected entities
+- 3dOrbitView now allows to reselect entities from inside view dialog
+- MLine command has been implemented (MlEdit and MlStyle will follow)
+
+
+******* LTE 2000 Kernel version v.1.9.0.1 *******
+
+Fixed :
+=======
+- LTE Kernel uses completely new technology for better stability
+- fixes some problems related to command recognition
+- large number of bugs and issues related to LISP LT 2004/2005 are fixed
+- fixes several issues related to command recognition in LT 2005
+- fixes a stability error with LT 2005
+- fixes a strange LTE error message when plotting/publishing in Background mode
+- fixes calculation error for Center/Apex point option in Cylinder/Cone ACIS commands
+- fixes the problem with empty DWF plots (aceplotx.arx was not loaded) in all LT versions
+- fixes several problems with Lisp and Command recognition from inside script files
+- fixes problems with Alias recognition (Aclt.pgp and Acad.pgp)
+- fixes several problems with script files
+- fixes some issues related to 3dOrbit and 3dOrbitView
+- fixes some issues related to (mapcar), (lambda) and (command) functions (LISP LT 2004/2005)
+- fixes a problem with RefEdit in LT 2000
+- fixes an ARX compatibility problem with LT 2000
+
+Improved :
+==========
+- supports LT 2005 and 30-Days-Trial versions now
+- several compatibility improvements for ARX and LISP applications
+- (LT 2004 LISP) several compatibility improvements for LISP LT 2004/2005
+- more commands provided by LTE Kernel : BattMan, EAttEdit, LayerP, LayerPMode, 3DOrbitView
+- 3D Orbit commands completely implemented
+- 3D Orbit Viewer fixed and completed
+- Shademode command improved (no regens anymore)
+- added native Profile management in LT options dialog (LT 2004/2005 only)
+- added improved Reference Edit commands (RefEdit, -RefEdit, RefSet, RefClose)
+- allows Lisp usage from inside script files (LT 2004/2005)
+- several compatibility improvements for ARX
+- added TRACE command for all LT 2000-2005
+- added ACIS commands for LT 2004/2005 : box, wedge, cylinder, cone, torus, sphere
+- MInsert command reworked : now available for Lisp and Arx applications
+
+
+******* LTE 2000 Kernel version v.1.8.4.4 *******
+
+Fixed :
+=======
+- (LT 2004 LISP) fixes several issues and bugs related to LISP processing
+- (LT 2004 LISP) fixes wrong file output for (print), (princ) and (prin1) functions
+- fixes an error with Rotate3D/Mirror3D commands, when used with non-World UCS
+- fixes a technical problem that causes memory exceptions when closing LT
+
+Improved :
+==========
+- several compatibility improvements for ARX and LISP applications
+- (LT 2004 LISP) Lisp function implemented : (vmon), (defun-q)
+
+
+******* LTE 2000 Kernel version v.1.8.4.3 *******
+
+Fixed :
+=======
+- (LT 2004 LISP) some problems with KELVINATED Lisp files are fixed
+- (LT 2004 LISP) fixes a minor problem with handling DCL image tiles
+- (LT 2004 LISP) fixes a problem when function names were used as arguments to other functions
+- (LT 2004 LISP) fixes some problems with VPCLIP and MINSERT commands when used from Lisp
+
+Improved :
+==========
+- ARX command added for LT 2004
+- (LT 2004) LISP prompt has been improved in some compatibility details
+
+
+******* LTE 2000 Kernel version v.1.8.4.2 *******
+
+Fixed :
+=======
+- (LT 2004) several minor issues with common Lisp functions are fixed
+- (LT 2004) Lisp symbol names can start with a number now
+- (LT 2004) some problems with DCL interface functions are solved
+- (LT 2004) fixes an issue in communication between ARX and Lisp
+- (LT 2004) fixes a problem with (findfile <filename>) function
+- (LT 2004) fixes some stability problems with LT 2004
+- (LT 2004) fixes a memory exception error when closing LT 2004
+- (LT 2004) fixes a problem with handling XED data list in LISP
+- fixes a minor problem of LTSetup.exe with missing Dll
+
+Improved :
+==========
+- (Lisp LT 2004) (acad-push-dbmod) and (acad-push-dbmod) are implemented
+- Support for ObjectDCL 2004 is implemented
+- LISP prompt improved - now allows multi-line input like AutoLISP
+- MINSERT command added for LT 2004
+
+
+******* LTE 2000 Kernel version v.1.8.4.1 *******
+
+Fixed :
+=======
+- (LT 2004) several minor issues with Lisp functions are fixed
+- (LT 2004) problems with KELVINATED Lisp files are fixed
+- (LT 2004) block comments ;|...|; are properly handled now
+- (LT 2004) several issues with DCL related Lisp code are fixed
+- (LT 2004) problem with missing S::STARTUP is fixed
+- (LT 2004) Memory-Management problems are fixed
+
+Improved :
+==========
+- (Lisp LT 2004) VL functions "vl-sort" and "vl-sort-i" are implemented
+- Performance of "Lisp for LT 2004" has increased by around 100% 
+- LTSetup.exe and LTE are improved for non-adiministrator login
+
+
+******* LTE 2000 Kernel version v.1.8.4.0 *******
+
+Fixed :
+=======
+- fixes some problems with LTX based software from ManuSoft
+- fixes a timing problem when scriptfiles are used at LT startup
+
+Improved :
+==========
+- includes first Beta version of "Lisp for LT 2004" processor
+
+
+******* LTE 2000 Kernel version v.1.8.3.3 *******
+
+Fixed :
+=======
+- fixes a number of technical issues related to all LT versions
+- fixes a number of problems with commands
+
+Improved :
+==========
+- added support for AutoCAD LT 2004 ServicePack 1
+- some improvements related to finding files and LT overall stability
+
+
+******* LTE 2000 Kernel version v.1.8.3.2 *******
+
+Fixed :
+=======
+- fixes a number of technical issues related to all LT versions
+
+
+******* LTE 2000 Kernel version v.1.8.3.1 *******
+
+Fixed :
+=======
+- fixes a number of technical issues related to LT 2004
+
+Improved :
+==========
+- commands added for LT 2004 : AcisIn, AcisOut, Section, Slice, AttRedef
+
+
+******* LTE 2000 Kernel version v.1.8.3.0 *******
+
+Fixed :
+=======
+- fixes a problem with DoubleClick-Edit in LT 2004
+
+Improved :
+==========
+- commands added for LT 2004 : Sketch, SolidEdit
+
+
+******* LTE 2000 Kernel version v.1.8.2.0 *******
+
+Improved :
+==========
+- added nearly all missing commands for LT 2004
+
+
+******* LTE 2000 Kernel version v.1.8.1.2 *******
+
+Improved :
+==========
+- added support for LT 2000 Traditional Chinese (TC)
+- added support for LT 2004 30-Days-Trial version
+
+
+******* LTE 2000 Kernel version v.1.8.1.1 *******
+
+Improved :
+==========
+- added possibility for conditional load of specified arx/lisp files
+
+
+******* LTE 2000 Kernel version v.1.8.1.0 *******
+This is the first LTE Kernel with support for LT 2004
+
+Improved :
+==========
+- added support for LT 2004 (V.0.86)
+- command "Start" and Lisp function "(startapp...) added
+
+
+******* LTE 2000 Kernel version v.1.8.0.5 *******
+Fixed :
+=======
+- fixes a number of minor issues
+
+
+******* LTE 2000 Kernel version v.1.8.0.3 *******
+Fixed :
+=======
+- fixed an issue related to analysing proper PATH setting in Windows
+- fixed an issue related to preparation of AcSolids.arx/ltx
+
+Improved :
+==========
+- (getenv) / acedGetEnv() has been improved to support ACAD environment variable
+
+
+******* LTE 2000 Kernel version v.1.8.0.2 *******
+Fixed :
+=======
+- sometimes, AutoCAD LT sends unwanted "_RefEdit" command when double-clicking blocks or XRefs : this is now redirected to Properties Manager
+- support for Japanese LT2000i with _VERNUM=U.1.20 and _VERNUM=U.1.81 is fixed
+- support for Chinese LT2002 with _VERNUM=K.0.33 and _VERNUM=K.0.47 is fixed
+- support for several LT 2002 versions (locked by LMS Tech's C-Dilla) is fixed
+- a minor issue with DemandLoading arx modules and their initialization is fixed
+- minor issue fixed with executing _exit and _quit options for several commands, as compared with _exit and _quit commands
+
+Improved :
+==========
+- LTE kernel now supports LT2000i version with _VERNUM=U.1.00
+- LTE kernel now supports LT2002 version with _VERNUM=K.0.33
+- improved compatibility with self-CRC-checking applications (like "AcadXTabs")
+- now supports _Chamfer and _Fillets commands with solids
+
+
+******* LTE 2000 Kernel version v.1.7.9.9 *******
+Fixed :
+=======
+- Support for CAD-Standards tools has been reworked - CAD-Standards should now run fine without exceptions
+- a minor issue related to command recognition with non-US C-Dilla locked LT 2002 Trial version is fixed
+- a minor issue handling the _align command is fixed, which caused _align to calculate wrong rotations
+
+Improved :
+==========
+- improved internal timings and hooking & patching technology solves several minor issues and provides better compatibiliy for ARX applications;
+  this provides exact DemandLoad processing timing as with AutoCAD
+- LTE kernel now monitors getvar() function to detect all calls for non-existing system variables and provides proper results
+- LTE kernel now monitors getenv() function to detect all calls for non-existing environment variables and provides proper results
+- LTE kernel optimizes LT DemandLoad to ensure faster startup and overall performance
+- LTE kernel optimizes ExpressTools DemandLoad to ensure best compatibility
+- "Shell" command has been moved from LT-Extender into LTE Kernel, so it is available for LTE based applications
+- improved recognition and compatibility with drcauto's LTToolKit, SmartArchitect and so on
+
+
+******* LTE 2000 Kernel version v.1.7.9.8 *******
+Fixed :
+=======
+- a minor issue is fixed, which caused an "Unknown command" error when unlocked commands were started from Lisp/Arx
+- a minor issue with LTSetup/LTUninst is fixed, which could cause menu columns to disappear after un-registering LTE based applications
+
+Improved :
+==========
+- because of the fixed LTE kernel issue, compatibility with Lisp/Arx applications is improved
+
+
+******* LTE 2000 Kernel version v.1.7.9.7 *******
+Improved :
+==========
+- LTE kernel now uses a most intelligent algorithm for analysing, patching & hooking into arx modules to be loaded
+- is now safe against endless loops for corss-referencing file (Dll) dependencies
+- supports most complex arx applications with cross-referencing file (Dll) dependencies
+
+
+******* LTE 2000 Kernel version v.1.7.9.6 *******
+Fixed :
+=======
+- a minor issue fixed : Double-Click-Edit sometimes failed with Block Attributes "Unknown Command"
+
+
+******* LTE 2000 Kernel version v.1.7.9.5 *******
+Fixed :
+=======
+- a minor issue fixed : some arx files were only loaded in first instance of LT, but failed loading in second instance
+
+
+******* LTE 2000 Kernel version v.1.7.9.4 *******
+Fixed :
+=======
+- an issue has been fixed which has caused some instability under special conditions
+
+Improved :
+==========
+- added support for Dll files created by VB
+- internal algorithm to find requested files has been improved to be tolerant with faulty filenames and pathes
+- startup timing has been improved to avoid problems with "AutoCAD Today" window
+
+
+******* LTE 2000 Kernel version v.1.7.9.3 *******
+Improved :
+==========
+- LTE Kernel now supports shows messages using multiple languages : German, English
+
+
+******* LTE 2000 Kernel version v.1.7.9.2 *******
+
+Fixed :
+=======
+- several stability issues are fixed
+- more intelligent code hooking is implemented, preserving original LT arx/dll files from unnessecary code hooking
+
+Improved :
+==========
+- support added for 2 more LT 2000 i versions : U.0.91 and U.1.81 (U.1.20)
+
+
+******* LTE 2000 Kernel version v.1.7.9.0 *******
+
+Fixed :
+=======
+- a special stability problem is fixed (related to acEdJig & User input)
+
+
+******* LTE 2000 Kernel version v.1.7.8.5 *******
+
+Fixed :
+=======
+- several stability issues are fixed
+
+
+Improved :
+==========
+- compatibility with LTX Kernel by ManuSoft has been improved
+- recoginition of commands defined by DemandLoad has been improved and is fully compatible now
+
+
+******* LTE 2000 Kernel version v.1.7.0.0 *******
+
+Fixed :
+=======
+- several minor issues with files patching are fixed
+
+
+Improved :
+==========
+- LTE now only applies those in-memory modifications to LT, which are absolutely nessecary,
+  thus improving stability (previous kernel build sometimes caused trouble)
+
+- LTE now includes internal version management :
+  if several LTE based applications are installed using different LTE kernel versions,
+  this version management always ensures that the latest kernel build is loaded
+  => this prevents serious problems under such situations
+
+- because of optimized LTE kernel technology, unloading arx files works fine like in AutoCAD
+
+- performance and algorithm for file patching is improved
+
+- several workarounds for invalid DLL handling by Windows are implemented
+  (Windows sometimes loads the identical DLL file from short-named path and long-named 
+   path twice !! - LTE kernel will check this situatuon)
+
+- LTE kernel is now compatible with LTX kernel and LTX based applications :
+  if LTX is detected in-memory at LTE startup, LTE kernel will not provide the standard 
+  in-memory modifications, because LTX is loaded earlier and will provide these modifications;
+  nevetherless, LTE kernel *will* provide those technologies which are not provided by LTX :
+  - Lisp (prompt, file, menu)
+  - full Acis support
+  - LoadLibrary(), LoadLibraryEx() and GetModuleFileHandle() detection
+
+- a message box is displayed if invalid pathnames are defined in "PATH" variable
+  => especially WISE installer often places "X:\Pathname" with apostrophes into PATH 
+     variable, which is invalid under IWndows and could cause problems finding DLLs
+
+- LTSetup/LTUninst checks for running Aclt.exe to prevent useless registrations
+
+
+New Features :
+==============
+- _Union, _Subtract and _Intersect will accept solids now !!!
+
+- AutoLISP is now supported directly at the prompt !!!
+
+- AutoLISP is also supported in Menus now !!! (ConvertMNU.exe is not longer nessecary)
+
+  2 minor limitations with Menu files :
+
+  a) compiled menus (*.mnr/mnc) are always incompatible between AutoCAD & LT
+     => therefore, always use a copy of the menu to be used with LT
+        (MymMnu.mnu/mns => MyMenu-LT.mnu/mns)
+
+  b) do not use (load lispfile OnError) inside menu
+     the "OnError" argument is not supported within menus !
+     => therefore, use
+        1. (load lispfile) - returns T/NIL
+        -or-
+        2. (ltload lispfile OnError) - returns T/OnError
+     but you can use (load lispfile OnError) in any lisp file without problems
+
+
+Other news & interesting details :
+==================================
+During the last time, we have checked some most complex applications with partners & developers :
+as a result, we can now definitively state and proof, that LTX kernel can cause serious problems !
+Basically the major fault in LTX is related to loading arx files - the technology used by LTX 
+will confuse LTs internal arx module management ... this will sometimes cause problem when unloading
+modules (arx/dbx/dll) during LT shutdown. Especially applications with multiple & complex 
+dependencies between their arx/dbx modules are effected - usually leading into "FATAL ERROR..."
+and exception messages.
+
+This was proven with those mentioned applications - after LTE kernel is fully developed now, we 
+are proud that LTE kernel will *NOT* confuse LTs internal module management !
+
+Beside this major LTX fault, LTE offers many improvements compared to LTX :
+
+- arx/dbx/dll loading technology is fully compatible with LT !
+
+- all ::LoadModule() and ::LoadModuleEx() calls are monitored to apply file patching to DLL files,
+  if nessecary - then, the patched file is loaded; this will reduce the developers' efforts !!
+  Important: ::AfxLoadLibrary() calls are *not* monitored !
+
+- all ::GetModuleHandle() calls are monitored, to provide the correct HINSTANCE handle to
+  calling applications
+  i.e. ::GetModuleHandle("MyApp.arx" will return NULL - this unexpected result usually cause
+       problems for the applications ....
+       LTE kernel detects these calls and will return the correct HINSTANCE handle, based on
+       the file naming convention (*.arx -> *.ltx, *.dll -> *.dlx, *.dbx -> *.dxx, *.abc -> *.ab!)
+

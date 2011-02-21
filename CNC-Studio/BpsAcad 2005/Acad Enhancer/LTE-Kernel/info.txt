@@ -1,0 +1,10 @@
+Installation de LT-Extender
+
+Le programme LTSetup.exe doit être lancé pour terminer l'installation du logiciel.
+
+
+Si un mauvais fonctionnement d'AutoCAD LT venait à se produire, il est possible d'utiliser le programme
+
+Démarrer : Boum Power Software / Acad Enhancer / LTUninstall.exe
+
+Pour annuler l'installation du logiciel.

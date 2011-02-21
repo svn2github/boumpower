@@ -1,0 +1,58 @@
+(defun etos(arg)
+  (cond
+    ((null arg) "nil")
+    ((= T arg) "T")
+    ((= 'REAL (type arg)) (ftoa arg))
+    ((= 'STR (type arg)) (etosf arg))
+    ((= 'INT (type arg)) (itoa arg))
+    ((= 'SYM (type arg)) (strcat "'" (strcase (etosf arg)))) ; quoted
+    ((= 'LIST (type arg)) (strcat "("
+        (etos (car arg)) ; for list or dotted pair
+        (cond
+          ((null (cdr arg)) ")") ; just one element
+          ((listp (cdr arg)) (strcat
+            (apply 'strcat (mapcar '(lambda (x) (strcat " " (etos x))) (cdr arg))) ; list
+            ")")) ; a regular list
+          ( T (strcat " . " (etos (cdr arg)) ")")) ; dotted pair
+        )))
+    (T (etosf arg))
+  ))
+
+(defun StrRScan(s ss / p lenss)
+  (setq lenss (strlen ss)
+        p (- (strlen s) lenss))
+  (if (and (> lenss 0) (>= p lenss))
+    (while (and (/= (substr s p lenss) ss) (> p 0))
+      (setq p (1- p)))
+    (setq p 0))
+  p)
+
+; convert float to alpha
+(defun ftoa(x / s p1 p2)
+  (setq s (rtos x 1 16)
+        p2 (StrRScan s "E")
+        p1 (1- p2))
+  (while (= (substr s p1 1) "0")
+    (setq p1 (1- p1)))
+  (if (= (substr s p1 1) ".") (setq p1 (1+ p1)))
+  (strcat (substr s 1 p1) (substr s p2))
+)
+
+(defun etosf(arg / i f fname)
+  (setq f (open (setq fname (strcat (gettempdir) "~etos.tmp")) "w"))
+  (prin1 arg f)
+  (close f)
+  (setq f (open fname "r"))
+  (setq arg (read-line f))
+  (close f)
+  (close (open fname "w")) ; delete file
+  ; bypass bug in prin1...
+  ; replace " with \042
+  (setq i (1- (strlen arg)))
+  (while (> i 1)
+    (if (= (substr arg i 1) "\"")
+      (setq arg (strcat (substr arg 1 (1- i)) "\\042" (substr arg (1+ i)))))
+    (setq i (1- i))
+  )
+  arg ; result
+)

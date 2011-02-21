@@ -1,0 +1,121 @@
+//----------- General Settings ---------------
+[GENERAL]
+APPLICATION=<My Application>       // Application's Name
+ICONFILE=MyApp.ico                 // any valid icon resource (*.ico, *.exe, *.dll etc.) - if empty, the Acad icon is used
+MNUFILE=Sample.mnu                 // Menufile to integrate into AutoCAD
+MNLFILE=Sample.mnl                 // MenuLisp file to integrate, 1. line is modified with "(setq <SET_MNL_FILEPATH> <this_path>)"
+LNGFILE=Sample.ini                 // Language file to integrate, 1. line is modified with "<SET_LNG_LANGUAGE> <inst_lng>"
+LNGREGKEY=                           // Registry key where the Language selection is saved
+SET_MNL_FILEPATH=app_install_path  // Text for <MNLFILE> to insert as: "(setq <SET_MNL_FILEPATH> <this_dir>)"
+SET_LNG_LANGUAGE=LANGUAGE          // Text for <LNGFILE> to insert as: "<SET_LNG_LANGUAGE> <inst_lng>"
+MENUGROUP=SampleApplication        // Name of the Menu Group in <MNUFILE>
+POPUP=POP1                         // Name of Popup to show
+SHOW_POPUP=1                       // Show Popup:                 -1=DISABLE 0=OFF 1=ON
+CREATE_ICONS=1                     // Create Desktop-Icons:       -1=DISABLE 0=OFF 1=ON
+CREATE_SHORTCUTS=0                 // Create Startmenu-Shortcuts: -1=DISABLE 0=OFF 1=ON
+PROGRAMGROUP_NAME=My Application   // Name of the startmenu programgroup or empty, where to insert shortcut icons (SEE CREATE_SHORTCUTS)
+ALLOW_MULTI_INSTALLS=1             // 0=only 1 Program installation usable, 1=multiple installations usable
+ALLUSERS_ICONDESKTOP=0             // Desktop-Icons & Startmenu Group : 1=ALL USERS, 0=CURRENT USER ONLY
+CONVERT_UNC_2_LOCAL=1              // Use local drive mappings if available
+
+LT_INSTALL_PROG=LTSetup.exe        // LTX Registration program (or empty)
+LT_UNINSTALL_PROG=LTUninst.exe     // LTX Un-Registration program (or empty)
+
+//------------- DO NOT CHANGE ANY SETTINGS HERE !!! -------------
+SEARCHKEY_1=R16.0                  // To search for AutoCAD R16 versions
+SEARCHKEY_2=R15.0                  // To search for AutoCAD R15 versions
+SEARCHKEY_3=R14.0                  // To search for AutoCAD R14 versions
+AUTOCAD_INSTALL_BASEKEY=HKEY_LOCAL_MACHINE\SOFTWARE\Autodesk\AutoCAD
+AUTOCAD_PROFILE_BASEKEY=HKEY_CURRENT_USER\Software\Autodesk\AutoCAD
+LOCATION_KEY=AcadLocation          // Registry key to read AutoCAD installation dir
+PRODUCTNAME_KEY=ProductName        // Registry key to verify correctly installed AutoCAD
+VERIFY_PRODUCTNAME=UnKnown         // Value for <PRODUCTNAME_KEY> that indicates correctly installed AutoCAD
+PROFILE_KEY=Profiles               // Name of Sub-Key with Profiles-List below
+MENUS_KEY=Menus                    // Name of Sub-Key with Menu-Entries right
+MENUGROUP_KEY=Group                // Prefix in Menugroup-Itemlist of <MENUS_KEY> : "Group1, Group2, ..."
+MENUPOPUP_KEY=Pop                  // Prefix in Popups-Itemlist of <MENUS_KEY> : "Pop1, Pop2, ..."
+//------------- DO NOT CHANGE ANY SETTINGS HERE !!! -------------
+
+
+
+//------ Dialog Text/Messages: ENGLISH ----------
+[ENGLISH]
+MNUFILE=                        // optional : Language dependend Menufile to integrate into AutoCAD (or empty)
+MNLFILE=                        // optional : Language dependend MenuLisp file to integrate, 1. line is modified with "(setq <SET_MNL_FILEPATH> <this_path>)"  (or empty)
+TITLE=Register <My Application> with AutoCAD
+MSG=Please select all AutoCAD-Profiles where you want <My Application> to be integrated
+COL_ACAD=AutoCAD-Version
+COL_PATH=Installation-Path
+COL_PROFILE=Profile
+LT_MESSAGE=Registration especially for Acad LT
+BTN_LT_INSTALL=Register with Acad LT
+BTN_LT_UNINSTALL=Un-Register with Acad LT
+PROGRAM_PATH=<My Application> Path :
+BTN_COPY_PROFILE=Create new Profile
+BTN_DESKTOP=Create Desktop-Icons
+BTN_SHORTCUTS=Create Startmenu-Shortcuts
+BTN_POPUP=Show popup menu
+BTN_SAVE=Save
+BTN_CLOSE=Close
+MSG_NO_ACAD=No useable AutoCAD-Installations found !
+MSG_NO_PROFILE=No useable Profiles found !
+MSG_IS_SAVED=Your settings are saved into AutoCAD's Registry-Data.
+ASK_AT_EXIT=Your changed settings are not yet saved - exit anyway ?
+TITLE_COPY_PROFILE=Copy to new Profile
+MSG_COPY_PROFILE=Please specify the name for the newProfile ...
+BTN_PROFILE_OK=Save
+TIP_LT_INSTALL=Use this button to Register <My Application> for AutoCAD LT
+TIP_LT_UNINSTALL=Use this button to Un-Register <My Application> for AutoCAD LT
+TIP_COPY_PROFILE=You may copy the currently selected profile to a new profile name
+TIP_GLOBAL=This Registration-Program may be executed any time later
+TIP_ACAD_LIST=Select an AutoCAD-Version, to edit those Profile-Settings
+TIP_PROFILE_LIST=Select all Profiles where you want <My Application> to be working
+TIP_DESKTOP=this will create a separate Desktop-Icon for each selected AutoCAD-Profile
+TIP_SHORTCUT=this will create a separate Startmenu-Shortcut for each selected AutoCAD-Profile
+TIP_POPUP=This will show the <My Application>-Popup-Menu in AutoCAD
+TIP_LANGUAGE=Select Language / Sprache bestimmen
+TIP_SAVE=Saves your settings into AutoCAD's Registry-Data
+TIP_EXIT=Closes this Registrations-Dialog : Don't forget to save !
+TITLE_NOTICE=Please Note
+MSG_NO_PROFILE=Please select an existing profile first, that serves as a template for the new profile to be created !
+
+//------ Dialog Text/Messages: GERMAN -----------
+[DEUTSCH]
+MNUFILE=                        // optional : Language dependend Menufile to integrate into AutoCAD (or empty)
+MNLFILE=                        // optional : Language dependend MenuLisp file to integrate, 1. line is modified with "(setq <SET_MNL_FILEPATH> <this_path>)"  (or empty)
+TITLE=<My Application> bei AutoCAD anmelden
+MSG=Legen Sie bitte fest, in welchen AutoCAD-Profilen <My Application> arbeiten soll.
+COL_ACAD=AutoCAD-Version
+COL_PATH=Installations-Pfad
+COL_PROFILE=Profil
+LT_MESSAGE=Registrierung speziell für Acad LT
+BTN_LT_INSTALL=Anmelden bei Acad LT
+BTN_LT_UNINSTALL=Abmelden bei Acad LT
+PROGRAM_PATH=<My Application>-Pfad :
+BTN_COPY_PROFILE=Neues Profil erstellen
+BTN_DESKTOP=Desktop-Icons erstellen
+BTN_SHORTCUTS=Startmenü-Einträge erstellen
+BTN_POPUP=Popup-Menü anzeigen
+BTN_SAVE=Speichern
+BTN_CLOSE=Schliessen
+MSG_NO_ACAD=Keine verwendbaren AutoCAD-Installationen gefunden !
+MSG_NO_PROFILE=Keine verwendbaren Profile gefunden !
+MSG_IS_SAVED=Ihre Einstellungen wurden in den AutoCAD-Registry-Daten gespeichert.
+ASK_AT_EXIT=Ihre geänderten Einstellungen sind noch nicht gespeichert - trotzdem Beenden ?
+TITLE_COPY_PROFILE=Auf neues Profil kopieren
+MSG_COPY_PROFILE=Geben Sie bitte den Namen für das neue Profil an
+BTN_PROFILE_OK=Speichern
+TIP_LT_INSTALL=Hier kann <My Application> bei AutoCAD LT angemeldet werden
+TIP_LT_UNINSTALL=Hier wird <My Application> bei AutoCAD LT abgemeldet
+TIP_GLOBAL=Das Registrierungs-Programm kann auch jederzeit wieder gestartet werden
+TIP_COPY_PROFILE=Das gewählte Profil kann auf einen neuen Profilnamen kopiert werden
+TIP_ACAD_LIST=Markieren Sie eine AutoCAD-Version, um deren Profile zu bearbeiten
+TIP_PROFILE_LIST=Markieren Sie die Profile, in denen <My Application> arbeiten soll
+TIP_DESKTOP=für jedes der markierten AutoCAD-Profile wird automatisch ein Desktop-Icon erstellt.
+TIP_SHORTCUT=für jedes der markierten AutoCAD-Profile wird automatisch ein Startmenü-Eintrag erstellt.
+TIP_POPUP=Zeigt das <My Application>-Popup-Menü in AutoCAD an
+TIP_LANGUAGE=Sprache bestimmen / Select Language
+TIP_SAVE=Speichert Ihre Einstellungen in den AutoCAD-Registry-Daten ab
+TIP_EXIT=Beendet diesen Registrierungs-Dialog : Speichern nicht vergessen !
+TITLE_NOTICE=Hinweis
+MSG_NO_PROFILE=Wählen Sie ein bestehendes Profil, welches als Vorlage für das neu zu erstellende Profil dient !

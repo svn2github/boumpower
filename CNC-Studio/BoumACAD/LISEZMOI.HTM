@@ -1,0 +1,87 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>Untitled Normal Page</title>
+</head>
+
+<body bgcolor="#FFFFFF">
+
+<p align="center"><font size="7">*** Boum Power Software ***</font></p>
+
+<p align="center">&nbsp;</p>
+
+<p align="left">Table des matières</p>
+
+<ol>
+    <li><p align="left"><a href="#Installation">Installation</a></p>
+    </li>
+    <li><a href="#Links">Liens</a></li>
+</ol>
+
+<p align="left">&nbsp;</p>
+
+<h1 align="left"><a name="Installation"></a>Installation</h1>
+
+<p align="left">Les modifications suivantes sont à apporter au
+fichier Acad.lsp (noter que le nom de ce fichier peut varier d'une
+version à l'autre d'AutoCAD : AcadR13.lsp AcLT.lsp, etc) se référer
+à la documentation d'AutoCAD pour plus de détails.</p>
+
+<p>Ajouter la ligne suivante :</p>
+
+<dl>
+    <dd>(load &quot;BoumACAD&quot;)</dd>
+</dl>
+
+<p>Créer ou modifier la fonction S::STARTUP afin d'appeler (BoumAcadStartup)</p>
+
+<dl>
+    <dd>(defun S::STARTUP()</dd>
+    <dd><dl>
+            <dd>(BoumAcadStartup)</dd>
+            <dd>(princ)</dd>
+        </dl>
+    </dd>
+</dl>
+
+<blockquote>
+    <p>)</p>
+    <p>&nbsp;</p>
+</blockquote>
+
+<p align="left">Veiller également aux réglages d'AutoCAD: le
+chemin d'accès au répertoire d'installation de ce logiciel doit
+figurer dans :</p>
+
+<dl>
+    <dd><p align="left">Options/Préférences/Environnement/Support
+        (AutoCAD R13)</p>
+    </dd>
+</dl>
+
+<p>ou dans le</p>
+
+<dl>
+    <dd>chemin de recherche de fichiers de support (AutoACAD R14
+        ?, AutoCAD LT)</dd>
+</dl>
+
+<blockquote>
+    <dl>
+        <div align="left">
+        <dt>&nbsp;</dt>
+        </div>
+    </dl>
+</blockquote>
+
+<h1><a name="Links"></a>Liens</h1>
+
+<p>Quelques liens :</p>
+
+<p>Site de l'entreprise <a href="http://www.z-b.ch"
+target="_blank">Zahnd &amp; Bodenman SA</a></p>
+</body>
+</html>

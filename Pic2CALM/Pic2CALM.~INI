@@ -1,0 +1,124 @@
+[Processors]
+; Section=Liste de processeurs
+Pic16f84="Pic16f84", "Pic16c84"
+
+[Pic16f84]
+; Proc=Nom du processeur dans la ligne .proc
+; WordBits=nombre de bits par mots
+; Accumulators=liste des accumulateurs
+Proc=Pic16f84
+WordBits=14
+RegisterCount=$FF
+MemorySize=1024
+Accumulators='w'
+
+[Pic16f84.Labels]
+; Addrs=Label
+$000="RESET$"
+$004="INTERRUPT$"
+
+[Pic16f84.Registers]
+; Registre=RegisterName
+$00={FSR}
+$01=TMR0
+$02=PCL
+$03=F
+$04=FSR
+$05=PortA
+$06=PortB
+$07=Reg07 ! no use
+$08=EEDATA
+$09=EEADR
+$0A=PCLATH
+$0B=INTCON
+
+$62=Option
+$65=TrisA
+$66=TrisB
+$68=EECON1
+$69=EECON2
+
+[Pic16f84.Mnemonics]
+;    Mnemonic=Nom, Operands, Opcode
+;
+;      OpCode
+;        f     : file register
+;        b     : bit address
+;        k     : literal
+;        d     : destination select NE PAS UTILISER !!!,
+;                coder 2x l'instruction avec les bons Operands
+;
+;      Operands
+;        Addr    : Label pour Jump, Goto, Call, etc
+;        #Val,W  : Literal field, constant data
+;        Reg,W   : Register file address 0x00 to 0x7F, d=0 store in W
+;        W,Reg   : idem, mais attention si on utilise d car d=1 store in W
+;        Reg     : Register only
+;        W       : accumulator only
+;        Reg:#b  : bit-oriented operation
+;
+;    Les instructions non triviale comme ClrC, ClrZ, etc sont
+;    à mettre en fin de table pour être décodée.
+Mnemonic="Move", "#Val,W", "11 00xx kkkk kkkk"
+Mnemonic="Move", "W,Reg", "00 0000 1fff ffff"
+Mnemonic="Move", "Reg,W", "00 1000 0fff ffff"
+Mnemonic="Test", "Reg", "00 1000 1fff ffff"
+Mnemonic="Move", "W,Reg", "00 0000 0fff ffff"
+Mnemonic="Add", "#Val,W", "11 1110 kkkk kkkk"
+Mnemonic="Add", "Reg,W", "00 0111 0fff ffff"
+Mnemonic="Add", "W,Reg", "00 0111 1fff ffff"
+Mnemonic="Sub", "#Val,W", "11 1100 kkkk kkkk"
+Mnemonic="Sub", "Reg,W", "00 0010 0fff ffff"
+Mnemonic="Sub", "W,Reg", "00 0010 1fff ffff"
+Mnemonic="And", "#Val,W", "11 1001 kkkk kkkk"
+Mnemonic="And", "Reg,W", "00 0101 0fff ffff"
+Mnemonic="And", "W,Reg", "00 0101 1fff ffff"
+Mnemonic="Or", "#Val,W", "11 1000 kkkk kkkk"
+Mnemonic="Or", "Reg,W", "00 0100 0fff ffff"
+Mnemonic="Or", "W,Reg", "00 0100 1fff ffff"
+Mnemonic="Xor", "#Val,W", "11 1010 kkkk kkkk"
+Mnemonic="Xor", "Reg,W", "00 0110 0fff ffff"
+Mnemonic="Xor", "W,Reg", "00 0110 1fff ffff"
+Mnemonic="Swap", "Reg,W", "00 1110 0fff ffff"
+Mnemonic="Swap", "Reg", "00 1110 1fff ffff"
+Mnemonic="Clr", "Reg", "00 0001 1fff ffff"
+Mnemonic="Clr", "W", "00 0001 0xxx xxxx"
+Mnemonic="ClrWDT", "", "00 0000 0110 0100"
+Mnemonic="Sleep", "", "00 0000 0110 0011"
+Mnemonic="Not", "Reg", "00 1001 1fff ffff"
+Mnemonic="Not", "Reg,W", "00 1001 0fff ffff"
+Mnemonic="Inc", "Reg", "00 1010 1fff ffff"
+Mnemonic="Inc", "Reg,W", "00 1010 0fff ffff"
+Mnemonic="Dec", "Reg", "00 0011 1fff ffff"
+Mnemonic="Dec", "Reg,W", "00 0011 0fff ffff"
+Mnemonic="RLC", "Reg", "00 1101 1fff ffff"
+Mnemonic="RLC", "Reg,W", "00 1101 0fff ffff"
+Mnemonic="RRC", "Reg", "00 1100 1fff ffff"
+Mnemonic="RRC", "Reg,W", "00 1100 0fff ffff"
+Mnemonic="Clr", "Reg:#b", "01 00bb bfff ffff"
+Mnemonic="Set", "Reg:#b", "01 01bb bfff ffff"
+Mnemonic="IncSkip,EQ", "Reg", "00 1111 1fff ffff"
+Mnemonic="IncSkip,EQ", "Reg,W", "00 1111 0fff ffff"
+Mnemonic="DecSkip,EQ", "Reg", "00 1011 1fff ffff"
+Mnemonic="DecSkip,EQ", "Reg,W", "00 1011 0fff ffff"
+Mnemonic="TestSkip,BC", "Reg:#b", "01 10bb bfff ffff"
+Mnemonic="TestSkip,BS", "Reg:#b", "01 11bb bfff ffff"
+Mnemonic="Jump", "Addr", "10 1kkk kkkk kkkk"
+Mnemonic="Call", "Addr", "10 0kkk kkkk kkkk"
+Mnemonic="RetMove", "#Val,W", "11 01xx kkkk kkkk"
+Mnemonic="Ret", "", "00 0000 0000 1000"
+Mnemonic="RetI", "", "00 0000 0000 1001"
+Mnemonic="Nop", "", "00 0000 0xx0 0000"
+Mnemonic="ClrC", "", "01 0000 0000 0011"
+Mnemonic="SetC", "", "01 0100 0000 0011"
+Mnemonic="ClrD", "", "01 0000 1000 0011"
+Mnemonic="SetD", "", "01 0100 1000 0011"
+Mnemonic="ClrZ", "", "01 0001 0000 0011"
+Mnemonic="SetZ", "", "01 0101 0000 0011"
+Mnemonic="Skip,CS", "", "01 1100 0000 0011"
+Mnemonic="Skip,CC", "", "01 1000 0000 0011"
+Mnemonic="Skip,DS", "", "01 1100 1000 0011"
+Mnemonic="Skip,DC", "", "01 1000 1000 0011"
+Mnemonic="Skip,ZS", "", "01 1101 0000 0011"
+Mnemonic="Skip,ZC", "", "01 1001 0000 0011"
+

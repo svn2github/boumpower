@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Calcam>
+  <Program>
+    <!--(c) 2008, O. Baumgartner-->
+    <cnc>OP -- Ouverture</cnc>
+    <cnc>RPR H=17.61+1.80+0.1  -- Utilisation de calcul dans la commande</cnc>
+    <cnc>F -- Fermeture</cnc>
+    <cnc>S3 -- Sortie du N&#xB0;3 depuis DSecu</cnc>
+    <cnc>E5 D=DSecu+3.0 -- Utilisation d&apos;une variable dans les calculs</cnc>
+    <cnc>AP Dist=0.3, Copeau=0.0356 -- Param&#xE8;tre dans la commande</cnc>
+    <cnc/>
+  </Program>
+  <DemoData>
+    <RowCount>2</RowCount>
+    <Row1>
+      <Col1>OP </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>10</Col8>
+      <Col9/>
+      <Col10>0</Col10>
+      <Col11>10</Col11>
+      <Col12> Ouverture</Col12>
+    </Row1>
+    <Row2>
+      <Col1>RPR </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>0</Col8>
+      <Col9/>
+      <Col10>10</Col10>
+      <Col11>10</Col11>
+      <Col12/>
+    </Row2>
+  </DemoData>
+  <DemoData>
+    <RowCount>3</RowCount>
+    <Row1>
+      <Col1>OP </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>10</Col8>
+      <Col9/>
+      <Col10>0</Col10>
+      <Col11>10</Col11>
+      <Col12> Ouverture</Col12>
+    </Row1>
+    <Row2>
+      <Col1>RPR </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4>-19.51</Col4>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>13</Col8>
+      <Col9/>
+      <Col10>10</Col10>
+      <Col11>23</Col11>
+      <Col12> Utilisation de calcul dans la commande</Col12>
+    </Row2>
+    <Row3>
+      <Col1>F </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>0</Col8>
+      <Col9/>
+      <Col10>23</Col10>
+      <Col11>23</Col11>
+      <Col12> Fermeture</Col12>
+    </Row3>
+  </DemoData>
+  <DemoData>
+    <RowCount>6</RowCount>
+    <Row1>
+      <Col1>OP </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>10</Col8>
+      <Col9/>
+      <Col10>0</Col10>
+      <Col11>10</Col11>
+      <Col12> Ouverture</Col12>
+    </Row1>
+    <Row2>
+      <Col1>RPR </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4>-19.51</Col4>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>13</Col8>
+      <Col9/>
+      <Col10>10</Col10>
+      <Col11>23</Col11>
+      <Col12> Utilisation de calcul dans la commande</Col12>
+    </Row2>
+    <Row3>
+      <Col1>F </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>15</Col8>
+      <Col9/>
+      <Col10>23</Col10>
+      <Col11>38</Col11>
+      <Col12> Fermeture</Col12>
+    </Row3>
+    <Row4>
+      <Col1>S3 </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>8</Col8>
+      <Col9/>
+      <Col10>38</Col10>
+      <Col11>46</Col11>
+      <Col12> Sortie du N&#xB0;3 depuis DSecu</Col12>
+    </Row4>
+    <Row5>
+      <Col1>E5 </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4>0</Col4>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>0</Col8>
+      <Col9/>
+      <Col10>46</Col10>
+      <Col11>46</Col11>
+      <Col12> Utilisation d&apos;une variable dans les calculs</Col12>
+    </Row5>
+    <Row6>
+      <Col1>AP </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5>0.3</Col5>
+      <Col6/>
+      <Col7>0.0356</Col7>
+      <Col8>15</Col8>
+      <Col9/>
+      <Col10>46</Col10>
+      <Col11>61</Col11>
+      <Col12> Param&#xE8;tre dans la commande</Col12>
+    </Row6>
+  </DemoData>
+  <DemoData>
+    <RowCount>6</RowCount>
+    <Row1>
+      <Col1>OP </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>10</Col8>
+      <Col9/>
+      <Col10>0</Col10>
+      <Col11>10</Col11>
+      <Col12> Ouverture</Col12>
+    </Row1>
+    <Row2>
+      <Col1>RPR </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4>-19.51</Col4>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>13</Col8>
+      <Col9/>
+      <Col10>10</Col10>
+      <Col11>23</Col11>
+      <Col12> Utilisation de calcul dans la commande</Col12>
+    </Row2>
+    <Row3>
+      <Col1>F </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>15</Col8>
+      <Col9/>
+      <Col10>23</Col10>
+      <Col11>38</Col11>
+      <Col12> Fermeture</Col12>
+    </Row3>
+    <Row4>
+      <Col1>S3 </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>8</Col8>
+      <Col9/>
+      <Col10>38</Col10>
+      <Col11>46</Col11>
+      <Col12> Sortie du N&#xB0;3 depuis DSecu</Col12>
+    </Row4>
+    <Row5>
+      <Col1>E5 </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4>0</Col4>
+      <Col5/>
+      <Col6/>
+      <Col7/>
+      <Col8>0</Col8>
+      <Col9/>
+      <Col10>46</Col10>
+      <Col11>46</Col11>
+      <Col12> Utilisation d&apos;une variable dans les calculs</Col12>
+    </Row5>
+    <Row6>
+      <Col1>AP </Col1>
+      <Col2/>
+      <Col3/>
+      <Col4/>
+      <Col5>0.3</Col5>
+      <Col6/>
+      <Col7>0.0356</Col7>
+      <Col8>15</Col8>
+      <Col9/>
+      <Col10>46</Col10>
+      <Col11>61</Col11>
+      <Col12> Param&#xE8;tre dans la commande</Col12>
+    </Row6>
+  </DemoData>
+</Calcam>

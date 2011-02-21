@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Calcam>
+  <Program>
+    <!--(c) 2008, O. Baumgartner-->
+    <cnc>O -- Ouverture</cnc>
+    <cnc>RPR 17.61+1.80+0.1 -- Les calculs sont possible dans les commandes</cnc>
+    <cnc>F -- Fermeture</cnc>
+    <cnc>S3 -- Sortie du N&#xB0;3 depuis le DiamSecu</cnc>
+    <cnc>E5 DiamSecu+3.0 -- Entr&#xE9;e du N&#xB0;5, avec utilisation d&apos;une variable</cnc>
+    <cnc/>
+  </Program>
+  <DemoData>
+    <RowCount>6</RowCount>
+    <Row1>
+      <OP>O </OP>
+      <DECAL/>
+      <AUX/>
+      <D-TOT | HAUTEUR/>
+      <COURSE/>
+      <CAME/>
+      <COPEAU/>
+      <TOURS>10</TOURS>
+      <DEGRES/>
+      <DU T.>0</DU T.>
+      <AU T.>0</AU T.>
+      <REMARQUE> Ouverture</REMARQUE>
+    </Row1>
+    <Row2>
+      <OP>RPR </OP>
+      <DECAL/>
+      <AUX/>
+      <D-TOT | HAUTEUR/>
+      <COURSE/>
+      <CAME/>
+      <COPEAU/>
+      <TOURS>13</TOURS>
+      <DEGRES/>
+      <DU T.>0</DU T.>
+      <AU T.>0</AU T.>
+      <REMARQUE> Les calculs sont possible dans les commandes</REMARQUE>
+    </Row2>
+    <Row3>
+      <OP>F </OP>
+      <DECAL/>
+      <AUX/>
+      <D-TOT | HAUTEUR/>
+      <COURSE/>
+      <CAME/>
+      <COPEAU/>
+      <TOURS>15</TOURS>
+      <DEGRES/>
+      <DU T.>0</DU T.>
+      <AU T.>0</AU T.>
+      <REMARQUE> Fermeture</REMARQUE>
+    </Row3>
+    <Row4>
+      <OP>S3 </OP>
+      <DECAL/>
+      <AUX/>
+      <D-TOT | HAUTEUR/>
+      <COURSE/>
+      <CAME/>
+      <COPEAU/>
+      <TOURS>8</TOURS>
+      <DEGRES/>
+      <DU T.>0</DU T.>
+      <AU T.>0</AU T.>
+      <REMARQUE> Sortie du N&#xB0;3 depuis le DiamSecu</REMARQUE>
+    </Row4>
+    <Row5>
+      <OP>E5 </OP>
+      <DECAL/>
+      <AUX/>
+      <D-TOT | HAUTEUR/>
+      <COURSE/>
+      <CAME/>
+      <COPEAU/>
+      <TOURS>0</TOURS>
+      <DEGRES/>
+      <DU T.>0</DU T.>
+      <AU T.>0</AU T.>
+      <REMARQUE> Entr&#xE9;e du N&#xB0;5, avec utilisation d&apos;une variable</REMARQUE>
+    </Row5>
+    <Row6>
+      <OP/>
+      <DECAL/>
+      <AUX/>
+      <D-TOT | HAUTEUR/>
+      <COURSE/>
+      <CAME/>
+      <COPEAU/>
+      <TOURS/>
+      <DEGRES/>
+      <DU T./>
+      <AU T./>
+      <REMARQUE/>
+    </Row6>
+  </DemoData>
+</Calcam>

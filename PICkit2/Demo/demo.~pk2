@@ -1,0 +1,35 @@
+// Programme de test pour script PICkit2
+
+Script 'DEMO SOS'
+// Emmet un SOS à l'aide de la LED 'Busy'
+  Const
+    Trait = 50 // 50 * 5.46 ms =~ 0.25s
+    Point = 20 // 20 * 5.46 ms =~ 0.1s
+    Inter = 25 // 25 * 5.46 ms =~ 0.15s
+    Blanc = 90 // 90 * 5.46 ms =~ 0.5s
+
+begin
+  SOS:    Do
+            VddOn
+            BusyLedON
+            DelayLong(Point)
+            BusyLedOFF
+            DelayLong(Inter)
+          Loop( 2) // 3-1
+          DelayLong(Blanc)
+
+          Do
+            BusyLedON
+            DelayLong(Trait)
+            BusyLedOFF
+            DelayLong(Inter)
+          Loop( 2) // 3-1
+          DelayLong(Blanc)
+
+          Do
+            BusyLedON
+            DelayLong(Point)
+            BusyLedOFF
+            DelayLong(Inter)
+          Loop( 2) // 3-1
+end

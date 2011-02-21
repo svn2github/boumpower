@@ -1,0 +1,63 @@
+unit CncShellDlgs;
+
+interface
+
+uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, 
+  Buttons, ExtCtrls, Grids, ValEdit, ComCtrls;
+
+type
+  TMetadataDlg = class(TForm)
+    OKBtn: TButton;
+    CancelBtn: TButton;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    MetaEditor: TValueListEditor;
+    Splitter1: TSplitter;
+    Panel3: TPanel;
+    Image1: TImage;
+    TrackBar1: TTrackBar;
+    Label1: TLabel;
+    procedure FormCreate(Sender: TObject);
+  private
+    { déclarations privées }
+  public
+    function  Execute(FileName : TFileName) : boolean;
+    procedure AddMetadata(const KeyName, Desc, Value, Mask: string; MaxLen : integer; CanEdit : boolean);
+  end;
+
+var
+  MetadataDlg: TMetadataDlg;
+
+implementation
+
+{$R *.dfm}
+
+function TMetadataDlg.Execute(FileName : TFileName) : boolean;
+begin
+  result := false;
+  Show;
+end;
+
+
+procedure TMetadataDlg.FormCreate(Sender: TObject);
+begin
+  AddMetadata('Machine',  'Machine', '', '', 18, true);
+  AddMetadata('Customer', 'Client', '', '', 18, true);
+  AddMetadata('Object',   'Objet', '', '', 18, true);
+  AddMetadata('Drawing',  'Plan', '', '', 18, true);
+  AddMetadata('Thumbnail', 'Aperçu', '', '', 18, false);
+end;
+
+procedure TMetadataDlg.AddMetadata(const KeyName, Desc, Value, Mask: string; MaxLen : integer; CanEdit : boolean);
+begin
+  MetaEditor.InsertRow(KeyName, Value, true);
+  with MetaEditor.ItemProps[KeyName] do begin
+    KeyDesc := Desc;
+    MaxLength := MaxLen;
+    EditMask := Mask;
+    ReadOnly := not CanEdit;
+  end;
+end;
+
+
+end.

@@ -1,0 +1,11 @@
+#include "cindlg.h"
+
+CINDLG DIALOG
+    60, 60, 182, 70
+          STYLE WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+          CAPTION "CIN"
+BEGIN
+    DEFPUSHBUTTON "OK", IDOK, 36, 42, 42, 12
+    EDITTEXT IDE_EDIT1, 88, 15, 74, 12
+    LTEXT "CIN >>", -1, 24, 18, 60, 10
+END
