@@ -1,0 +1,143 @@
+unit RelocateDialog;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Forms, Dialogs, Controls, StdCtrls,
+  Buttons, IntelHEX;
+
+type
+  TRelocateDlg = class(TForm)
+    OKBtn: TButton;
+    CancelBtn: TButton;
+    HelpBtn: TButton;
+    SrcList: TListBox;
+    DstList: TListBox;
+    SrcLabel: TLabel;
+    DstLabel: TLabel;
+    IncludeBtn: TSpeedButton;
+    CopyBtn: TSpeedButton;
+    ExcludeBtn: TSpeedButton;
+    EditOffset: TEdit;
+    procedure IncludeBtnClick(Sender: TObject);
+    procedure ExcludeBtnClick(Sender: TObject);
+    procedure CopyBtnClick(Sender: TObject);
+  private
+    { déclarations privées }
+  public
+    { déclarations publiques }
+    procedure SetItem(List: TListBox; Index: Integer);
+    function GetFirstSelection(List: TCustomListBox): Integer;
+    procedure SetButtons;
+    function Execute(Source, Dest : TIntelHexFile) : integer;
+  end;
+
+var
+  RelocateDlg: TRelocateDlg;
+
+implementation
+
+{$R *.dfm}
+
+procedure TRelocateDlg.IncludeBtnClick(Sender: TObject);
+var
+  Index: Integer;
+begin
+  Index := GetFirstSelection(SrcList);
+  DstList.Items.AddObject(Format('[Relocated] %s', [SrcList.Items[Index]]),
+                          SrcList.Items.Objects[Index]);
+  SrcList.Items.Delete(Index);
+  SetItem(SrcList, Index);
+end;
+
+procedure TRelocateDlg.CopyBtnClick(Sender: TObject);
+var
+  Index: Integer;
+begin
+  Index := GetFirstSelection(SrcList);
+  DstList.Items.AddObject(SrcList.Items[Index],
+                          SrcList.Items.Objects[Index]);
+  SrcList.Items.Delete(Index);
+  SetItem(SrcList, Index);
+end;
+
+
+procedure TRelocateDlg.ExcludeBtnClick(Sender: TObject);
+var
+  Index: Integer;
+  S : String;
+begin
+  Index := GetFirstSelection(DstList);
+  S := DstList.Items[Index];
+  if S[1]='[' then Delete(S, 1, Pos(']', S)+1);
+  SrcList.Items.AddObject(S, DstList.Items.Objects[Index]);
+  DstList.Items.Delete(Index);
+  SetItem(DstList, Index);
+end;
+
+procedure TRelocateDlg.SetButtons;
+var
+  SrcEmpty, DstEmpty: Boolean;
+begin
+  SrcEmpty := SrcList.Items.Count = 0;
+  DstEmpty := DstList.Items.Count = 0;
+  IncludeBtn.Enabled := not SrcEmpty;
+  CopyBtn.Enabled := not SrcEmpty;
+  ExcludeBtn.Enabled := not DstEmpty;
+end;
+
+function TRelocateDlg.GetFirstSelection(List: TCustomListBox): Integer;
+begin
+  for Result := 0 to List.Items.Count - 1 do
+    if List.Selected[Result] then Exit;
+  Result := LB_ERR;
+end;
+
+procedure TRelocateDlg.SetItem(List: TListBox; Index: Integer);
+var
+  MaxIndex: Integer;
+begin
+  with List do
+  begin
+    SetFocus;
+    MaxIndex := List.Items.Count - 1;
+    if Index = LB_ERR then Index := 0
+    else if Index > MaxIndex then Index := MaxIndex;
+    Selected[Index] := True;
+  end;
+  SetButtons;
+end;
+
+function TRelocateDlg.Execute(Source, Dest : TIntelHexFile) : integer;
+var
+  i,j : integer;
+  Offset : integer;
+begin
+  SrcLabel.Caption := ExtractFileName(Source.FileName);
+  SrcList.Clear;
+  i := 0;
+  while i < Source.HexSections.Count do begin
+    if Source.HexSections.Item[i].Count>0 then
+      SrcList.AddItem(Source.HexSections.Item[i].SectionName, Source.HexSections.Item[i]);
+    inc(i);
+  end;
+  SetButtons;
+  result := ShowModal;
+  if result <> mrOK then exit;
+  TryStrToInt(EditOffset.Text, Offset);
+  i := 0;
+  while i < DstList.Items.Count do begin
+    j := 0;
+    while j< TIntelHexSection(DstList.Items.Objects[i]).Count do begin
+      with TIntelHexSection(DstList.Items.Objects[i]).Item[j] do
+        if DstList.Items[i][1] = '[' then
+          Dest.AddData(Address+Offset, DataPtr^, ByteCount)
+        else
+          Dest.AddData(Address, DataPtr^, ByteCount);
+      inc(j);
+    end;
+    inc(i);
+  end;
+end;
+
+end.

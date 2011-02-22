@@ -1,0 +1,123 @@
+object BootloaderDlg: TBootloaderDlg
+  Left = 245
+  Top = 108
+  BorderStyle = bsDialog
+  Caption = 'Relocated Bootloader Wizard'
+  ClientHeight = 327
+  ClientWidth = 488
+  Color = clBtnFace
+  ParentFont = True
+  OldCreateOrder = True
+  Position = poScreenCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object OKBtn: TButton
+    Left = 167
+    Top = 292
+    Width = 75
+    Height = 25
+    Caption = 'OK'
+    Default = True
+    Enabled = False
+    ModalResult = 1
+    TabOrder = 0
+  end
+  object CancelBtn: TButton
+    Left = 247
+    Top = 292
+    Width = 75
+    Height = 25
+    Cancel = True
+    Caption = 'Annuler'
+    ModalResult = 2
+    TabOrder = 1
+  end
+  object RadioGroup1: TRadioGroup
+    Left = 8
+    Top = 8
+    Width = 473
+    Height = 121
+    Caption = 'Booloader'
+    TabOrder = 2
+  end
+  object MCHPUSB: TRadioButton
+    Left = 32
+    Top = 24
+    Width = 337
+    Height = 17
+    Caption = 'Microchip MCHPUSB Bootloader [0x0000 .. 0x07FF]'
+    TabOrder = 3
+    OnClick = BootloaderCheckClick
+  end
+  object HID: TRadioButton
+    Left = 32
+    Top = 48
+    Width = 337
+    Height = 17
+    Caption = 'Microchip HID Bootloader [0x0000 .. 0x0FFF]'
+    TabOrder = 4
+    OnClick = BootloaderCheckClick
+  end
+  object VASCO: TRadioButton
+    Left = 32
+    Top = 72
+    Width = 337
+    Height = 17
+    Caption = 'VASCO Bootloader [0x0000 .. 0x1FFF]'
+    TabOrder = 5
+    OnClick = BootloaderCheckClick
+  end
+  object FileSelectCB: TComboBox
+    Left = 32
+    Top = 96
+    Width = 433
+    Height = 21
+    ItemHeight = 13
+    TabOrder = 6
+    OnChange = SelectCBChange
+  end
+  object RadioGroup2: TRadioGroup
+    Left = 8
+    Top = 136
+    Width = 473
+    Height = 65
+    Caption = 'Application'
+    TabOrder = 7
+  end
+  object AppSelectCB: TComboBox
+    Left = 32
+    Top = 160
+    Width = 433
+    Height = 21
+    Enabled = False
+    ItemHeight = 13
+    TabOrder = 8
+    OnChange = SelectCBChange
+  end
+  object RadioGroup3: TRadioGroup
+    Left = 8
+    Top = 216
+    Width = 473
+    Height = 65
+    Caption = 'Configuration bits'
+    TabOrder = 9
+  end
+  object ConfigSelectCB: TComboBox
+    Left = 32
+    Top = 240
+    Width = 433
+    Height = 21
+    Enabled = False
+    ItemHeight = 13
+    TabOrder = 10
+    OnChange = SelectCBChange
+  end
+  object OpenDialog: TJvOpenDialog
+    DefaultExt = 'hex'
+    Filter = 'Fichier hex (*.hex)|*.hex'
+    Height = 0
+    Width = 0
+    Left = 432
+    Top = 24
+  end
+end

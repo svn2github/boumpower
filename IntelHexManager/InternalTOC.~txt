@@ -1,0 +1,9 @@
+[Directory\MicrochipHID]
+NumFiles=2
+[Directory\MicrochipHID\File0]
+Name=MICROCHIP_HID_0000.HEX
+Desc=Microchip HID demo0
+[Directory\MicrochipHID\File1]
+Name=MICROCHIP_HID_0001.HEX
+Desc=Microchip HID demo1
+
