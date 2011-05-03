@@ -228,17 +228,9 @@ object Form1: TForm1
   end
   object IdIPWatch1: TIdIPWatch
     Active = False
+    HistoryEnabled = False
     HistoryFilename = 'iphist.dat'
     Left = 456
     Top = 40
-  end
-  object IdTelnet1: TIdTelnet
-    MaxLineAction = maException
-    ReadTimeout = 0
-    Port = 23
-    OnDataAvailable = IdTelnet1DataAvailable
-    Terminal = 'dumb'
-    Left = 408
-    Top = 80
   end
 end

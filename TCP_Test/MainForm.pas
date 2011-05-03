@@ -31,7 +31,6 @@ type
     GroupBox1: TGroupBox;
     TelnetCB: TCheckBox;
     IdIPWatch1: TIdIPWatch;
-    IdTelnet1: TIdTelnet;
     procedure ClientServerClick(Sender: TObject);
     procedure ConnectBtnClick(Sender: TObject);
     procedure TcpClient1Error(Sender: TObject; SocketError: Integer);
