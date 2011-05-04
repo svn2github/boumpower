@@ -4,7 +4,8 @@
 // (c)2011 www.boumpower.ch  
  
   $url = 'http://www.danseinfo.ch/';
- 
+  $jours = array("Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi","Samedi");
+  
 // build Google Agenda Button 
  function GoogleAgendaButton($text, $from_date, $to_date, $sprop, $details="", $location="") {
     $tag = "<a href=\"http://www.google.com/calendar/event?action=TEMPLATE" .
@@ -61,7 +62,7 @@
         echo "      <item>\n";
 // don't use pubDate, because it's future        
 //        echo "        <pubDate>" . date("r", $date) . "</pubDate>";
-        echo "        <title>" . date("d.m.Y", $date) . " " . trim($a->plaintext) . "</title>\n";
+        echo "        <title>" . $jours[date("w")] . date(" d.m.Y", $date) . " " . trim($a->plaintext) . "</title>\n";
         echo "        <link>" . $a->href . "</link>\n";
         echo "        <guid>" . $a->href . "</guid>\n";
         echo "        <description><![CDATA[" . $body->innertext . 
@@ -73,7 +74,10 @@
    
   echo "  </channel>\n";
   echo "</rss>\n";
-    
+  // clean up memory
+  $html->clear();
+  unset($html);
+        
   // Dump contents (without tags) from HTML for debug
  // echo $html->plaintext;
 ?>
