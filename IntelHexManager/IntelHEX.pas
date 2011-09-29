@@ -58,6 +58,7 @@ type
     procedure   CopyTo(HexFile : TIntelHexFile; RelocateOffset : integer);
     procedure   ReportStats(S : TStrings; var TotalBytes : cardinal; ReportMode : TReportMode);
     procedure   DrawMemoryMap(ABitMap : TBitMap; BytesOnLine : integer);
+    function    GetData(Offset : cardinal; var Buffer; BufferSize : integer; Fill : byte = $FF) : boolean;
   public
     property Item[Index : integer] : TIntelHexRecord read GetItem;
     property Count : integer read GetCount;
@@ -77,7 +78,7 @@ type
   public
     constructor Create;
     destructor  Destroy; override;
-    function   Add(SectionName : string; RangeMin, RangeMax : cardinal) : TIntelHexSection;
+    function    Add(SectionName : string; RangeMin, RangeMax : cardinal) : TIntelHexSection;
     function    FindSectionIndex(Address : cardinal) : integer;
     function    FindSection(Address : cardinal) : TIntelHexSection;
     function    FindSectionByName(const SectionName : string; var Dest : TIntelHexSection) : boolean;
@@ -85,6 +86,7 @@ type
     procedure   CopyTo(HexFile : TIntelHexFile; RelocateOffset : integer);
     procedure   ReportStats(S : TStrings; var TotalBytes : cardinal; ReportMode : TReportMode);
     procedure   DrawMemoryMap(ABitMap : TBitMap; BytesOnLine : integer);
+    function    GetData(Offset : cardinal; var Buffer; BufferSize : integer; Fill : byte = $FF) : boolean;
   public
     property Item[Index : integer] : TIntelHexSection read GetItem;
     property Count : integer read GetCount;
@@ -116,6 +118,7 @@ type
     procedure   SaveToStream(Stream : TStream);
     procedure   ReportStats(S : TStrings; ReportMode : TReportMode);
     procedure   DrawMemoryMap(ABitMap : TBitMap; BytesOnLine : integer);
+    function    GetData(Offset : cardinal; var Buffer; BufferSize : integer; Fill : byte = $FF) : boolean;
   public
     property FileName : string read FFileName;
     property HexSections : TIntelHexSections read FSections;
@@ -307,6 +310,35 @@ begin
   end;
 end;
 
+function TIntelHexSection.GetData(Offset : cardinal; var Buffer; BufferSize : integer; Fill : byte = $FF) : boolean;
+var
+  Rec : TIntelHexRecord;
+  Diff   : integer; // différence entre le début du record et l'offset
+  Count  : integer; // nombre de bytes à copier
+  Index  : integer; // position dans le Buffer;
+begin
+  result := false;
+  FillChar(Buffer, BufferSize, Fill);
+  if not FindFirst(Offset, BufferSize, Rec) then exit;
+  result := true;
+  Index := 0; // début du buffer
+//  while (Rec <> nil) and (Rec.Address <= Offset+Index) and (Index < BufferSize) do begin
+  while (Rec <> nil) and (Index < BufferSize) do begin
+    Diff := Offset+Index-Rec.Address;
+    if Diff < 0 then begin
+      Index := Index-Diff;
+      Diff := 0;
+    end;
+    Count := Min(Rec.ByteCount-Diff, BufferSize-Index);
+    if Count >0 then begin
+      Move(Rec.DataPtr^[Diff], TByteArray(Buffer)[Index], Count);
+      Inc(Index, Count);
+    end;
+    FindNext(Rec, Rec);
+  end;
+end;
+
+
 {--------------------------------------------------------------------------------------------------------}
 
 constructor TIntelHexSections.Create;
@@ -425,6 +457,17 @@ begin
     Inc(i);
   end;
 end;
+
+function TIntelHexSections.GetData(Offset : cardinal; var Buffer; BufferSize : integer; Fill : byte) : boolean;
+var
+  i : integer;
+begin
+  result := false;
+  i := FindSectionIndex(Offset);
+  if i < 0 then exit;
+  result := Item[i].GetData(Offset, Buffer, BufferSize, Fill);
+end;
+
 
 {--------------------------------------------------------------------------------------------------------}
 
@@ -745,6 +788,12 @@ begin
   FSections.DrawMemoryMap(ABitmap, BytesOnLine);
 end;
 
+function TIntelHexFile.GetData(Offset : cardinal; var Buffer; BufferSize : integer; Fill : byte = $FF) : boolean;
+begin
+  result := FSections.GetData(Offset, Buffer, BufferSize, Fill);
+end;
+
+
 {--------------------------------------------------------------------------------------------------------}
 
 procedure DrawMemoryBlockOnMap(ABitmap : TBitmap; BytesOnLine : integer; Address : cardinal; Count : integer);
@@ -820,3 +869,4 @@ begin
 end;
 
 end.
+
