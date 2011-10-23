@@ -1,37 +1,22 @@
-WScript.Echo("Cypher script for subversion");
+// Usage :
+// Start_Commit Hook  WScrip "Path to this script" /c "PassPhrase"
+// Post_update  Hook  WScrip "Path to this script" /d "PassPhrase"
 
-gnuPG = "\"c:\\Program files\\GNU\\gnuPG\\gpg.exe\"";	// Path of gnuPG
-oShell = WScript.CreateObject("WScript.Shell");		// Shell object
-RetCode = 0;						// Script return code
+gnuPG = "\"c:\\Program files\\GNU\\gnuPG\\gpg.exe\"";		// Path of gnuPG
+CypherLog = "svncypher.log";					// Log file name
 
-function crypt(filename, passphrase) 
-{
-	WScript.Echo("Crypt " + filename + " PassPhrase = " + passphrase);
- 	ret = oShell.Run(gnuPG + " --batch --yes --passphrase \"" + passphrase +"\" --armor --symmetric \"" + filename +"\"", 9, true);
-	return(ret);
-};
+var FSO = WScript.CreateObject("Scripting.FileSystemObject");
+var oShell = WScript.CreateObject("WScript.Shell");		// Shell object
+var message = "Cypher script for Remote Control Embedded Device -> Windows\n\n";
+var RetCode = 0;						// Script return code
+var Ret;
 
-function decrypt(filename, passphrase) 
-{
-	WScript.Echo("Decrypt " + filename + " PassPhrase = " + passphrase);
-	oShell.Run("cmd /C copy \"" + filename + "\" \"" + filename + ".old\" /Y", 5, true);
-	ret = oShell.Run(gnuPG + " --batch --yes --passphrase \"" + passphrase +"\" -d -o \"" + filename +"\" \"" + filename +".asc\"", 9, true);
-	if (ret != 0) WScript.Echo("ERROR, check ", filename, ".old (RetCode=", ret, ")");
-	return(ret);
-}
-
-function filecopy(sourcename, destname)
-{
-	WScript.Echo("Copy " + sourcename + " " + destname);
-	oShell.Run("cmd /C copy \"" + sourcename + "\" \"" + destname + "\" /Y", 5, true);
-	return(0);
-};
 
 args = WScript.Arguments.length;
 
 if (args < 2) 
 {
-  	WScript.Echo("usage: svncypher [/c, /d] \"passphrase\" ");
+  	WScript.Echo("!!! usage: svncypher [/c, /d] \"passphrase\" ");
 	WScript.Quit(-1);
 };
 
@@ -41,19 +26,78 @@ passphrase = WScript.Arguments.Item(1);
 
 if (mode == "/c")
 { // put here action to do for /c (crypt) argument
-	filecopy("Test.txt", "");
-	RetCode = crypt("Test.txt", passphrase);
+	if (MoreRecent("RemoteWidgets.pas", CypherLog)) {
+	  FSO.CopyFile("Release\\Win32\\RemoteWidgets.dcu", "RemoteWidgets.dcu");
+	  message += "File copied      : Release\\Win32\\RemoteWidgets.dcu\n";
+	  Ret = crypt("RemoteWidgets.pas", passphrase);
+	  if (Ret != 0) 
+		RetCode = Ret
+  	  else {
+		AddToCypherLog("Crypted RemoteWidgets.pas");		
+		message += "File crypted     : RemoteWidgets.pas with "+passphrase+"\n";
+	       }
+	}
 }
 
 if (mode == "/d")
 { // put here action to do for /d (decrypt) argument
-	RetCode = decrypt("Test.txt", passphrase);
+	if (MoreRecent("RemoteWidgets.pas.asc", CypherLog)) {
+	  FSO.CopyFile("RemoteWidgets.pas", "RemoteWidgets.pas.old");
+	  message += "File copied      : RemoteWidgets.pas.old\n";
+  	  Ret = decrypt("RemoteWidgets.pas", passphrase);
+	  if (Ret != 0) {
+	  	RetCode = Ret;
+		message += "ERROR, check RemoteWidgets.pas.old to restore"; 
+	    }
+	  else {
+		AddToCypherLog("Decrypted RemoteWidgets.pas");		
+		message += "File decrypted : RemoteWidgets.pas with "+passphrase+"\n";
+		FSO.DeleteFile("RemoteWidgets.dcu");
+		message += "File deleted     : RemoteWidgets.dcu";
+	    }
+	}
 }
 
-if (RetCode == 0) 
- 	WScript.Echo("Cypher done.");
-else 
- 	WScript.Echo("Cypher ERROR : RetCode=", RetCode);
+if (RetCode != 0) message += "\n ---> ERROR : RetCode = "+RetCode;
 
+WScript.Echo(message);
 WScript.Quit(RetCode);
+
+//--------------------------------------------------------------------------------------------------------------------------------
+
+
+function MoreRecent(ThisFile, ThanFile)
+{
+	if (!FSO.FileExists(ThisFile)) return(false);
+	if (!FSO.FileExists(ThanFile)) return(true);
+	var This = FSO.GetFile(ThisFile);
+	var Than = FSO.GetFile(ThanFile);
+	return(This.DateLastModified > Than.DateLastModified);
+}
+
+function AddToCypherLog(msg)
+{
+	var dt = new Date();
+	var f = FSO.OpenTextFile(CypherLog, 8, true); // Touch the file for date
+	f.WriteLine(dt.toString()+" "+msg);
+	f.Close();
+}
+
+function crypt(filename, passphrase) 
+{
+//	WScript.Echo("Crypt " + filename + " PassPhrase = " + passphrase);
+ 	ret = oShell.Run(gnuPG + " --batch --yes --passphrase \"" + passphrase +"\" --armor --symmetric \"" + filename +"\"", 9, true);
+	return(ret);
+};
+
+function decrypt(filename, passphrase) 
+{
+//	WScript.Echo("Decrypt " + filename + " PassPhrase = " + passphrase);
+	ret = oShell.Run(gnuPG + " --batch --yes --passphrase \"" + passphrase +"\" -d -o \"" + filename +"\" \"" + filename +".asc\"", 9, true);
+//	var f = FSO.OpenTextFile(filename +".asc", 8, false); // Touch the file
+//	f.WriteLine("\nDecrypted");
+//	f.Close();
+	return(ret);
+}
+
 
