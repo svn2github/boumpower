@@ -1,0 +1,60 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{01C564BC-456A-49FB-8310-A68FBDC06CC1}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="Packages\XE2\LKSL.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Demos\XE2\Managed String Array\LKSL_ManagedStringArrayDemo.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Demos\XE2\Managed Types\LKSL_SmartTypesDemo.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="LKSL">
+			<MSBuild Projects="Packages\XE2\LKSL.dproj"/>
+		</Target>
+		<Target Name="LKSL:Clean">
+			<MSBuild Projects="Packages\XE2\LKSL.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="LKSL:Make">
+			<MSBuild Projects="Packages\XE2\LKSL.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="LKSL_ManagedStringArrayDemo">
+			<MSBuild Projects="Demos\XE2\Managed String Array\LKSL_ManagedStringArrayDemo.dproj"/>
+		</Target>
+		<Target Name="LKSL_ManagedStringArrayDemo:Clean">
+			<MSBuild Projects="Demos\XE2\Managed String Array\LKSL_ManagedStringArrayDemo.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="LKSL_ManagedStringArrayDemo:Make">
+			<MSBuild Projects="Demos\XE2\Managed String Array\LKSL_ManagedStringArrayDemo.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="LKSL_SmartTypesDemo">
+			<MSBuild Projects="Demos\XE2\Managed Types\LKSL_SmartTypesDemo.dproj"/>
+		</Target>
+		<Target Name="LKSL_SmartTypesDemo:Clean">
+			<MSBuild Projects="Demos\XE2\Managed Types\LKSL_SmartTypesDemo.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="LKSL_SmartTypesDemo:Make">
+			<MSBuild Projects="Demos\XE2\Managed Types\LKSL_SmartTypesDemo.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="LKSL;LKSL_ManagedStringArrayDemo;LKSL_SmartTypesDemo"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="LKSL:Clean;LKSL_ManagedStringArrayDemo:Clean;LKSL_SmartTypesDemo:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="LKSL:Make;LKSL_ManagedStringArrayDemo:Make;LKSL_SmartTypesDemo:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>
