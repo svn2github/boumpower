@@ -1,0 +1,49 @@
+package Lua4Delphi;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'Lua4Delphi for Delphi XE2'}
+{$LIBSUFFIX '160'}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  LKSL;
+
+contains
+  L4D.Engine.Reg in '..\..\Source\Packages\L4D.Engine.Reg.pas',
+  L4D.Engine.Constants in '..\..\Source\Core\L4D.Engine.Constants.pas',
+  L4D.Engine.DelphiTypes in '..\..\Source\Core\L4D.Engine.DelphiTypes.pas',
+  L4D.Lua.Intf in '..\..\Source\Lua\L4D.Lua.Intf.pas',
+  L4D.Lua.Common in '..\..\Source\Lua\L4D.Lua.Common.pas',
+  L4D.Lua.Lua51 in '..\..\Source\Lua\L4D.Lua.Lua51.pas',
+  L4D.Lua.StaticLua51 in '..\..\Source\Lua\L4D.Lua.StaticLua51.pas',
+  L4D.Lua.Constants in '..\..\Source\Lua\L4D.Lua.Constants.pas',
+  L4D.Engine.Main in '..\..\Source\Core\L4D.Engine.Main.pas',
+  L4D.Engine.StaticLua51 in '..\..\Source\Core\L4D.Engine.StaticLua51.pas';
+
+end.
+
