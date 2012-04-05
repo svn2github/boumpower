@@ -1,0 +1,1313 @@
+object frmMain: TfrmMain
+  Left = 0
+  Top = 0
+  Caption = 'Lua4Delphi (v2) - Basic Integration Demo'
+  ClientHeight = 595
+  ClientWidth = 653
+  Visible = False
+  OnCreate = FormCreate
+  OnResize = FormResize
+  StyleBook = StyleBook1
+  StyleLookup = 'backgroundstyle'
+  object cpException: TCalloutPanel
+    Width = 811.000000000000000000
+    Height = 50.000000000000000000
+    ClipChildren = True
+    StyleLookup = 'CalloutPanel1Style1'
+    TabOrder = 0
+    CalloutWidth = 23.000000000000000000
+    CalloutLength = 11.000000000000000000
+    object btnExceptionHide: TSpeedButton
+      Align = alBottom
+      Position.Point = '(0,32)'
+      Width = 811.000000000000000000
+      Height = 18.000000000000000000
+      OnClick = btnExceptionHideClick
+      TabOrder = 0
+      Text = #9650
+      object lblException: TLabel
+        Align = alBottom
+        Position.Point = '(0,-32)'
+        Width = 811.000000000000000000
+        Height = 50.000000000000000000
+        Padding.Rect = '(0,10,0,0)'
+        StyleLookup = 'lblExceptionStyle1'
+        TabOrder = 0
+        Font.Style = [fsBold]
+        TextAlign = taCenter
+        Text = 'lblException'
+      end
+    end
+  end
+  object Panel1: TPanel
+    Align = alClient
+    Width = 653.000000000000000000
+    Height = 595.000000000000000000
+    TabOrder = 1
+    object memOutput: TMemo
+      Align = alClient
+      Position.Point = '(0,269)'
+      Width = 653.000000000000000000
+      Height = 326.000000000000000000
+      StyleLookup = 'memOutputStyle1'
+      TabOrder = 0
+      UseSmallScrollBars = True
+      ReadOnly = True
+      KeyboardType = vktDefault
+    end
+    object Splitter1: TSplitter
+      Align = alTop
+      Cursor = crVSplit
+      Position.Point = '(0,265)'
+      Width = 653.000000000000000000
+      Height = 4.000000000000000000
+      StyleLookup = 'Splitter1Style1'
+      TabOrder = 1
+      MinSize = 20.000000000000000000
+    end
+    object tcTop: TTabControl
+      Align = alTop
+      Width = 653.000000000000000000
+      Height = 265.000000000000000000
+      StyleLookup = 'tcTopStyle1'
+      TabOrder = 2
+      TabIndex = 1
+      TabHeight = 20.000000000000000000
+      object tabCode: TTabItem
+        Width = 73.000000000000000000
+        Height = 20.000000000000000000
+        StyleLookup = 'tabCodeStyle1'
+        TabOrder = 0
+        Index = 0
+        TextAlign = taCenter
+        Text = 'Lua Code'
+        WordWrap = False
+        object memCode: TMemo
+          Align = alClient
+          Position.Point = '(0,33)'
+          Width = 653.000000000000000000
+          Height = 212.000000000000000000
+          StyleLookup = 'memCodeStyle1'
+          TabOrder = 0
+          UseSmallScrollBars = True
+          Text = 
+            '-- Executes the "print" method defined in the Delphi app'#13#10'print(' +
+            '"Hello World, from Lua")'#13#10'-- Executes "print" (from Delphi), pas' +
+            'sing the formatted evaluation of Pi'#13#10'print(string.format("Pi = %' +
+            '.16f", math.pi))'#13#10#13#10'-- Assign some Global Values'#13#10'Foo = "Hello"'#13 +
+            #10'Bar = "World"'#13#10'Leet = 1337'#13#10'Power = 9001'#13#10#13#10'-- Executes "print"' +
+            ' (from Delphi), passing multiple concatenated values'#13#10'print(Foo.' +
+            '.Bar, Leet..Power)'#13#10#13#10'-- Raise an error (to be displayed as spec' +
+            'ified by our Delphi app)'#13#10'error("All ur base r belong to us!")'
+          KeyboardType = vktDefault
+        end
+        object pnlTop: TPanel
+          Align = alTop
+          Width = 653.000000000000000000
+          Height = 33.000000000000000000
+          StyleLookup = 'pnlTopStyle1'
+          TabOrder = 1
+          object btnExecute: TButton
+            Position.Point = '(10,5)'
+            Width = 113.000000000000000000
+            Height = 22.000000000000000000
+            OnClick = btnExecuteClick
+            TabOrder = 0
+            Text = 'Execute Lua Code'
+          end
+          object btnLoadFromFile: TButton
+            Position.Point = '(128,5)'
+            Width = 105.000000000000000000
+            Height = 22.000000000000000000
+            OnClick = btnLoadFromFileClick
+            TabOrder = 1
+            Text = 'Load Lua File'
+          end
+        end
+      end
+      object tabGlobals: TTabItem
+        Position.Point = '(73,0)'
+        Width = 120.000000000000000000
+        Height = 20.000000000000000000
+        TabOrder = 1
+        Index = 1
+        TextAlign = taCenter
+        Text = 'Global Values'
+        WordWrap = False
+        object edGlobalName: TEdit
+          Position.Point = '(104,63)'
+          Width = 265.000000000000000000
+          Height = 22.000000000000000000
+          TabOrder = 0
+          KeyboardType = vktDefault
+          OnChange = edGlobalNameChange
+          OnTyping = edGlobalNameChange
+          Password = False
+          object Label1: TLabel
+            Position.Point = '(-104,3)'
+            Width = 96.000000000000000000
+            Height = 15.000000000000000000
+            TabOrder = 0
+            TextAlign = taTrailing
+            Text = 'Global Name:'
+          end
+        end
+        object edGlobalValue: TEdit
+          Enabled = False
+          Position.Point = '(104,95)'
+          Width = 265.000000000000000000
+          Height = 22.000000000000000000
+          TabOrder = 1
+          KeyboardType = vktDefault
+          Password = False
+          object Label2: TLabel
+            Position.Point = '(-104,3)'
+            Width = 96.000000000000000000
+            Height = 15.000000000000000000
+            TabOrder = 0
+            TextAlign = taTrailing
+            Text = 'Global Value:'
+          end
+          object btnGlobalSetValue: TButton
+            Position.Point = '(272,0)'
+            Width = 80.000000000000000000
+            Height = 22.000000000000000000
+            OnClick = btnGlobalSetValueClick
+            TabOrder = 1
+            Text = 'Set Value'
+          end
+        end
+        object cbGlobalType: TComboBox
+          Enabled = False
+          Position.Point = '(456,63)'
+          Width = 161.000000000000000000
+          Height = 22.000000000000000000
+          TabOrder = 2
+          ItemIndex = 0
+          OnChange = cbGlobalTypeChange
+          object Label3: TLabel
+            Position.Point = '(-104,3)'
+            Width = 96.000000000000000000
+            Height = 15.000000000000000000
+            TabOrder = 1
+            TextAlign = taTrailing
+            Text = 'Global Type:'
+          end
+          object ListBoxItem1: TListBoxItem
+            Position.Point = '(5000,5000)'
+            Width = 141.000000000000000000
+            Height = 19.000000000000000000
+            HitTest = False
+            TabOrder = 0
+            IsSelected = True
+            Text = 'None'
+          end
+          object ListBoxItem2: TListBoxItem
+            Position.Point = '(0,19)'
+            Width = 141.000000000000000000
+            Height = 19.000000000000000000
+            HitTest = False
+            TabOrder = 1
+            Text = 'Nil'
+          end
+          object ListBoxItem3: TListBoxItem
+            Position.Point = '(0,38)'
+            Width = 141.000000000000000000
+            Height = 19.000000000000000000
+            HitTest = False
+            TabOrder = 2
+            Text = 'Boolean'
+          end
+          object ListBoxItem4: TListBoxItem
+            Position.Point = '(0,57)'
+            Width = 141.000000000000000000
+            Height = 19.000000000000000000
+            HitTest = False
+            TabOrder = 3
+            Text = 'Light Userdata'
+          end
+          object ListBoxItem5: TListBoxItem
+            Position.Point = '(0,76)'
+            Width = 141.000000000000000000
+            Height = 19.000000000000000000
+            HitTest = False
+            TabOrder = 4
+            Text = 'Number'
+          end
+          object ListBoxItem6: TListBoxItem
+            Position.Point = '(0,95)'
+            Width = 141.000000000000000000
+            Height = 19.000000000000000000
+            HitTest = False
+            TabOrder = 5
+            Text = 'String'
+          end
+          object ListBoxItem7: TListBoxItem
+            Position.Point = '(0,114)'
+            Width = 141.000000000000000000
+            Height = 19.000000000000000000
+            HitTest = False
+            TabOrder = 6
+            Text = 'Table'
+          end
+          object ListBoxItem8: TListBoxItem
+            Position.Point = '(0,133)'
+            Width = 141.000000000000000000
+            Height = 19.000000000000000000
+            HitTest = False
+            TabOrder = 7
+            Text = 'Function'
+          end
+          object ListBoxItem9: TListBoxItem
+            Position.Point = '(0,152)'
+            Width = 141.000000000000000000
+            Height = 19.000000000000000000
+            HitTest = False
+            TabOrder = 8
+            Text = 'Userdata'
+          end
+          object ListBoxItem10: TListBoxItem
+            Position.Point = '(0,171)'
+            Width = 141.000000000000000000
+            Height = 19.000000000000000000
+            HitTest = False
+            TabOrder = 9
+            Text = 'Thread'
+          end
+        end
+        object btnGlobalNew: TButton
+          Position.Point = '(152,31)'
+          Width = 80.000000000000000000
+          Height = 22.000000000000000000
+          OnClick = btnGlobalNewClick
+          TabOrder = 3
+          Text = 'New/Edit'
+        end
+        object btnGlobalCancel: TButton
+          Position.Point = '(240,31)'
+          Width = 80.000000000000000000
+          Height = 22.000000000000000000
+          OnClick = btnGlobalCancelClick
+          TabOrder = 4
+          Text = 'Cancel'
+        end
+      end
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    DefaultExt = '*.lua'
+    Filter = '*.lua'
+    Left = 280
+    Top = 185
+  end
+  object StyleBook1: TStyleBook
+    Resource.Strings = (
+      'object _1: TLayout'
+      '  Align = alClient'
+      '  Position.Point = '#39'(0,33)'#39
+      '  Width = 842.000000000000000000'
+      '  Height = 798.000000000000000000'
+      '  object TCalloutRectangle'
+      '    StyleName = '#39'CalloutPanel1Style1'#39
+      '    Position.Point = '#39'(396,374)'#39
+      '    Width = 50.000000000000000000'
+      '    Height = 50.000000000000000000'
+      '    HitTest = False'
+      '    DesignVisible = False'
+      '    Fill.Color = claGold'
+      '    Stroke.Color = xFF8E8E8E'
+      '    CalloutWidth = 23.000000000000000000'
+      '    CalloutLength = 11.000000000000000000'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'lblExceptionStyle1'#39
+      '    Position.Point = '#39'(396,389)'#39
+      '    Width = 49.000000000000000000'
+      '    Height = 20.000000000000000000'
+      '    DesignVisible = False'
+      '    object TText'
+      '      StyleName = '#39'text'#39
+      '      Align = alClient'
+      '      Locked = True'
+      '      Width = 49.000000000000000000'
+      '      Height = 20.000000000000000000'
+      '      HitTest = False'
+      '      Fill.Color = claRed'
+      '      Text = '#39'label'#39
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'cbGlobalTypeStyleHighlight'#39
+      '    Position.Point = '#39'(376,386)'#39
+      '    Width = 89.000000000000000000'
+      '    Height = 26.000000000000000000'
+      '    DesignVisible = False'
+      '    object TRectangle'
+      '      StyleName = '#39'background'#39
+      '      Align = alContents'
+      '      Width = 89.000000000000000000'
+      '      Height = 26.000000000000000000'
+      '      HitTest = False'
+      '      Fill.Color = claGreenyellow'
+      '      Stroke.Kind = bkNone'
+      '      XRadius = 3.000000000000000000'
+      '      YRadius = 3.000000000000000000'
+      '      object TRectangle'
+      '        Align = alContents'
+      '        Width = 89.000000000000000000'
+      '        Height = 26.000000000000000000'
+      '        HitTest = False'
+      '        Fill.Kind = bkGradient'
+      '        Fill.Gradient.Points = <'
+      '          item'
+      '            Color = x24F4F4F4'
+      '          end'
+      '          item'
+      '            Color = x24EAEAEA'
+      '            Offset = 0.499000012874603300'
+      '          end'
+      '          item'
+      '            Color = x4E868686'
+      '            Offset = 0.500000000000000000'
+      '          end>'
+      '        Stroke.Color = xC84F4F4F'
+      '        XRadius = 3.000000000000000000'
+      '        YRadius = 3.000000000000000000'
+      '      end'
+      '      object TColorAnimation'
+      '        Duration = 0.200000002980232200'
+      '        Trigger = '#39'IsMouseOver=true'#39
+      '        StartValue = xFFEFEFEF'
+      '        StopValue = xFFA5D9FF'
+      '        PropertyName = '#39'Fill.Color'#39
+      '      end'
+      '      object TColorAnimation'
+      '        Duration = 0.200000002980232200'
+      '        Trigger = '#39'IsMouseOver=false'#39
+      '        StartValue = xFFA5D9FF'
+      '        StopValue = xFFEFEFEF'
+      '        PropertyName = '#39'Fill.Color'#39
+      '      end'
+      '      object TInnerGlowEffect'
+      '        Trigger = '#39'IsOpen=true'#39
+      '        Enabled = False'
+      '        Softness = 0.400000005960464400'
+      '        GlowColor = xFF4F4848'
+      '        Opacity = 0.899999976158142100'
+      '      end'
+      '      object TRectangle'
+      '        Align = alClient'
+      '        Position.Point = '#39'(1,1)'#39
+      '        Locked = True'
+      '        Width = 87.000000000000000000'
+      '        Height = 24.000000000000000000'
+      '        Padding.Rect = '#39'(1,1,1,1)'#39
+      '        HitTest = False'
+      '        Fill.Kind = bkNone'
+      '        Stroke.Color = x96FCFCFC'
+      '        XRadius = 2.000000000000000000'
+      '        YRadius = 2.000000000000000000'
+      '      end'
+      '    end'
+      '    object TLayout'
+      '      Align = alRight'
+      '      Position.Point = '#39'(74,0)'#39
+      '      Locked = True'
+      '      Width = 15.000000000000000000'
+      '      Height = 26.000000000000000000'
+      '      object TPath'
+      '        Align = alCenter'
+      '        Position.Point = '#39'(3,10)'#39
+      '        Width = 8.000000000000000000'
+      '        Height = 5.000000000000000000'
+      '        HitTest = False'
+      '        Fill.Color = claBlack'
+      '        Stroke.Kind = bkNone'
+      '        Data.Path = {'
+      
+        '          04000000000000000000000000000000010000000000803F000000' +
+        '0001000000'
+      '          0000003F0000803F030000000000000000000000}'
+      '      end'
+      '    end'
+      '    object TBrushObject'
+      '      StyleName = '#39'foreground'#39
+      '      Brush.Color = claBlack'
+      '    end'
+      '    object TContent'
+      '      StyleName = '#39'content'#39
+      '      Align = alContents'
+      '      Position.Point = '#39'(2,2)'#39
+      '      Locked = True'
+      '      Width = 64.000000000000000000'
+      '      Height = 22.000000000000000000'
+      '      Padding.Rect = '#39'(2,2,23,2)'#39
+      '      HitTest = False'
+      '    end'
+      '    object TGlowEffect'
+      '      Trigger = '#39'IsFocused=true'#39
+      '      Enabled = False'
+      '      Softness = 0.200000002980232200'
+      '      GlowColor = x82005ACC'
+      '      Opacity = 0.899999976158142100'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'cbGlobalTypeStyleInvalid'#39
+      '    Position.Point = '#39'(376,386)'#39
+      '    Width = 89.000000000000000000'
+      '    Height = 26.000000000000000000'
+      '    DesignVisible = False'
+      '    object TRectangle'
+      '      StyleName = '#39'background'#39
+      '      Align = alContents'
+      '      Width = 89.000000000000000000'
+      '      Height = 26.000000000000000000'
+      '      HitTest = False'
+      '      Fill.Color = claTomato'
+      '      Stroke.Kind = bkNone'
+      '      XRadius = 3.000000000000000000'
+      '      YRadius = 3.000000000000000000'
+      '      object TRectangle'
+      '        Align = alContents'
+      '        Width = 89.000000000000000000'
+      '        Height = 26.000000000000000000'
+      '        HitTest = False'
+      '        Fill.Kind = bkGradient'
+      '        Fill.Gradient.Points = <'
+      '          item'
+      '            Color = x24F4F4F4'
+      '          end'
+      '          item'
+      '            Color = x24EAEAEA'
+      '            Offset = 0.499000012874603300'
+      '          end'
+      '          item'
+      '            Color = x4E868686'
+      '            Offset = 0.500000000000000000'
+      '          end>'
+      '        Stroke.Color = xC84F4F4F'
+      '        XRadius = 3.000000000000000000'
+      '        YRadius = 3.000000000000000000'
+      '      end'
+      '      object TColorAnimation'
+      '        Duration = 0.200000002980232200'
+      '        Trigger = '#39'IsMouseOver=true'#39
+      '        StartValue = xFFEFEFEF'
+      '        StopValue = xFFA5D9FF'
+      '        PropertyName = '#39'Fill.Color'#39
+      '      end'
+      '      object TColorAnimation'
+      '        Duration = 0.200000002980232200'
+      '        Trigger = '#39'IsMouseOver=false'#39
+      '        StartValue = xFFA5D9FF'
+      '        StopValue = xFFEFEFEF'
+      '        PropertyName = '#39'Fill.Color'#39
+      '      end'
+      '      object TInnerGlowEffect'
+      '        Trigger = '#39'IsOpen=true'#39
+      '        Enabled = False'
+      '        Softness = 0.400000005960464400'
+      '        GlowColor = xFF4F4848'
+      '        Opacity = 0.899999976158142100'
+      '      end'
+      '      object TRectangle'
+      '        Align = alClient'
+      '        Position.Point = '#39'(1,1)'#39
+      '        Locked = True'
+      '        Width = 87.000000000000000000'
+      '        Height = 24.000000000000000000'
+      '        Padding.Rect = '#39'(1,1,1,1)'#39
+      '        HitTest = False'
+      '        Fill.Kind = bkNone'
+      '        Stroke.Color = x96FCFCFC'
+      '        XRadius = 2.000000000000000000'
+      '        YRadius = 2.000000000000000000'
+      '      end'
+      '    end'
+      '    object TLayout'
+      '      Align = alRight'
+      '      Position.Point = '#39'(74,0)'#39
+      '      Locked = True'
+      '      Width = 15.000000000000000000'
+      '      Height = 26.000000000000000000'
+      '      object TPath'
+      '        Align = alCenter'
+      '        Position.Point = '#39'(3,10)'#39
+      '        Width = 8.000000000000000000'
+      '        Height = 5.000000000000000000'
+      '        HitTest = False'
+      '        Fill.Color = claBlack'
+      '        Stroke.Kind = bkNone'
+      '        Data.Path = {'
+      
+        '          04000000000000000000000000000000010000000000803F000000' +
+        '0001000000'
+      '          0000003F0000803F030000000000000000000000}'
+      '      end'
+      '    end'
+      '    object TBrushObject'
+      '      StyleName = '#39'foreground'#39
+      '      Brush.Color = claBlack'
+      '    end'
+      '    object TContent'
+      '      StyleName = '#39'content'#39
+      '      Align = alContents'
+      '      Position.Point = '#39'(2,2)'#39
+      '      Locked = True'
+      '      Width = 64.000000000000000000'
+      '      Height = 22.000000000000000000'
+      '      Padding.Rect = '#39'(2,2,23,2)'#39
+      '      HitTest = False'
+      '    end'
+      '    object TGlowEffect'
+      '      Trigger = '#39'IsFocused=true'#39
+      '      Enabled = False'
+      '      Softness = 0.200000002980232200'
+      '      GlowColor = x82005ACC'
+      '      Opacity = 0.899999976158142100'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'memOutputStyle1'#39
+      '    Position.Point = '#39'(362,333)'#39
+      '    Width = 116.999992370605500000'
+      '    Height = 131.000000000000000000'
+      '    ClipChildren = True'
+      '    DesignVisible = False'
+      '    object TRectangle'
+      '      StyleName = '#39'background'#39
+      '      Align = alContents'
+      '      Locked = True'
+      '      Width = 116.999992370605500000'
+      '      Height = 131.000000000000000000'
+      '      Margins.Rect = '#39'(3,3,2,2)'#39
+      '      HitTest = False'
+      '      Fill.Color = claAntiquewhite'
+      '      Stroke.Color = claSilver'
+      '      object TLayout'
+      '        StyleName = '#39'content'#39
+      '        Align = alClient'
+      '        Position.Point = '#39'(3,3)'#39
+      '        Width = 93.999992370605470000'
+      '        Height = 108.000000000000000000'
+      '      end'
+      '      object TScrollBar'
+      '        StyleName = '#39'vscrollbar'#39
+      '        Align = alRight'
+      '        Position.Point = '#39'(98.9999923706055,3)'#39
+      '        Width = 16.000000000000000000'
+      '        Height = 108.000000000000000000'
+      '        Padding.Rect = '#39'(2,0,0,0)'#39
+      '        StyleLookup = '#39'memOutputvscrollbar1'#39
+      '        TabOrder = 3'
+      '        Max = 100.000000000000000000'
+      '        Orientation = orVertical'
+      '        SmallChange = 1.000000000000000000'
+      '      end'
+      '      object TScrollBar'
+      '        StyleName = '#39'hscrollbar'#39
+      '        Align = alBottom'
+      '        Position.Point = '#39'(3,113)'#39
+      '        Width = 111.999992370605500000'
+      '        Height = 16.000000000000000000'
+      '        Padding.Rect = '#39'(0,2,0,0)'#39
+      '        StyleLookup = '#39'memOutputhscrollbar1'#39
+      '        TabOrder = 4'
+      '        Max = 100.000000000000000000'
+      '        Orientation = orHorizontal'
+      '        SmallChange = 1.000000000000000000'
+      '      end'
+      '      object TSmallScrollBar'
+      '        StyleName = '#39'vsmallscrollbar'#39
+      '        Align = alRight'
+      '        Position.Point = '#39'(99,2)'#39
+      '        Width = 8.000000000000000000'
+      '        Height = 8.000000000000000000'
+      '        Padding.Rect = '#39'(2,0,0,0)'#39
+      '        Visible = False'
+      '        StyleLookup = '#39'memOutputvsmallscrollbar1'#39
+      '        TabOrder = 1'
+      '        Max = 100.000000000000000000'
+      '        Orientation = orVertical'
+      '        SmallChange = 1.000000000000000000'
+      '      end'
+      '      object TSmallScrollBar'
+      '        StyleName = '#39'hsmallscrollbar'#39
+      '        Align = alBottom'
+      '        Position.Point = '#39'(2,113)'#39
+      '        Width = 150.000000000000000000'
+      '        Height = 8.000000000000000000'
+      '        Padding.Rect = '#39'(0,2,0,0)'#39
+      '        Visible = False'
+      '        StyleLookup = '#39'memOutputhsmallscrollbar1'#39
+      '        TabOrder = 2'
+      '        Max = 100.000000000000000000'
+      '        Orientation = orHorizontal'
+      '        SmallChange = 1.000000000000000000'
+      '      end'
+      '    end'
+      '    object TBrushObject'
+      '      StyleName = '#39'foreground'#39
+      '      Brush.Color = claBlack'
+      '    end'
+      '    object TBrushObject'
+      '      StyleName = '#39'selection'#39
+      '      Brush.Color = x802A8ADF'
+      '    end'
+      '    object TGlowEffect'
+      '      Trigger = '#39'IsFocused=true'#39
+      '      Enabled = False'
+      '      Softness = 0.200000002980232200'
+      '      GlowColor = x82005ACC'
+      '      Opacity = 0.899999976158142100'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'memOutputvscrollbar1'#39
+      '    Position.Point = '#39'(333,372)'#39
+      '    Width = 176.000000000000000000'
+      '    Height = 53.000000000000000000'
+      '    DesignVisible = False'
+      '    object TRectangle'
+      '      StyleName = '#39'background'#39
+      '      Align = alContents'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      HitTest = False'
+      '      Fill.Color = xFF484848'
+      '      Stroke.Kind = bkNone'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'leftbutton'#39
+      '      Align = alLeft'
+      '      Position.Point = '#39'(0,18)'#39
+      '      Locked = True'
+      '      Width = 18.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarleftbutton'#39
+      '      TabOrder = 1'
+      '      CanFocus = False'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'htrack'#39
+      '      Align = alClient'
+      '      Position.Point = '#39'(18,18)'#39
+      '      Locked = True'
+      '      Width = 140.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarhtrackstyle'#39
+      '      TabOrder = 2'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'rightbutton'#39
+      '      Align = alRight'
+      '      Position.Point = '#39'(158,18)'#39
+      '      Locked = True'
+      '      Width = 18.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarrightbutton'#39
+      '      TabOrder = 3'
+      '      CanFocus = False'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'vtrack'#39
+      '      Align = alClient'
+      '      Position.Point = '#39'(18,18)'#39
+      '      Locked = True'
+      '      Width = 140.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarvtrackstyle'#39
+      '      TabOrder = 4'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'topbutton'#39
+      '      Align = alTop'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 18.000000000000000000'
+      '      StyleLookup = '#39'scrollbartopbutton'#39
+      '      TabOrder = 5'
+      '      CanFocus = False'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'bottombutton'#39
+      '      Align = alBottom'
+      '      Position.Point = '#39'(0,35)'#39
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 18.000000000000000000'
+      '      StyleLookup = '#39'scrollbarbottombutton'#39
+      '      TabOrder = 6'
+      '      CanFocus = False'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'memOutputhscrollbar1'#39
+      '    Position.Point = '#39'(333,372)'#39
+      '    Width = 176.000000000000000000'
+      '    Height = 53.000000000000000000'
+      '    DesignVisible = False'
+      '    object TRectangle'
+      '      StyleName = '#39'background'#39
+      '      Align = alContents'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      HitTest = False'
+      '      Fill.Color = claGreenyellow'
+      '      Stroke.Kind = bkNone'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'leftbutton'#39
+      '      Align = alLeft'
+      '      Position.Point = '#39'(0,18)'#39
+      '      Locked = True'
+      '      Width = 18.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarleftbutton'#39
+      '      TabOrder = 1'
+      '      CanFocus = False'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'htrack'#39
+      '      Align = alClient'
+      '      Position.Point = '#39'(18,18)'#39
+      '      Locked = True'
+      '      Width = 140.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarhtrackstyle'#39
+      '      TabOrder = 2'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'rightbutton'#39
+      '      Align = alRight'
+      '      Position.Point = '#39'(158,18)'#39
+      '      Locked = True'
+      '      Width = 18.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarrightbutton'#39
+      '      TabOrder = 3'
+      '      CanFocus = False'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'vtrack'#39
+      '      Align = alClient'
+      '      Position.Point = '#39'(18,18)'#39
+      '      Locked = True'
+      '      Width = 140.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarvtrackstyle'#39
+      '      TabOrder = 4'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'topbutton'#39
+      '      Align = alTop'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 18.000000000000000000'
+      '      StyleLookup = '#39'scrollbartopbutton'#39
+      '      TabOrder = 5'
+      '      CanFocus = False'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'bottombutton'#39
+      '      Align = alBottom'
+      '      Position.Point = '#39'(0,35)'#39
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 18.000000000000000000'
+      '      StyleLookup = '#39'scrollbarbottombutton'#39
+      '      TabOrder = 6'
+      '      CanFocus = False'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'memOutputvsmallscrollbar1'#39
+      '    Position.Point = '#39'(333,372)'#39
+      '    Width = 176.000000000000000000'
+      '    Height = 53.000000000000000000'
+      '    DesignVisible = False'
+      '    object TTrack'
+      '      StyleName = '#39'htrack'#39
+      '      Align = alClient'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      StyleLookup = '#39'smallscrollbarhtrackstyle'#39
+      '      TabOrder = 0'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'vtrack'#39
+      '      Align = alClient'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      StyleLookup = '#39'smallscrollbarvtrackstyle'#39
+      '      TabOrder = 1'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'memOutputhsmallscrollbar1'#39
+      '    Position.Point = '#39'(333,372)'#39
+      '    Width = 176.000000000000000000'
+      '    Height = 53.000000000000000000'
+      '    DesignVisible = False'
+      '    object TTrack'
+      '      StyleName = '#39'htrack'#39
+      '      Align = alClient'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      StyleLookup = '#39'smallscrollbarhtrackstyle'#39
+      '      TabOrder = 0'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'vtrack'#39
+      '      Align = alClient'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      StyleLookup = '#39'smallscrollbarvtrackstyle'#39
+      '      TabOrder = 1'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'memCodeStyle1'#39
+      '    Position.Point = '#39'(362,333)'#39
+      '    Width = 116.999992370605500000'
+      '    Height = 131.000000000000000000'
+      '    ClipChildren = True'
+      '    DesignVisible = False'
+      '    object TRectangle'
+      '      StyleName = '#39'background'#39
+      '      Align = alContents'
+      '      Locked = True'
+      '      Width = 116.999992370605500000'
+      '      Height = 131.000000000000000000'
+      '      Margins.Rect = '#39'(3,3,2,2)'#39
+      '      HitTest = False'
+      '      Fill.Color = claHoneydew'
+      '      Stroke.Color = claSilver'
+      '      object TLayout'
+      '        StyleName = '#39'content'#39
+      '        Align = alClient'
+      '        Position.Point = '#39'(3,3)'#39
+      '        Width = 93.999992370605470000'
+      '        Height = 108.000000000000000000'
+      '      end'
+      '      object TScrollBar'
+      '        StyleName = '#39'vscrollbar'#39
+      '        Align = alRight'
+      '        Position.Point = '#39'(98.9999923706055,3)'#39
+      '        Width = 16.000000000000000000'
+      '        Height = 108.000000000000000000'
+      '        Padding.Rect = '#39'(2,0,0,0)'#39
+      '        StyleLookup = '#39'memCodevscrollbar1'#39
+      '        TabOrder = 3'
+      '        Max = 100.000000000000000000'
+      '        Orientation = orVertical'
+      '        SmallChange = 1.000000000000000000'
+      '      end'
+      '      object TScrollBar'
+      '        StyleName = '#39'hscrollbar'#39
+      '        Align = alBottom'
+      '        Position.Point = '#39'(3,113)'#39
+      '        Width = 111.999992370605500000'
+      '        Height = 16.000000000000000000'
+      '        Padding.Rect = '#39'(0,2,0,0)'#39
+      '        StyleLookup = '#39'memCodehscrollbar1'#39
+      '        TabOrder = 4'
+      '        Max = 100.000000000000000000'
+      '        Orientation = orHorizontal'
+      '        SmallChange = 1.000000000000000000'
+      '      end'
+      '      object TSmallScrollBar'
+      '        StyleName = '#39'vsmallscrollbar'#39
+      '        Align = alRight'
+      '        Position.Point = '#39'(99,2)'#39
+      '        Width = 8.000000000000000000'
+      '        Height = 8.000000000000000000'
+      '        Padding.Rect = '#39'(2,0,0,0)'#39
+      '        Visible = False'
+      '        StyleLookup = '#39'memCodevsmallscrollbar1'#39
+      '        TabOrder = 1'
+      '        Max = 100.000000000000000000'
+      '        Orientation = orVertical'
+      '        SmallChange = 1.000000000000000000'
+      '      end'
+      '      object TSmallScrollBar'
+      '        StyleName = '#39'hsmallscrollbar'#39
+      '        Align = alBottom'
+      '        Position.Point = '#39'(2,113)'#39
+      '        Width = 150.000000000000000000'
+      '        Height = 8.000000000000000000'
+      '        Padding.Rect = '#39'(0,2,0,0)'#39
+      '        Visible = False'
+      '        StyleLookup = '#39'memCodehsmallscrollbar1'#39
+      '        TabOrder = 2'
+      '        Max = 100.000000000000000000'
+      '        Orientation = orHorizontal'
+      '        SmallChange = 1.000000000000000000'
+      '      end'
+      '    end'
+      '    object TBrushObject'
+      '      StyleName = '#39'foreground'#39
+      '      Brush.Color = claBlack'
+      '    end'
+      '    object TBrushObject'
+      '      StyleName = '#39'selection'#39
+      '      Brush.Color = x802A8ADF'
+      '    end'
+      '    object TGlowEffect'
+      '      Trigger = '#39'IsFocused=true'#39
+      '      Enabled = False'
+      '      Softness = 0.200000002980232200'
+      '      GlowColor = x82005ACC'
+      '      Opacity = 0.899999976158142100'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'memCodevscrollbar1'#39
+      '    Position.Point = '#39'(333,372)'#39
+      '    Width = 176.000000000000000000'
+      '    Height = 53.000000000000000000'
+      '    DesignVisible = False'
+      '    object TRectangle'
+      '      StyleName = '#39'background'#39
+      '      Align = alContents'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      HitTest = False'
+      '      Fill.Color = claGreenyellow'
+      '      Stroke.Kind = bkNone'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'leftbutton'#39
+      '      Align = alLeft'
+      '      Position.Point = '#39'(0,18)'#39
+      '      Locked = True'
+      '      Width = 18.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarleftbutton'#39
+      '      TabOrder = 1'
+      '      CanFocus = False'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'htrack'#39
+      '      Align = alClient'
+      '      Position.Point = '#39'(18,18)'#39
+      '      Locked = True'
+      '      Width = 140.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarhtrackstyle'#39
+      '      TabOrder = 2'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'rightbutton'#39
+      '      Align = alRight'
+      '      Position.Point = '#39'(158,18)'#39
+      '      Locked = True'
+      '      Width = 18.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarrightbutton'#39
+      '      TabOrder = 3'
+      '      CanFocus = False'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'vtrack'#39
+      '      Align = alClient'
+      '      Position.Point = '#39'(18,18)'#39
+      '      Locked = True'
+      '      Width = 140.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarvtrackstyle'#39
+      '      TabOrder = 4'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'topbutton'#39
+      '      Align = alTop'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 18.000000000000000000'
+      '      StyleLookup = '#39'scrollbartopbutton'#39
+      '      TabOrder = 5'
+      '      CanFocus = False'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'bottombutton'#39
+      '      Align = alBottom'
+      '      Position.Point = '#39'(0,35)'#39
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 18.000000000000000000'
+      '      StyleLookup = '#39'scrollbarbottombutton'#39
+      '      TabOrder = 6'
+      '      CanFocus = False'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'memCodehscrollbar1'#39
+      '    Position.Point = '#39'(333,372)'#39
+      '    Width = 176.000000000000000000'
+      '    Height = 53.000000000000000000'
+      '    DesignVisible = False'
+      '    object TRectangle'
+      '      StyleName = '#39'background'#39
+      '      Align = alContents'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      HitTest = False'
+      '      Fill.Color = xFF484848'
+      '      Stroke.Kind = bkNone'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'leftbutton'#39
+      '      Align = alLeft'
+      '      Position.Point = '#39'(0,18)'#39
+      '      Locked = True'
+      '      Width = 18.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarleftbutton'#39
+      '      TabOrder = 1'
+      '      CanFocus = False'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'htrack'#39
+      '      Align = alClient'
+      '      Position.Point = '#39'(18,18)'#39
+      '      Locked = True'
+      '      Width = 140.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarhtrackstyle'#39
+      '      TabOrder = 2'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'rightbutton'#39
+      '      Align = alRight'
+      '      Position.Point = '#39'(158,18)'#39
+      '      Locked = True'
+      '      Width = 18.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarrightbutton'#39
+      '      TabOrder = 3'
+      '      CanFocus = False'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'vtrack'#39
+      '      Align = alClient'
+      '      Position.Point = '#39'(18,18)'#39
+      '      Locked = True'
+      '      Width = 140.000000000000000000'
+      '      Height = 17.000000000000000000'
+      '      StyleLookup = '#39'scrollbarvtrackstyle'#39
+      '      TabOrder = 4'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'topbutton'#39
+      '      Align = alTop'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 18.000000000000000000'
+      '      StyleLookup = '#39'scrollbartopbutton'#39
+      '      TabOrder = 5'
+      '      CanFocus = False'
+      '    end'
+      '    object TButton'
+      '      StyleName = '#39'bottombutton'#39
+      '      Align = alBottom'
+      '      Position.Point = '#39'(0,35)'#39
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 18.000000000000000000'
+      '      StyleLookup = '#39'scrollbarbottombutton'#39
+      '      TabOrder = 6'
+      '      CanFocus = False'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'memCodevsmallscrollbar1'#39
+      '    Position.Point = '#39'(333,372)'#39
+      '    Width = 176.000000000000000000'
+      '    Height = 53.000000000000000000'
+      '    DesignVisible = False'
+      '    object TTrack'
+      '      StyleName = '#39'htrack'#39
+      '      Align = alClient'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      StyleLookup = '#39'smallscrollbarhtrackstyle'#39
+      '      TabOrder = 0'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'vtrack'#39
+      '      Align = alClient'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      StyleLookup = '#39'smallscrollbarvtrackstyle'#39
+      '      TabOrder = 1'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'memCodehsmallscrollbar1'#39
+      '    Position.Point = '#39'(333,372)'#39
+      '    Width = 176.000000000000000000'
+      '    Height = 53.000000000000000000'
+      '    DesignVisible = False'
+      '    object TTrack'
+      '      StyleName = '#39'htrack'#39
+      '      Align = alClient'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      StyleLookup = '#39'smallscrollbarhtrackstyle'#39
+      '      TabOrder = 0'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '    object TTrack'
+      '      StyleName = '#39'vtrack'#39
+      '      Align = alClient'
+      '      Locked = True'
+      '      Width = 176.000000000000000000'
+      '      Height = 53.000000000000000000'
+      '      StyleLookup = '#39'smallscrollbarvtrackstyle'#39
+      '      TabOrder = 1'
+      '      Max = 1.000000000000000000'
+      '      Orientation = orHorizontal'
+      '      ViewportSize = 0.100000001490116100'
+      '    end'
+      '  end'
+      '  object TLayout'
+      '    StyleName = '#39'Splitter1Style1'#39
+      '    Position.Point = '#39'(396,374)'#39
+      '    Width = 50.000000000000000000'
+      '    Height = 50.000000000000000000'
+      '    DesignVisible = False'
+      '    object TEllipse'
+      '      StyleName = '#39'background'#39
+      '      Align = alFit'
+      '      Locked = True'
+      '      Width = 50.000000000000000000'
+      '      Height = 50.000000000000000000'
+      '      HitTest = False'
+      '      Fill.Kind = bkGradient'
+      '      Fill.Gradient.Points = <'
+      '        item'
+      '          Color = xFF24FC24'
+      '        end'
+      '        item'
+      '          Color = xFFECECEC'
+      '          Offset = 1.000000000000000000'
+      '        end>'
+      
+        '      Fill.Gradient.StartPosition.Point = '#39'(1.94849825163601E-8,' +
+        '-2.37071162700886E-9)'#39
+      '      Fill.Gradient.StopPosition.Point = '#39'(1,1)'#39
+      '      Stroke.Color = xFFA0A0A0'
+      '    end'
+      '  end'
+      '  object TRectangle'
+      '    StyleName = '#39'pnlTopStyle1'#39
+      '    Position.Point = '#39'(396,374)'#39
+      '    Width = 50.000000000000000000'
+      '    Height = 50.000000000000000000'
+      '    HitTest = False'
+      '    Fill.Color = claAzure'
+      '    Stroke.Color = xFF8E8E8E'
+      '  end'
+      'end')
+    Left = 336
+    Top = 128
+  end
+  object GradientAnimation1: TGradientAnimation
+    Duration = 0.200000002980232200
+    StartValue.Points = <
+      item
+        Color = xFFEDFEC3
+      end
+      item
+        Color = claWhite
+        Offset = 1.000000000000000000
+      end>
+    StartValue.StartPosition.Point = '(0.5,1)'
+    StartValue.StopPosition.Point = '(0.5,5.55111512312578E-17)'
+    StopValue.Points = <
+      item
+        Color = xFF7FB9FF
+      end
+      item
+        Color = xFFF1F7FF
+        Offset = 0.897106111049652100
+      end
+      item
+        Color = claWhite
+        Offset = 1.000000000000000000
+      end>
+    StopValue.StartPosition.Point = '(0.5,1)'
+    StopValue.StopPosition.Point = '(0.5,5.55111512312578E-17)'
+    PropertyName = 'Fill.Gradient'
+  end
+  object Lua4Delphi1: TL4D51Static
+    Options.Libraries.Base = False
+    Options.Libraries.IO = False
+    Options.Libraries.Math = False
+    Options.Libraries.OS = False
+    Options.Libraries.Package = False
+    Options.Libraries.Strings = False
+    Options.Libraries.Table = False
+    OnCreate = Lua4Delphi1Create
+    OnException = Lua4Delphi1Exception
+    OnLuaError = Lua4Delphi1LuaError
+    Left = 224
+    Top = 365
+  end
+end

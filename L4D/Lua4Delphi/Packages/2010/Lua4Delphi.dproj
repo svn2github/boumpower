@@ -1,0 +1,124 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{23C71155-A645-4DC2-A0B7-93EBFAD2EDE0}</ProjectGuid>
+			<MainSource>Lua4Delphi.dpk</MainSource>
+			<ProjectVersion>12.0</ProjectVersion>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DesignOnlyPackage>false</DesignOnlyPackage>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<GenPackage>true</GenPackage>
+			<DllSuffix>140</DllSuffix>
+			<DCC_Platform>x86</DCC_Platform>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_DependencyCheckOutputName>C:\Users\Public\Documents\RAD Studio\7.0\Bpl\Lua4Delphi140.bpl</DCC_DependencyCheckOutputName>
+			<DCC_UnitSearchPath>..\..\Source\Common;..\..\Source\Core;..\..\Source\Packages;..\..\Source\Wrappers;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_S>false</DCC_S>
+			<DCC_N>false</DCC_N>
+			<GenDll>true</GenDll>
+			<DCC_DcpOutput>..\..\BPL\Win32\$(Config)\2010\DCP</DCC_DcpOutput>
+			<DCC_E>false</DCC_E>
+			<DCC_DcuOutput>..\..\DCU\2010\Win32\$(Config)</DCC_DcuOutput>
+			<DCC_K>false</DCC_K>
+			<DCC_F>false</DCC_F>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DCC_DebugInformation>false</DCC_DebugInformation>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="Lua4Delphi.dpk">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="LKSL.dcp"/>
+			<DCCReference Include="E:\Source\Core\L4D.Engine.Constants.pas"/>
+			<DCCReference Include="E:\Source\Core\L4D.Engine.DelphiTypes.pas"/>
+			<DCCReference Include="E:\Source\Core\L4D.Engine.Main.pas"/>
+			<DCCReference Include="E:\Source\Core\L4D.Engine.StaticLua51.pas"/>
+			<DCCReference Include="E:\Source\Lua\L4D.Lua.Common.pas"/>
+			<DCCReference Include="E:\Source\Lua\L4D.Lua.Constants.pas"/>
+			<DCCReference Include="E:\Source\Lua\L4D.Lua.Intf.pas"/>
+			<DCCReference Include="E:\Source\Lua\L4D.Lua.Lua51.pas"/>
+			<DCCReference Include="E:\Source\Lua\L4D.Lua.Lua52.pas"/>
+			<DCCReference Include="E:\Source\Lua\L4D.Lua.StaticLua51.pas"/>
+			<DCCReference Include="E:\Source\Packages\L4D.Engine.Reg.pas"/>
+			<None Include="E:\Source\Common\Lua4Delphi.inc"/>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType>Package</Borland.ProjectType>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Source>
+						<Source Name="MainSource">Lua4Delphi.dpk</Source>
+					</Source>
+					<Parameters>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">True</VersionInfo>
+						<VersionInfo Name="MajorVer">2</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">0</VersionInfo>
+						<VersionInfo Name="Build">1</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">2057</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName">LaKraven Studios Ltd.</VersionInfoKeys>
+						<VersionInfoKeys Name="FileDescription">Lua4Delphi for Delphi 2010</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">2.0.0.1</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName">Lua4Delphi_2010</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalCopyright">Copyright (C) 2009-2011, LaKraven Studios Ltd, All Rights Reserved</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalTrademarks">&quot;Lua4Delphi&quot; and its logo are Trademarks of LaKraven Studios Ltd.</VersionInfoKeys>
+						<VersionInfoKeys Name="OriginalFilename">Lua4Delphi140.bpl</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductName">Lua4Delphi</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductVersion">2</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments"/>
+					</VersionInfoKeys>
+				</Delphi.Personality>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>

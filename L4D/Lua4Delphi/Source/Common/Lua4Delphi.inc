@@ -23,6 +23,8 @@
   Changelog:
     5th February 2012:
       - Released
+    6th February 2012:
+      - Added "L4D_USE_INLINE" define
 }
 {$I LKSL.inc}
 
@@ -38,4 +40,5 @@
   {$DEFINE L4D_DEVELOPER_HINTS} // Shows Developer Hints (intended for development of Lua4Delphi itself)
 {$ELSE}
   {$INLINE ON} // Good for optimization (minimal size cost)
+  {$DEFINE L4D_USE_INLINE}
 {$ENDIF}

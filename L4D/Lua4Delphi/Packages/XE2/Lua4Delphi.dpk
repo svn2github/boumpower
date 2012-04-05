@@ -40,6 +40,7 @@ contains
   L4D.Lua.Intf in '..\..\Source\Lua\L4D.Lua.Intf.pas',
   L4D.Lua.Common in '..\..\Source\Lua\L4D.Lua.Common.pas',
   L4D.Lua.Lua51 in '..\..\Source\Lua\L4D.Lua.Lua51.pas',
+  L4D.Lua.Lua52 in '..\..\Source\Lua\L4D.Lua.Lua52.pas',
   L4D.Lua.StaticLua51 in '..\..\Source\Lua\L4D.Lua.StaticLua51.pas',
   L4D.Lua.Constants in '..\..\Source\Lua\L4D.Lua.Constants.pas',
   L4D.Engine.Main in '..\..\Source\Core\L4D.Engine.Main.pas',

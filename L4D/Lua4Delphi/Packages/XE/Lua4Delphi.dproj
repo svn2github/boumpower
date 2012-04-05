@@ -1,0 +1,129 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{B0E61D9A-B026-46B5-8BF8-1A9D81725151}</ProjectGuid>
+			<MainSource>Lua4Delphi.dpk</MainSource>
+			<ProjectVersion>12.3</ProjectVersion>
+			<Base>True</Base>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Platform>Win32</Platform>
+			<AppType>Package</AppType>
+			<FrameworkType>None</FrameworkType>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_Description>Lua4Delphi for Delphi XE</DCC_Description>
+			<GenPackage>true</GenPackage>
+			<DllSuffix>150</DllSuffix>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_BplOutput>..\..\BPL\$(Platform)\$(Config)</DCC_BplOutput>
+			<DCC_UnitSearchPath>..\..\Source\Common;..\..\Source\Core;..\..\Source\Packages;..\..\Source\Wrappers;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_CBuilderOutput>All</DCC_CBuilderOutput>
+			<DCC_S>false</DCC_S>
+			<DCC_N>false</DCC_N>
+			<GenDll>true</GenDll>
+			<DCC_DcpOutput>..\..\BPL\$(Platform)\$(Config)\XE\DCP</DCC_DcpOutput>
+			<DCC_E>false</DCC_E>
+			<DCC_DcuOutput>..\..\DCU\XE2\$(Platform)\$(Config)</DCC_DcuOutput>
+			<DCC_K>false</DCC_K>
+			<DCC_F>false</DCC_F>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_DcuOutput>..\..\DCU\XE\$(Platform)\$(Config)</DCC_DcuOutput>
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+			<DCC_Optimize>false</DCC_Optimize>
+			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DCC_DebugInformation>false</DCC_DebugInformation>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="Lua4Delphi.dpk">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="LKSL.dcp"/>
+			<DCCReference Include="E:\Source\Core\L4D.Engine.Constants.pas"/>
+			<DCCReference Include="E:\Source\Core\L4D.Engine.DelphiTypes.pas"/>
+			<DCCReference Include="E:\Source\Core\L4D.Engine.Main.pas"/>
+			<DCCReference Include="E:\Source\Core\L4D.Engine.StaticLua51.pas"/>
+			<DCCReference Include="E:\Source\Lua\L4D.Lua.Common.pas"/>
+			<DCCReference Include="E:\Source\Lua\L4D.Lua.Constants.pas"/>
+			<DCCReference Include="E:\Source\Lua\L4D.Lua.Intf.pas"/>
+			<DCCReference Include="E:\Source\Lua\L4D.Lua.Lua51.pas"/>
+			<DCCReference Include="E:\Source\Lua\L4D.Lua.StaticLua51.pas"/>
+			<DCCReference Include="E:\Source\Packages\L4D.Engine.Reg.pas"/>
+			<None Include="E:\Source\Common\Lua4Delphi.inc"/>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType>Package</Borland.ProjectType>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Source>
+						<Source Name="MainSource">Lua4Delphi.dpk</Source>
+					</Source>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">True</VersionInfo>
+						<VersionInfo Name="MajorVer">2</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">0</VersionInfo>
+						<VersionInfo Name="Build">1</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">2057</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName">LaKraven Studios Ltd.</VersionInfoKeys>
+						<VersionInfoKeys Name="FileDescription">Lua4Delphi for Delphi XE</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">2.0.0.1</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName">Lua4Delphi_DXE</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalCopyright">Copyright (C) 2009-2012, LaKraven Studios Ltd, All Rights Reserved</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalTrademarks">&quot;Lua4Delphi&quot; and its logo are Trademarks of LaKraven Studios Ltd.</VersionInfoKeys>
+						<VersionInfoKeys Name="OriginalFilename">Lua4Delphi150.bpl</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductName">Lua4Delphi</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductVersion">2</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments"/>
+					</VersionInfoKeys>
+				</Delphi.Personality>
+				<Platforms>
+					<Platform value="Win32">True</Platform>
+				</Platforms>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>

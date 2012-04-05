@@ -53,8 +53,8 @@
 			<VerInfo_Keys>CompanyName=LaKraven Studios Ltd.;FileDescription=Lua4Delphi for Delphi XE2;FileVersion=2.0.0.0;InternalName=Lua4Delphi_DXE2;LegalCopyright=Copyright (C) 2009-2011, LaKraven Studios Ltd, All Rights Reserved;LegalTrademarks=&quot;Lua4Delphi&quot; and its logo are Trademarks of LaKraven Studios Ltd.;OriginalFilename=Lua4Delphi_DXE2.bpl;ProductName=Lua4Delphi;ProductVersion=2;Comments=</VerInfo_Keys>
 			<VerInfo_Locale>2057</VerInfo_Locale>
 			<DCC_UsePackage>rtl;LKSL;$(DCC_UsePackage)</DCC_UsePackage>
-			<DCC_DcpOutput>..\..\BPL\XE2\$(Platform)\$(Config)\DCP</DCC_DcpOutput>
-			<DCC_BplOutput>..\..\BPL\XE2\$(Platform)\$(Config)</DCC_BplOutput>
+			<DCC_DcpOutput>..\..\BPL\$(Platform)\$(Config)\DCP</DCC_DcpOutput>
+			<DCC_BplOutput>..\..\BPL\$(Platform)\$(Config)</DCC_BplOutput>
 			<VerInfo_MajorVer>2</VerInfo_MajorVer>
 			<DCC_Description>Lua4Delphi for Delphi XE2</DCC_Description>
 			<DCC_CBuilderOutput>All</DCC_CBuilderOutput>
@@ -117,6 +117,7 @@
 			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Intf.pas"/>
 			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Common.pas"/>
 			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Lua51.pas"/>
+			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Lua52.pas"/>
 			<DCCReference Include="..\..\Source\Lua\L4D.Lua.StaticLua51.pas"/>
 			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Constants.pas"/>
 			<DCCReference Include="..\..\Source\Core\L4D.Engine.Main.pas"/>

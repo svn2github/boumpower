@@ -91,12 +91,12 @@ type
   TLua51Common = class(TLua51Base, ILua51LibLocal, ILua51AuxLocal)
   public
     {$REGION 'ILua51AuxLocal'}
-      function luaL_findtable(idx: Integer; const fname: PAnsiChar; szhint: Integer): PAnsiChar; overload; inline;
-      function luaL_loadbuffer(const buff: PAnsiChar; sz: Cardinal; const name: PAnsiChar): Integer; overload; inline;
-      function luaL_loadfile(const filename: PAnsiChar): Integer; overload; inline;
-      procedure luaL_openlib(const libname: PAnsiChar; const lr: PLuaLReg; nup: Integer); overload; inline;
-      procedure luaL_register(const libname: PAnsiChar; const lr: PLuaLReg); overload; inline;
-      function luaL_typerror(narg: Integer; const tname: PAnsiChar): Integer; overload; inline;
+      function luaL_findtable(idx: Integer; const fname: PAnsiChar; szhint: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function luaL_loadbuffer(const buff: PAnsiChar; sz: Cardinal; const name: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function luaL_loadfile(const filename: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure luaL_openlib(const libname: PAnsiChar; const lr: PLuaLReg; nup: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure luaL_register(const libname: PAnsiChar; const lr: PLuaLReg); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function luaL_typerror(narg: Integer; const tname: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
     {$ENDREGION}
   end;
 

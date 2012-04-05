@@ -23,6 +23,9 @@
   Changelog:
     5th February 2012:
       - Released
+    6th February 2012:
+      - Methods and Object Methods now use a "Container Object" in an Array.
+      - Fixed bug with reading returned values in Delphi
 }
 unit L4D.Engine.Main;
 
@@ -50,6 +53,8 @@ const
 
 type
   { Forward Declarations }
+  TL4DMethod = class;
+  TL4DMethodObject = class;
   TL4DMethodStack = class;
   TL4DGlobalStack = class;
   TL4DEngine = class;
@@ -82,12 +87,45 @@ type
   TL4DDelphiObjectFunction = procedure(var ALuaStack: TL4DMethodStack) of object;
 
   { Array Types }
-  TPointerArray = Array of Pointer;
+  TL4DMethodArray = Array of TL4DMethod;
+  TL4DMethodObjectArray = Array of TL4DMethodObject;
+
+  { Pointer Types }
+  PL4DMethod = ^TL4DMethod;
+  PL4DMethodObject = ^TL4DMethodObject;
+
+  {
+    TL4DMethod
+      - A container for Delphi Methods registered with Lua
+  }
+  {$REGION 'TL4DMethod - A container for Delphi Methods registered with Lua'}
+    TL4DMethod = class(TPersistent)
+    private
+      FMethod: TL4DDelphiFunction;
+    public
+      constructor Create(const AMethod: TL4DDelphiFunction);
+      property Method: TL4DDelphiFunction read FMethod;
+    end;
+  {$ENDREGION}
+
+  {
+    TL4DMethodObject
+    - A container for Object-bound Delphi Methods registered with Lua
+  }
+  {$REGION 'TL4DMethodObject - A container for Object-bound Delphi Methods registered with Lua'}
+    TL4DMethodObject = class(TPersistent)
+    private
+      FMethod: TL4DDelphiObjectFunction;
+    public
+      constructor Create(const AMethod: TL4DDelphiObjectFunction);
+      property Method: TL4DDelphiObjectFunction read FMethod;
+    end;
+  {$ENDREGION}
 
   {
     TL4DMethodResultStack
   }
-  {$REGION 'Method Result Stack Type'}
+  {$REGION 'TL4DMethodResultStack - Method Result Stack Type'}
     PL4DMethodResultStack = ^TL4DMethodResultStack;
     TL4DMethodResultStack = record
       type TL4DMethodResultStackValue = record
@@ -95,34 +133,34 @@ type
         FIndex: Integer;
         FStack: PL4DMethodResultStack;
         // Getters
-        function GetAsAnsiString: AnsiString; inline;
-        function GetAsBoolean: Boolean; inline;
-        function GetAsChar: Char; inline;
-        function GetAsDouble: Double; inline;
-        function GetAsExtended: Extended; inline;
-        function GetAsInteger: Integer; inline;
-        function GetAsPAnsiChar: PAnsiChar; inline;
-        function GetAsPChar: PChar; inline;
-        function GetAsPointer: Pointer; inline;
-        function GetAsSingle: Single; inline;
-        function GetAsString: String; inline;
-        function GetAsVariant: Variant; inline;
-        function GetAsWideString: WideString; inline;
-        function GetCanBeAnsiString: Boolean; inline;
-        function GetCanBeBoolean: Boolean; inline;
-        function GetCanBeChar: Boolean; inline;
-        function GetCanBeDouble: Boolean; inline;
-        function GetCanBeExtended: Boolean; inline;
-        function GetCanBeInteger: Boolean; inline;
-        function GetCanBePAnsiChar: Boolean; inline;
-        function GetCanBePChar: Boolean; inline;
-        function GetCanBePointer: Boolean; inline;
-        function GetCanBeSingle: Boolean; inline;
-        function GetCanBeString: Boolean; inline;
-        function GetCanBeVariant: Boolean; inline;
-        function GetCanBeWideString: Boolean; inline;
-        function GetType: TL4DStackValueType; inline;
-        function GetTypeName: String; inline;
+        function GetAsAnsiString: AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsChar: Char; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsDouble: Double; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsExtended: Extended; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsInteger: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPAnsiChar: PAnsiChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPChar: PChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPointer: Pointer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsSingle: Single; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsString: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsVariant: Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsWideString: WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeAnsiString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeDouble: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeExtended: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeInteger: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePAnsiChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePointer: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeSingle: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeVariant: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeWideString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetType: TL4DStackValueType; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetTypeName: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       public
         function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): TL4DMethodResultStack;
         property AsAnsiString: AnsiString read GetAsAnsiString;
@@ -157,7 +195,7 @@ type
     private
       FLua: TL4DEngine;
       FOffset: Integer;
-      function GetCount: Integer; inline;
+      function GetCount: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       function GetValue(const AIndex: Integer): TL4DMethodResultStackValue; {inline;}
     public
       procedure Cleanup;
@@ -169,41 +207,41 @@ type
   {
     TL4DMethodStack
   }
-  {$REGION 'TL4DMethodStack- Method Stack Type'}
+  {$REGION 'TL4DMethodStack - Method Stack Type'}
     TL4DMethodStack = class(TPersistent)
       type TL4DMethodStackValue = record
       private
         FIndex: Integer;
         FStack: TL4DMethodStack;
         // Getters
-        function GetAsAnsiString: AnsiString; inline;
-        function GetAsBoolean: Boolean; inline;
-        function GetAsChar: Char; inline;
-        function GetAsDouble: Double; inline;
-        function GetAsExtended: Extended; inline;
-        function GetAsInteger: Integer; inline;
-        function GetAsPAnsiChar: PAnsiChar; inline;
-        function GetAsPChar: PChar; inline;
-        function GetAsPointer: Pointer; inline;
-        function GetAsSingle: Single; inline;
-        function GetAsString: String; inline;
-        function GetAsVariant: Variant; inline;
-        function GetAsWideString: WideString; inline;
-        function GetCanBeAnsiString: Boolean; inline;
-        function GetCanBeBoolean: Boolean; inline;
-        function GetCanBeChar: Boolean; inline;
-        function GetCanBeDouble: Boolean; inline;
-        function GetCanBeExtended: Boolean; inline;
-        function GetCanBeInteger: Boolean; inline;
-        function GetCanBePAnsiChar: Boolean; inline;
-        function GetCanBePChar: Boolean; inline;
-        function GetCanBePointer: Boolean; inline;
-        function GetCanBeSingle: Boolean; inline;
-        function GetCanBeString: Boolean; inline;
-        function GetCanBeVariant: Boolean; inline;
-        function GetCanBeWideString: Boolean; inline;
-        function GetType: TL4DStackValueType; inline;
-        function GetTypeName: String; inline;
+        function GetAsAnsiString: AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsChar: Char; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsDouble: Double; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsExtended: Extended; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsInteger: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPAnsiChar: PAnsiChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPChar: PChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPointer: Pointer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsSingle: Single; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsString: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsVariant: Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsWideString: WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeAnsiString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeDouble: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeExtended: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeInteger: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePAnsiChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePointer: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeSingle: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeVariant: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeWideString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetType: TL4DStackValueType; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetTypeName: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       public
         function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): TL4DMethodResultStack;
         property AsAnsiString: AnsiString read GetAsAnsiString;
@@ -238,27 +276,27 @@ type
     private
       FLua: TL4DEngine;
       FPushCount: Integer;
-      function GetCount: Integer; inline;
-      function GetValue(const AIndex: Integer): TL4DMethodStackValue; inline;
+      function GetCount: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetValue(const AIndex: Integer): TL4DMethodStackValue; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
     public
       constructor Create(const ALua: TL4DEngine);
-      procedure PushAnsiChar(const AValue: AnsiChar); inline;
-      procedure PushAnsiString(const AValue: AnsiString); inline;
-      procedure PushBoolean(const AValue: Boolean); inline;
-      procedure PushChar(const AValue: Char); inline;
-      procedure PushDouble(const AValue: Double); inline;
-      procedure PushExtended(const AValue: Extended); inline;
+      procedure PushAnsiChar(const AValue: AnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushAnsiString(const AValue: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushBoolean(const AValue: Boolean); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushChar(const AValue: Char); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushDouble(const AValue: Double); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushExtended(const AValue: Extended); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       procedure PushFunction(const AValue: TL4DDelphiFunction); overload;  // Stack-Managed Delphi Procedure
       procedure PushFunction(const AValue: TL4DDelphiObjectFunction); overload;  // Stack-Managed Delphi Object Procedure
-      procedure PushFunction(const AValue: TLuaDelphiFunction); overload; inline; // Standard Lua "C" Function
-      procedure PushInteger(const AValue: Integer); inline;
-      procedure PushPAnsiChar(const AValue: PAnsiChar); inline;
-      procedure PushPChar(const AValue: PChar); inline;
-      procedure PushPointer(const AValue: Pointer); inline;
-      procedure PushSingle(const AValue: Single); inline;
-      procedure PushString(const AValue: WideString); inline;
-      procedure PushVariant(const AValue: Variant); inline;
-      procedure PushWideString(const AValue: WideString); inline;
+      procedure PushFunction(const AValue: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // Standard Lua "C" Function
+      procedure PushInteger(const AValue: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushPAnsiChar(const AValue: PAnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushPChar(const AValue: PChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushPointer(const AValue: Pointer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushSingle(const AValue: Single); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushVariant(const AValue: Variant); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushWideString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       property Count: Integer read GetCount;
       property Value[const AIndex: Integer]: TL4DMethodStackValue read GetValue; default;
     end;
@@ -275,37 +313,37 @@ type
         FKey: AnsiString;
         FStack: TL4DGlobalStack;
         // Getters
-        function GetAsAnsiString: AnsiString; inline;
-        function GetAsBoolean: Boolean; inline;
-        function GetAsChar: Char; inline;
-        function GetAsDouble: Double; inline;
-        function GetAsExtended: Extended; inline;
-        function GetAsInteger: Integer; inline;
-        function GetAsPAnsiChar: PAnsiChar; inline;
-        function GetAsPChar: PChar; inline;
-        function GetAsPointer: Pointer; inline;
-        function GetAsSingle: Single; inline;
-        function GetAsString: String; inline;
-        function GetAsVariant: Variant; inline;
-        function GetAsWideString: WideString; inline;
-        function GetType: TL4DStackValueType; inline;
-        function GetTypeName: String; inline;
+        function GetAsAnsiString: AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsChar: Char; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsDouble: Double; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsExtended: Extended; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsInteger: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPAnsiChar: PAnsiChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPChar: PChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPointer: Pointer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsSingle: Single; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsString: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsVariant: Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsWideString: WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetType: TL4DStackValueType; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetTypeName: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         // Setters
-        procedure SetAnsiString(const AValue: AnsiString); inline;
-        procedure SetBoolean(const AValue: Boolean); inline;
-        procedure SetChar(const AValue: Char); inline;
-        procedure SetDouble(const AValue: Double); inline;
-        procedure SetExtended(const AValue: Extended); inline;
-        procedure SetInteger(const AValue: Integer); inline;
-        procedure SetPAnsiChar(const AValue: PAnsiChar); inline;
-        procedure SetPChar(const AValue: PChar); inline;
-        procedure SetPointer(const AValue: Pointer); inline;
-        procedure SetSingle(const AValue: Single); inline;
-        procedure SetString(const AValue: String); inline;
-        procedure SetVariant(const AValue: Variant); inline;
-        procedure SetWideString(const AValue: WideString); inline;
+        procedure SetAnsiString(const AValue: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetBoolean(const AValue: Boolean); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetChar(const AValue: Char); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetDouble(const AValue: Double); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetExtended(const AValue: Extended); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetInteger(const AValue: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetPAnsiChar(const AValue: PAnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetPChar(const AValue: PChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetPointer(const AValue: Pointer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetSingle(const AValue: Single); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetString(const AValue: String); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetVariant(const AValue: Variant); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetWideString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       public
-        procedure Delete; inline;
+        procedure Delete; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): TL4DMethodResultStack;
         property AsAnsiString: AnsiString read GetAsAnsiString write SetAnsiString;
         property AsBoolean: Boolean read GetAsBoolean write SetBoolean;
@@ -325,27 +363,27 @@ type
       end;
     private
       FLua: TL4DEngine;
-      function GetGlobal(const AKey: AnsiString): TL4DGlobalStackValue; inline;
-      procedure SetGlobal(const AKey: AnsiString); inline;
+      function GetGlobal(const AKey: AnsiString): TL4DGlobalStackValue; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure SetGlobal(const AKey: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
     public
       constructor Create(const ALua: TL4DEngine);
-      procedure PushAnsiChar(const AKey: AnsiString; const AValue: AnsiChar); inline;
-      procedure PushAnsiString(const AKey: AnsiString; const AValue: AnsiString); inline;
-      procedure PushBoolean(const AKey: AnsiString; const AValue: Boolean); inline;
-      procedure PushChar(const AKey: AnsiString; const AValue: Char); inline;
-      procedure PushDouble(const AKey: AnsiString; const AValue: Double); inline;
-      procedure PushExtended(const AKey: AnsiString; const AValue: Extended); inline;
+      procedure PushAnsiChar(const AKey: AnsiString; const AValue: AnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushAnsiString(const AKey: AnsiString; const AValue: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushBoolean(const AKey: AnsiString; const AValue: Boolean); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushChar(const AKey: AnsiString; const AValue: Char); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushDouble(const AKey: AnsiString; const AValue: Double); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushExtended(const AKey: AnsiString; const AValue: Extended); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       procedure PushFunction(const AKey: AnsiString; const AValue: TL4DDelphiFunction); overload;  // Stack-Managed Delphi Procedure
       procedure PushFunction(const AKey: AnsiString; const AValue: TL4DDelphiObjectFunction); overload;  // Stack-Managed Delphi Object Procedure
-      procedure PushFunction(const AKey: AnsiString; const AValue: TLuaDelphiFunction); overload; inline; // Standard Lua "C" Function
-      procedure PushInteger(const AKey: AnsiString; const AValue: Integer); inline;
-      procedure PushPAnsiChar(const AKey: AnsiString; const AValue: PAnsiChar); inline;
-      procedure PushPChar(const AKey: AnsiString; const AValue: PChar); inline;
-      procedure PushPointer(const AKey: AnsiString; const AValue: Pointer); inline;
-      procedure PushSingle(const AKey: AnsiString; const AValue: Single); inline;
-      procedure PushString(const AKey: AnsiString; const AValue: WideString); inline;
-      procedure PushVariant(const AKey: AnsiString; const AValue: Variant); inline;
-      procedure PushWideString(const AKey: AnsiString; const AValue: WideString); inline;
+      procedure PushFunction(const AKey: AnsiString; const AValue: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // Standard Lua "C" Function
+      procedure PushInteger(const AKey: AnsiString; const AValue: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushPAnsiChar(const AKey: AnsiString; const AValue: PAnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushPChar(const AKey: AnsiString; const AValue: PChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushPointer(const AKey: AnsiString; const AValue: Pointer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushSingle(const AKey: AnsiString; const AValue: Single); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushString(const AKey: AnsiString; const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushVariant(const AKey: AnsiString; const AValue: Variant); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushWideString(const AKey: AnsiString; const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       property Lua: TL4DEngine read FLua;
       property Value[const AKey: AnsiString]: TL4DGlobalStackValue read GetGlobal; default;
     end;
@@ -362,49 +400,50 @@ type
       FGlobals: TL4DGlobalStack;
       FLua: TLuaCommon;
       FInstanceType: TL4DInstanceType;
-      //FMethods: TPointerArray;
+      FMethods: TL4DMethodArray;
+      FObjectMethods: TL4DMethodObjectArray;
       FOptions: TL4DOptions;
       FOnException: TL4DExceptionEvent;
       FOnLuaError: TL4DLuaErrorEvent;
     public
       // Lua4Delphi Custom Macros
       function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): TL4DMethodResultStack;
-      function GetAsAnsiString(const AIndex: Integer): AnsiString; inline;
-      function GetAsBoolean(const AIndex: Integer): Boolean; inline;
-      function GetAsChar(const AIndex: Integer): Char; inline;
-      function GetAsDouble(const AIndex: Integer): Double; inline;
-      function GetAsExtended(const AIndex: Integer): Extended; inline;
-      function GetAsInteger(const AIndex: Integer): Integer; inline;
-      function GetAsPAnsiChar(const AIndex: Integer): PAnsiChar; inline;
-      function GetAsPChar(const AIndex: Integer): PChar; inline;
-      function GetAsPointer(const AIndex: Integer): Pointer; inline;
-      function GetAsSingle(const AIndex: Integer): Single; inline;
-      function GetAsString(const AIndex: Integer): WideString; inline;
-      function GetAsWideString(const AIndex: Integer): WideString; inline;
-      function GetAsVariant(const AIndex: Integer): Variant; inline;
+      function GetAsAnsiString(const AIndex: Integer): AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsBoolean(const AIndex: Integer): Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsChar(const AIndex: Integer): Char; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsDouble(const AIndex: Integer): Double; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsExtended(const AIndex: Integer): Extended; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsInteger(const AIndex: Integer): Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsPAnsiChar(const AIndex: Integer): PAnsiChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsPChar(const AIndex: Integer): PChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsPointer(const AIndex: Integer): Pointer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsSingle(const AIndex: Integer): Single; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsString(const AIndex: Integer): WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsWideString(const AIndex: Integer): WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetAsVariant(const AIndex: Integer): Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       function GetLuaType(const AIndex: Integer): TL4DStackValueType; //inline;
-      function GetLuaTypeName(const AIndex: Integer): String; inline;
+      function GetLuaTypeName(const AIndex: Integer): String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       function LoadLuaCode(const ACode, AName: WideString; const AAutoExecute: Boolean = True): Boolean;
       function LoadLuaFile(const AFileName: WideString; const AAutoExecute: Boolean = True): Boolean;
-      procedure Pop(const ANumber: Integer); inline;
-      procedure PushAnsiChar(const AValue: AnsiChar); inline;
-      procedure PushAnsiString(const AValue: AnsiString); inline;
-      procedure PushBoolean(const AValue: Boolean); inline;
-      procedure PushChar(const AValue: Char); inline;
-      procedure PushDouble(const AValue: Double); inline;
-      procedure PushExtended(const AValue: Extended); inline;
+      procedure Pop(const ANumber: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushAnsiChar(const AValue: AnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushAnsiString(const AValue: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushBoolean(const AValue: Boolean); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushChar(const AValue: Char); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushDouble(const AValue: Double); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushExtended(const AValue: Extended); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       procedure PushFunction(const AValue: TL4DDelphiFunction); overload;         // Stack-Managed Delphi Procedure
       procedure PushFunction(const AValue: TL4DDelphiObjectFunction); overload;   // Stack-Managed Delphi Object Procedure
-      procedure PushFunction(const AValue: TLuaDelphiFunction); overload; inline; // Standard Lua "C" Function
-      procedure PushInteger(const AValue: Integer); inline;
-      procedure PushPAnsiChar(const AValue: PAnsiChar); inline;
-      procedure PushPChar(const AValue: PChar); inline;
-      procedure PushPointer(const AValue: Pointer); inline;
-      procedure PushSingle(const AValue: Single); inline;
-      procedure PushString(const AValue: WideString); inline;
-      procedure PushVariant(const AValue: Variant); inline;
-      procedure PushWideString(const AValue: WideString); inline;
-      procedure Remove(const AIndex: Integer); inline;
+      procedure PushFunction(const AValue: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // Standard Lua "C" Function
+      procedure PushInteger(const AValue: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushPAnsiChar(const AValue: PAnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushPChar(const AValue: PChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushPointer(const AValue: Pointer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushSingle(const AValue: Single); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushVariant(const AValue: Variant); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure PushWideString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      procedure Remove(const AIndex: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       function SafeLuaExecute(const ANumArgs: Integer = 0; const ANumResults: Integer = 0; const AErrorFunc: Integer = 0): Integer; // Handles exceptions when executing Lua code
       // Base Methods
       constructor Create(ALuaType: TLuaBaseType); overload;
@@ -566,7 +605,8 @@ implementation
   function L4D_CallClassFunction(L: PLuaState): Integer; cdecl;
   var
     LLua: TL4DEngine;
-    LMethod: PL4DDelphiObjectFunction;
+//    LMethod: PL4DDelphiObjectFunction;
+    LMethod: PL4DMethodObject;
     LMethodStack: TL4DMethodStack;
   begin
     LLua := TL4DEngine.Create(LuaLinkType, L);
@@ -574,8 +614,12 @@ implementation
       LMethodStack := TL4DMethodStack.Create(LLua);
       try
         LMethodStack.FPushCount := 0;
+        LMethod := PL4DMethodObject(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
+        LMethod^.FMethod(LMethodStack);
+{
         LMethod := PL4DDelphiObjectFunction(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
         TL4DDelphiObjectFunction(LMethod^)(LMethodStack);
+}
         Result := LMethodStack.FPushCount;
       finally
         LMethodStack.Free;
@@ -583,6 +627,26 @@ implementation
     finally
       LLua.Free;
     end;
+  end;
+{$ENDREGION}
+
+{$REGION 'TL4DMethod - A container for Delphi Methods registered with Lua'}
+  { TL4DMethod }
+
+  constructor TL4DMethod.Create(const AMethod: TL4DDelphiFunction);
+  begin
+    inherited Create;
+    FMethod := AMethod;
+  end;
+{$ENDREGION}
+
+{$REGION 'TL4DMethodObject - A container for Object-bound Delphi Methods registered with Lua'}
+  { TL4DMethodObject }
+
+  constructor TL4DMethodObject.Create(const AMethod: TL4DDelphiObjectFunction);
+  begin
+    inherited Create;
+    FMethod := AMethod;
   end;
 {$ENDREGION}
 
@@ -1405,7 +1469,17 @@ implementation
   end;
 
   destructor TL4DEngine.Destroy;
+  var
+    I: Integer;
   begin
+    for I := Low(FObjectMethods) to High(FObjectMethods) do
+      FObjectMethods[I].Free;
+    SetLength(FObjectMethods, 0);
+
+    for I := Low(FMethods) to High(FMethods) do
+      FMethods[I].Free;
+    SetLength(FMethods, 0);
+
     FOptions.Free;
     FGlobals.Free;
     FLua.Free;
@@ -1555,14 +1629,14 @@ implementation
 
   procedure TL4DEngine.PushFunction(const AValue: TL4DDelphiObjectFunction);
   var
-    LMethod: PL4DDelphiObjectFunction;
-//    LIndex: Integer;
+    LMethod: PL4DMethodObject;
+    LIndex: Integer;
   begin
-    LMethod := FLua.lua_newuserdata(SizeOf(PL4DDelphiObjectFunction));
-//    LIndex := Length(FMethods);
-//    SetLength(FMethods, LIndex + 1);
-//    FMethods[LIndex] := LMethod;
-    TL4DDelphiObjectFunction(LMethod^) := AValue;
+    LMethod := FLua.lua_newuserdata(SizeOf(PL4DMethodObject));
+    LMethod^ := TL4DMethodObject.Create(AValue);
+    LIndex := Length(FObjectMethods);
+    SetLength(FObjectMethods, LIndex + 1);
+    FObjectMethods[LIndex] := LMethod^;
     FLua.lua_pushcclosure(L4D_CallClassFunction, 1);
   end;
 
@@ -1573,14 +1647,14 @@ implementation
 
   procedure TL4DEngine.PushFunction(const AValue: TL4DDelphiFunction);
   var
-    LMethod: PL4DDelphiFunction;
-//    LIndex: Integer;
+    LMethod: PL4DMethod;
+    LIndex: Integer;
   begin
-    LMethod := FLua.lua_newuserdata(SizeOf(PL4DDelphiFunction));
-//    LIndex := Length(FMethods);
-//    SetLength(FMethods, LIndex + 1);
-//    FMethods[LIndex] := LMethod;
-    TL4DDelphiFunction(LMethod^) := AValue;
+    LMethod := FLua.lua_newuserdata(SizeOf(PL4DMethod));
+    LMethod^ := TL4DMethod.Create(AValue);
+    LIndex := Length(FMethods);
+    SetLength(FMethods, LIndex + 1);
+    FMethods[LIndex] := LMethod^;
     FLua.lua_pushcclosure(L4D_CallDelphiFunction, 1);
   end;
 

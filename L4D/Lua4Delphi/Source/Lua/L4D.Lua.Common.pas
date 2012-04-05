@@ -62,24 +62,24 @@ type
       FLibPackage,
       FLibString,
       FLibTable: TLuaDelphiFunction;
-      function LoadLuaLibrary(const L: PLuaState; const ALibName: AnsiString; ALibFunc: TLuaDelphiFunction): Integer; inline;
+      function LoadLuaLibrary(const L: PLuaState; const ALibName: AnsiString; ALibFunc: TLuaDelphiFunction): Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       procedure SetLuaLibRefs; virtual; abstract;
       {$REGION 'ILuaLibCommonMacros'}
-        function lua_isboolean(L: PLuaState; idx: Integer): LongBool; overload; inline;
-        function lua_isfunction(L: PLuaState; idx: Integer): LongBool; overload; inline;
-        function lua_islightuserdata(L: PLuaState; idx: Integer): LongBool; overload; inline;
-        function lua_isnil(L: PLuaState; idx: Integer): LongBool; overload; inline;
-        function lua_isnone(L: PLuaState; idx: Integer): LongBool; overload; inline;
-        function lua_isnoneornil(L: PLuaState; idx: Integer): LongBool; overload; inline;
-        function lua_istable(L: PLuaState; idx: Integer): LongBool; overload; inline;
-        function lua_isthread(L: PLuaState; idx: Integer): LongBool; overload; inline;
-        procedure lua_newtable(L: PLuaState); overload; inline;
-        procedure lua_pop(L: PLuaState; n: Integer); overload; inline;
-        procedure lua_pushcfunction(L: PLuaState; f: TLuaDelphiFunction); overload; inline;
+        function lua_isboolean(L: PLuaState; idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isfunction(L: PLuaState; idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_islightuserdata(L: PLuaState; idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isnil(L: PLuaState; idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isnone(L: PLuaState; idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isnoneornil(L: PLuaState; idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_istable(L: PLuaState; idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isthread(L: PLuaState; idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_newtable(L: PLuaState); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_pop(L: PLuaState; n: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_pushcfunction(L: PLuaState; f: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function lua_pushliteral(L: PLuaState; s: PAnsiChar): PAnsiChar; overload; virtual; abstract;
         function lua_pushlstring(L: PLuaState; const s: PAnsiChar; ls: Cardinal): PAnsiChar; overload; virtual; abstract;
-        procedure lua_register(L: PLuaState; name: PAnsiChar; f: TLuaDelphiFunction); overload; inline;
-        function lua_tostring(L: PLuaState; idx: Integer): PAnsiChar; overload; inline;
+        procedure lua_register(L: PLuaState; name: PAnsiChar; f: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_tostring(L: PLuaState; idx: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       {$ENDREGION}
       {$REGION 'ILuaLibInterchange'}
         procedure lua_call(L: PLuaState; nargs, nresults: Integer); overload; virtual; abstract;                                 // External "lua_call" in 5.1, External "lua_callk" in 5.2
@@ -216,16 +216,16 @@ type
         procedure luaL_where(L: PLuaState; lvl: Integer); overload; virtual; abstract;
       {$ENDREGION}
       {$REGION 'ILuaAuxCommonMacros'}
-        function luaL_checkint(L: PLuaState; narg: Integer): Integer; overload; inline;
-        function luaL_checklong(L: PLuaState; narg: Cardinal): Cardinal; overload; inline;
-        function luaL_checkstring(L: PLuaState; narg: Integer): PAnsiChar; overload; inline;
-        function luaL_dofile(L: PLuaState; filename: PAnsiChar): Integer; overload; inline;
-        function luaL_dostring(L: PLuaState; str: PAnsiChar): Integer; overload; inline;
-        procedure luaL_getmetatable(L: PLuaState; tname: PAnsiChar); overload; inline;
-        function luaL_optint(L: PLuaState; narg, d: Integer): Integer; overload; inline;
-        function luaL_optlong(L: PLuaState; narg: Integer; d: Cardinal): Cardinal; overload; inline;
-        function luaL_optstring(L: PLuaState; narg: Integer; d: PAnsiChar): PAnsiChar; overload; inline;
-        function luaL_typename(L: PLuaState; index: Integer): PAnsiChar; overload; inline;
+        function luaL_checkint(L: PLuaState; narg: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_checklong(L: PLuaState; narg: Cardinal): Cardinal; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_checkstring(L: PLuaState; narg: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_dofile(L: PLuaState; filename: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_dostring(L: PLuaState; str: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure luaL_getmetatable(L: PLuaState; tname: PAnsiChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_optint(L: PLuaState; narg, d: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_optlong(L: PLuaState; narg: Integer; d: Cardinal): Cardinal; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_optstring(L: PLuaState; narg: Integer; d: PAnsiChar): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_typename(L: PLuaState; index: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       {$ENDREGION}
       {$REGION 'ILuaAuxInterchange'}
         function luaL_loadbuffer(L: PLuaState; buff: PAnsiChar; sz: Cardinal; name: PAnsiChar): Integer; overload; virtual; abstract;
@@ -251,166 +251,166 @@ type
       function GetLinkType: TLuaBaseType; virtual; abstract;
     public
       {$REGION 'ILuaLibCommonMacrosLocal'}
-        function lua_isboolean(idx: Integer): LongBool; overload; inline;
-        function lua_isfunction(idx: Integer): LongBool; overload; inline;
-        function lua_islightuserdata(idx: Integer): LongBool; overload; inline;
-        function lua_isnil(idx: Integer): LongBool; overload; inline;
-        function lua_isnone(idx: Integer): LongBool; overload; inline;
-        function lua_isnoneornil(idx: Integer): LongBool; overload; inline;
-        function lua_istable(idx: Integer): LongBool; overload; inline;
-        function lua_isthread(idx: Integer): LongBool; overload; inline;
-        procedure lua_newtable; overload; inline;
-        procedure lua_pop(n: Integer); overload; inline;
-        procedure lua_pushcfunction(f: TLuaDelphiFunction); overload; inline;
-        function lua_pushliteral(s: PAnsiChar): PAnsiChar; overload; inline;
-        function lua_pushlstring(const s: PAnsiChar; ls: Cardinal): PAnsiChar; overload; inline;
-        procedure lua_register(name: PAnsiChar; f: TLuaDelphiFunction); overload; inline;
-        function lua_tostring(idx: Integer): PAnsiChar; overload; inline;
+        function lua_isboolean(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isfunction(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_islightuserdata(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isnil(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isnone(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isnoneornil(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_istable(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isthread(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_newtable; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_pop(n: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_pushcfunction(f: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_pushliteral(s: PAnsiChar): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_pushlstring(const s: PAnsiChar; ls: Cardinal): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_register(name: PAnsiChar; f: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_tostring(idx: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       {$ENDREGION}
       {$REGION 'ILuaLibInterchangeLocal'}
-        procedure lua_call(nargs, nresults: Integer); overload; inline;
-        procedure lua_callk(nargs, nresults, ctx: Integer; k: TLuaDelphiFunction); overload; inline;
-        function lua_compare(idx1, idx2, op: Integer): LongBool; overload; inline;
-        function lua_cpcall(func: TLuaDelphiFunction; ud: Pointer): Integer; overload; inline;
-        function lua_equal(idx1, idx2: Integer): LongBool; overload; inline;
-        procedure lua_getfenv(idx: Integer); overload; inline;
-        procedure lua_getglobal(name: PAnsiChar); overload; inline;
-        procedure lua_getuservalue(idx: Integer); overload; inline;
-        function lua_lessthan(idx1, idx2: Integer): LongBool; overload; inline;
-        function lua_load(reader: TLuaReaderFunction; dt: Pointer; const chunkname: PAnsiChar): Integer; overload; inline; // 5.1 version
-        function lua_load(reader: TLuaReaderFunction; dt: Pointer; Source, Mode: PAnsiChar): Integer; overload; inline; // 5.2 version
-        function lua_objlen(idx: Integer): Cardinal; overload; inline;
-        function lua_pcall(nargs, nresults, errfunc: Integer): Integer; overload; inline;
-        function lua_pcallk(nargs, nresults, errfunc, ctx: Integer; k: TLuaDelphiFunction): Integer; overload; inline;
-        function lua_rawlen(idx: Integer): Cardinal; overload; inline;
-        function lua_resume(narg: Integer): Integer; overload; inline; // 5.1 version
-        function lua_setfenv(idx: Integer): LongBool; overload; inline;
-        procedure lua_setglobal(name: PAnsiChar); overload; inline;
-        function lua_setmetatable(objindex: Integer): LongBool; overload; inline;
-        procedure lua_setuservalue(idx: Integer); overload; inline;
-        function lua_tointeger(idx: Integer): Integer; overload; inline;
-        function lua_tointegerx(idx: Integer; isnum: PInteger): Integer; overload; inline;
-        function lua_tonumber(idx: Integer): Double; overload; inline;
-        function lua_tonumberx(idx: Integer; isnum: PInteger): Double; overload; inline;
-        function lua_yield(nresults: Integer): Integer; overload; inline;
-        function lua_yieldk(nresults, ctx: Integer; k: TLuaDelphiFunction): Integer; overload; inline;
+        procedure lua_call(nargs, nresults: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_callk(nargs, nresults, ctx: Integer; k: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_compare(idx1, idx2, op: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_cpcall(func: TLuaDelphiFunction; ud: Pointer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_equal(idx1, idx2: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_getfenv(idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_getglobal(name: PAnsiChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_getuservalue(idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_lessthan(idx1, idx2: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_load(reader: TLuaReaderFunction; dt: Pointer; const chunkname: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // 5.1 version
+        function lua_load(reader: TLuaReaderFunction; dt: Pointer; Source, Mode: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // 5.2 version
+        function lua_objlen(idx: Integer): Cardinal; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_pcall(nargs, nresults, errfunc: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_pcallk(nargs, nresults, errfunc, ctx: Integer; k: TLuaDelphiFunction): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_rawlen(idx: Integer): Cardinal; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_resume(narg: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // 5.1 version
+        function lua_setfenv(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_setglobal(name: PAnsiChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_setmetatable(objindex: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_setuservalue(idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_tointeger(idx: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_tointegerx(idx: Integer; isnum: PInteger): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_tonumber(idx: Integer): Double; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_tonumberx(idx: Integer; isnum: PInteger): Double; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_yield(nresults: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_yieldk(nresults, ctx: Integer; k: TLuaDelphiFunction): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       {$ENDREGION}
       {$REGION 'ILuaLibCommonLocal'}
-        function lua_atpanic(panicf: TLuaDelphiFunction): TLuaDelphiFunction; overload; inline;
-        function lua_checkstack(sz: Integer): LongBool; overload; inline;
-        procedure lua_close; overload; inline;
-        procedure lua_concat(n: Integer); overload; inline;
-        procedure lua_createtable(narr, nrec: Integer); overload; inline;
-        function lua_dump(writer: TLuaWriterFunction; data: Pointer): Integer; overload; inline;
-        function lua_error: Integer; overload; inline;
-        function lua_gc(what, data: Integer): Integer; overload; inline;
-        function lua_getallocf(ud: PPointer): TLuaAllocFunction; overload; inline;
-        procedure lua_getfield(idx: Integer; k: PAnsiChar); overload; inline;
-        function lua_gethook: TLuaHookFunction; overload; inline;
-        function lua_gethookcount: Integer; overload; inline;
-        function lua_gethookmask: Integer; overload; inline;
-        function lua_getinfo(const what: PAnsiChar; ar: PLuaDebug): Integer; overload; inline;
-        function lua_getlocal(ar: PLuaDebug; n: Integer): PAnsiChar; overload; inline;
-        function lua_getmetatable(objindex: Integer): LongBool; overload; inline;
-        function lua_getstack(level: Integer; ar: PLuaDebug): Integer; overload; inline;
-        procedure lua_gettable( idx: Integer); overload; inline;
-        function lua_gettop: Integer; overload; inline;
-        function lua_getupvalue(funcindex, n: Integer): PAnsiChar; overload; inline;
-        procedure lua_insert(idx: Integer); overload; inline;
-        function lua_iscfunction(idx: Integer): LongBool; overload; inline;
-        function lua_isnumber(idx: Integer): LongBool; overload; inline;
-        function lua_isstring(idx: Integer): LongBool; overload; inline;
-        function lua_isuserdata(idx: Integer): LongBool; overload; inline;
-        function lua_newthread: PLuaState; overload; inline;
-        function lua_newuserdata(sz: Cardinal): Pointer; overload; inline;
-        function lua_next(idx: Integer): Integer; overload; inline;
-        procedure lua_pushboolean(b: LongBool); overload; inline;
-        procedure lua_pushcclosure(fn: TLuaDelphiFunction; n: Integer); overload; inline;
-        function lua_pushfstring(const fmt: PAnsiChar): PAnsiChar; {varargs;} overload; inline;
-        procedure lua_pushinteger(n: Integer); overload; inline;
-        procedure lua_pushlightuserdata(p: Pointer); overload; inline;
-        procedure lua_pushnil; overload; inline;
-        procedure lua_pushnumber(n: Double); overload; inline;
-        function lua_pushstring(const s: PAnsiChar): PAnsiChar; overload; inline;
-        function lua_pushthread: LongBool; overload; inline;
-        procedure lua_pushvalue(idx: Integer); overload; inline;
-        function lua_pushvfstring(const fmt: PAnsiChar; argp: Pointer): PAnsiChar; overload; inline;
-        function lua_rawequal(idx1, idx2: Integer): LongBool; overload; inline;
-        procedure lua_rawget(idx: Integer); overload; inline;
-        procedure lua_rawgeti(idx, n: Integer); overload; inline;
-        procedure lua_rawset(idx: Integer); overload; inline;
-        procedure lua_rawseti(idx , n: Integer); overload; inline;
-        procedure lua_remove(idx: Integer); overload; inline;
-        procedure lua_replace(idx: Integer); overload; inline;
-        procedure lua_setallocf(f: TLuaAllocFunction; ud: Pointer); overload; inline;
-        procedure lua_setfield(idx: Integer; const k: PAnsiChar); overload; inline;
-        function lua_sethook(func: TLuaHookFunction; mask, count: Integer): Integer; overload; inline;
-        function lua_setlocal(ar: PLuaDebug; n: Integer): PAnsiChar; overload; inline;
-        procedure lua_settable(idx: Integer); overload; inline;
-        procedure lua_settop(idx: Integer); overload; inline;
-        function lua_setupvalue(funcindex, n: Integer): PAnsiChar; overload; inline;
-        function lua_status: Integer; overload; inline;
-        function lua_toboolean(idx: Integer): LongBool; overload; inline;
-        function lua_tocfunction(idx: Integer): TLuaDelphiFunction; overload; inline;
-        function lua_tolstring(idx: Integer; len: PCardinal): PAnsiChar; overload; inline;
-        function lua_topointer(idx: Integer): Pointer; overload; inline;
-        function lua_tothread(idx: Integer): PLuaState; overload; inline;
-        function lua_touserdata(idx: Integer): Pointer; overload; inline;
-        function lua_type(idx: Integer): Integer; overload; inline;
-        function lua_typename(tp: Integer): PAnsiChar; overload; inline;
-        procedure lua_xmove(dest: PLuaState; n: Integer); overload; inline;
-        function luaopen_base: Integer; overload; inline;
-        function luaopen_debug: Integer; overload; inline;
-        function luaopen_io: Integer; overload; inline;
-        function luaopen_math: Integer; overload; inline;
-        function luaopen_os: Integer; overload; inline;
-        function luaopen_package: Integer; overload; inline;
-        function luaopen_string: Integer; overload; inline;
-        function luaopen_table: Integer; overload; inline;
+        function lua_atpanic(panicf: TLuaDelphiFunction): TLuaDelphiFunction; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_checkstack(sz: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_close; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_concat(n: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_createtable(narr, nrec: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_dump(writer: TLuaWriterFunction; data: Pointer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_error: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_gc(what, data: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_getallocf(ud: PPointer): TLuaAllocFunction; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_getfield(idx: Integer; k: PAnsiChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_gethook: TLuaHookFunction; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_gethookcount: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_gethookmask: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_getinfo(const what: PAnsiChar; ar: PLuaDebug): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_getlocal(ar: PLuaDebug; n: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_getmetatable(objindex: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_getstack(level: Integer; ar: PLuaDebug): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_gettable( idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_gettop: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_getupvalue(funcindex, n: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_insert(idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_iscfunction(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isnumber(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isstring(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_isuserdata(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_newthread: PLuaState; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_newuserdata(sz: Cardinal): Pointer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_next(idx: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_pushboolean(b: LongBool); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_pushcclosure(fn: TLuaDelphiFunction; n: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_pushfstring(const fmt: PAnsiChar): PAnsiChar; {varargs;} overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_pushinteger(n: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_pushlightuserdata(p: Pointer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_pushnil; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_pushnumber(n: Double); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_pushstring(const s: PAnsiChar): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_pushthread: LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_pushvalue(idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_pushvfstring(const fmt: PAnsiChar; argp: Pointer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_rawequal(idx1, idx2: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_rawget(idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_rawgeti(idx, n: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_rawset(idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_rawseti(idx , n: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_remove(idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_replace(idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_setallocf(f: TLuaAllocFunction; ud: Pointer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_setfield(idx: Integer; const k: PAnsiChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_sethook(func: TLuaHookFunction; mask, count: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_setlocal(ar: PLuaDebug; n: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_settable(idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_settop(idx: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_setupvalue(funcindex, n: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_status: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_toboolean(idx: Integer): LongBool; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_tocfunction(idx: Integer): TLuaDelphiFunction; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_tolstring(idx: Integer; len: PCardinal): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_topointer(idx: Integer): Pointer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_tothread(idx: Integer): PLuaState; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_touserdata(idx: Integer): Pointer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_type(idx: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function lua_typename(tp: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure lua_xmove(dest: PLuaState; n: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaopen_base: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaopen_debug: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaopen_io: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaopen_math: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaopen_os: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaopen_package: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaopen_string: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaopen_table: Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       {$ENDREGION}
       {$REGION 'ILuaAuxCommonLocal'}
-        function luaL_argerror(numarg: Integer; const extramsg: PAnsiChar): Integer; overload; inline;
-        procedure luaL_buffinit(B: PLuaLBuffer); overload; inline;
-        function luaL_callmeta(obj: Integer; const e: PAnsiChar): Integer; overload; inline;
-        procedure luaL_checkany(narg: Integer); overload; inline;
-        function luaL_checkinteger(numArg: Integer): Integer; overload; inline;
-        function luaL_checklstring(numArg: Integer; ls: PCardinal): PAnsiChar; overload; inline;
-        function luaL_checknumber(numArg: Integer): Double; overload; inline;
+        function luaL_argerror(numarg: Integer; const extramsg: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure luaL_buffinit(B: PLuaLBuffer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_callmeta(obj: Integer; const e: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure luaL_checkany(narg: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_checkinteger(numArg: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_checklstring(numArg: Integer; ls: PCardinal): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_checknumber(numArg: Integer): Double; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function luaL_checkoption(narg: Integer; const def: PAnsiChar; const lst: array of PAnsiChar): Integer; overload;
-        procedure luaL_checkstack(sz: Integer; const msg: PAnsiChar); overload; inline;
-        procedure luaL_checktype(narg, t: Integer); overload; inline;
-        function luaL_checkudata(ud: Integer; const tname: PAnsiChar): Pointer; overload; inline;
-        function luaL_error(const fmt: PAnsiChar): Integer; {varargs;} overload; inline;
-        function luaL_getmetafield(obj: Integer; const e: PAnsiChar): Integer; overload; inline;
-        function luaL_gsub(const s, p, r: PAnsiChar): PAnsiChar; overload; inline;
-        function luaL_loadstring(const s: PAnsiChar): Integer; overload; inline;
-        function luaL_newmetatable(const tname: PAnsiChar): Integer; overload; inline;
-        procedure luaL_openlibs; overload; inline;
-        function luaL_optinteger(nArg: Integer; def: Integer): Integer; overload; inline;
-        function luaL_optnumber(nArg: Integer; def: Double): Double; overload; inline;
-        function luaL_optlstring(numArg: Integer; const def: PAnsiChar; ls: PCardinal): PAnsiChar; overload; inline;
-        function luaL_ref(t: Integer): Integer; overload; inline;
-        procedure luaL_unref(t, ref: Integer); overload; inline;
-        procedure luaL_where(lvl: Integer); overload; inline;
+        procedure luaL_checkstack(sz: Integer; const msg: PAnsiChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure luaL_checktype(narg, t: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_checkudata(ud: Integer; const tname: PAnsiChar): Pointer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_error(const fmt: PAnsiChar): Integer; {varargs;} overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_getmetafield(obj: Integer; const e: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_gsub(const s, p, r: PAnsiChar): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_loadstring(const s: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_newmetatable(const tname: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure luaL_openlibs; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_optinteger(nArg: Integer; def: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_optnumber(nArg: Integer; def: Double): Double; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_optlstring(numArg: Integer; const def: PAnsiChar; ls: PCardinal): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_ref(t: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure luaL_unref(t, ref: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure luaL_where(lvl: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       {$ENDREGION}
       {$REGION 'ILuaAuxCommonMacrosLocal'}
-        function luaL_checkint(narg: Integer): Integer; overload; inline;
-        function luaL_checklong(narg: Cardinal): Cardinal; overload; inline;
-        function luaL_checkstring(narg: Integer): PAnsiChar; overload; inline;
-        function luaL_dofile(filename: PAnsiChar): Integer; overload; inline;
-        function luaL_dostring(str: PAnsiChar): Integer; overload; inline;
-        procedure luaL_getmetatable(tname: PAnsiChar); overload; inline;
-        function luaL_optint(narg, d: Integer): Integer; overload; inline;
-        function luaL_optlong(narg: Integer; d: Cardinal): Cardinal; overload; inline;
-        function luaL_optstring(narg: Integer; d: PAnsiChar): PAnsiChar; overload; inline;
-        function luaL_typename(index: Integer): PAnsiChar; overload; inline;
+        function luaL_checkint(narg: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_checklong(narg: Cardinal): Cardinal; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_checkstring(narg: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_dofile(filename: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_dostring(str: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure luaL_getmetatable(tname: PAnsiChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_optint(narg, d: Integer): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_optlong(narg: Integer; d: Cardinal): Cardinal; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_optstring(narg: Integer; d: PAnsiChar): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_typename(index: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       {$ENDREGION}
       {$REGION 'ILuaAuxInterchangeLocal'}
-        function luaL_loadbuffer(buff: PAnsiChar; sz: Cardinal; name: PAnsiChar): Integer; overload; inline;
-        function luaL_loadbufferx(buff: PAnsiChar; sz: Cardinal; name, mode: PAnsiChar): Integer; overload; inline;
-        function luaL_loadfile(filename: PAnsiChar): Integer; overload; inline;
-        function luaL_loadfilex(filename, mode: PAnsiChar): Integer; overload; inline;
-        procedure luaL_register(libname: PAnsiChar; lib: PluaLReg); overload; inline;
+        function luaL_loadbuffer(buff: PAnsiChar; sz: Cardinal; name: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_loadbufferx(buff: PAnsiChar; sz: Cardinal; name, mode: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_loadfile(filename: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function luaL_loadfilex(filename, mode: PAnsiChar): Integer; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure luaL_register(libname: PAnsiChar; lib: PluaLReg); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       {$ENDREGION}
       constructor Create; overload;
       constructor Create(const ALuaState: PLuaState); overload;
