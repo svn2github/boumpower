@@ -199,6 +199,7 @@ type
       function GetValue(const AIndex: Integer): TL4DMethodResultStackValue; {inline;}
     public
       procedure Cleanup;
+      property Engine : TL4DEngine read FLua;
       property Count: Integer read GetCount;
       property Value[const AIndex: Integer]: TL4DMethodResultStackValue read GetValue; default;
     end;
@@ -297,6 +298,7 @@ type
       procedure PushString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       procedure PushVariant(const AValue: Variant); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       procedure PushWideString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      property Engine : TL4DEngine read FLua;
       property Count: Integer read GetCount;
       property Value[const AIndex: Integer]: TL4DMethodStackValue read GetValue; default;
     end;
@@ -583,7 +585,7 @@ implementation
   function L4D_CallDelphiFunction(L: PLuaState): Integer; cdecl;
   var
     LLua: TL4DEngine;
-    LMethod: PL4DMethod;
+    LMethod: PL4DDelphiFunction;
     LMethodStack: TL4DMethodStack;
   begin
     LLua := TL4DEngine.Create(LuaLinkType, L);
@@ -591,8 +593,8 @@ implementation
       LMethodStack := TL4DMethodStack.Create(LLua);
       try
         LMethodStack.FPushCount := 0;
-        LMethod := PL4DMethod(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
-        LMethod^.FMethod(LMethodStack);
+        LMethod := PL4DDelphiFunction(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
+        TL4DDelphiFunction(LMethod^)(LMethodStack);
         Result := LMethodStack.FPushCount;
       finally
         LMethodStack.Free;
@@ -605,6 +607,7 @@ implementation
   function L4D_CallClassFunction(L: PLuaState): Integer; cdecl;
   var
     LLua: TL4DEngine;
+//    LMethod: PL4DDelphiObjectFunction;
     LMethod: PL4DMethodObject;
     LMethodStack: TL4DMethodStack;
   begin
@@ -615,6 +618,10 @@ implementation
         LMethodStack.FPushCount := 0;
         LMethod := PL4DMethodObject(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
         LMethod^.FMethod(LMethodStack);
+{
+        LMethod := PL4DDelphiObjectFunction(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
+        TL4DDelphiObjectFunction(LMethod^)(LMethodStack);
+}
         Result := LMethodStack.FPushCount;
       finally
         LMethodStack.Free;

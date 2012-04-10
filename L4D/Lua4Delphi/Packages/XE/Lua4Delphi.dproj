@@ -4,7 +4,7 @@
 			<MainSource>Lua4Delphi.dpk</MainSource>
 			<ProjectVersion>12.3</ProjectVersion>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<Platform>Win32</Platform>
 			<AppType>Package</AppType>
 			<FrameworkType>None</FrameworkType>
@@ -37,7 +37,7 @@
 			<GenDll>true</GenDll>
 			<DCC_DcpOutput>..\..\BPL\$(Platform)\$(Config)\XE\DCP</DCC_DcpOutput>
 			<DCC_E>false</DCC_E>
-			<DCC_DcuOutput>..\..\DCU\XE\$(Platform)\$(Config)</DCC_DcuOutput>
+			<DCC_DcuOutput>..\..\DCU\XE2\$(Platform)\$(Config)</DCC_DcuOutput>
 			<DCC_K>false</DCC_K>
 			<DCC_F>false</DCC_F>
 		</PropertyGroup>
@@ -48,6 +48,7 @@
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_UnitSearchPath>C:\LKSL\Source\Common;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
 			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
@@ -59,16 +60,16 @@
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
 			<DCCReference Include="LKSL.dcp"/>
-			<DCCReference Include="E:\Source\Core\L4D.Engine.Constants.pas"/>
-			<DCCReference Include="E:\Source\Core\L4D.Engine.DelphiTypes.pas"/>
-			<DCCReference Include="E:\Source\Core\L4D.Engine.Main.pas"/>
-			<DCCReference Include="E:\Source\Core\L4D.Engine.StaticLua51.pas"/>
-			<DCCReference Include="E:\Source\Lua\L4D.Lua.Common.pas"/>
-			<DCCReference Include="E:\Source\Lua\L4D.Lua.Constants.pas"/>
-			<DCCReference Include="E:\Source\Lua\L4D.Lua.Intf.pas"/>
-			<DCCReference Include="E:\Source\Lua\L4D.Lua.Lua51.pas"/>
-			<DCCReference Include="E:\Source\Lua\L4D.Lua.StaticLua51.pas"/>
-			<DCCReference Include="E:\Source\Packages\L4D.Engine.Reg.pas"/>
+			<DCCReference Include="..\..\Source\Core\L4D.Engine.Constants.pas"/>
+			<DCCReference Include="..\..\Source\Core\L4D.Engine.DelphiTypes.pas"/>
+			<DCCReference Include="..\..\Source\Core\L4D.Engine.Main.pas"/>
+			<DCCReference Include="..\..\Source\Core\L4D.Engine.StaticLua51.pas"/>
+			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Common.pas"/>
+			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Constants.pas"/>
+			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Intf.pas"/>
+			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Lua51.pas"/>
+			<DCCReference Include="..\..\Source\Lua\L4D.Lua.StaticLua51.pas"/>
+			<DCCReference Include="..\..\Source\Packages\L4D.Engine.Reg.pas"/>
 			<None Include="E:\Source\Common\Lua4Delphi.inc"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
