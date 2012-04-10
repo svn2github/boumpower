@@ -21,11 +21,43 @@
   Released: 5th February 2012
 
   Changelog:
-    5th February 2012:
-      - Released
+    12th March 2012:
+      - HUGE number of bugs fixed
+      - Table Reading/Writing now work properly
+      - Too many changes to enumerate
+    23rd February 2012:
+      - Everything uses INTERFACES now!
+    22nd February 2012:
+      - Added TL4DEngineManager and the global instance "EngineManager"
+        - This addresses a big bug where Methods pushed back to Lua from another Method lose their reference
+          when their Stack Manager and Engine Instance are subsequently Freed.
+        - Not yet tested with Multithreading, but don't worry if it causes deadlock as full threading support
+          is a major focus of this development. It shouldn't be an issue if the Lua Engine Instance is created
+          before the Thread's Execute method begins.
+      - Nested Table Writing now works (Tables within Tables, n-tier)
+    16th February 2012:
+      - Completed TL4DTable
+      - Completed TL4DTableValue
+    13th February 2012:
+      - Implemented TL4DTable (incomplete)
+      - Added TL4DTableValue (incomplete)
+      - Added "NewTable" method to all Stack Managers
+      - Added "AsTable" to all Stack Value Types
+    11th February 2012:
+      - Added "Engine" property to TL4DEngineMember
+    10th February 2012:
+      - Made all Stack Managers inherit from TL4DEngineMember instead of TPersistent
+      - Changed TL4DMethodResultStack from Record to Class
+    8th February 2012:
+      - Added "Sender: TObject" parameter to TL4DExceptionEvent and TL4DLuaErrorEvent event method types
+    7th February 2012:
+      - Added TL4DTable class (not implemented yet)
+      - Fixed some bugs which could crash the IDE
     6th February 2012:
       - Methods and Object Methods now use a "Container Object" in an Array.
       - Fixed bug with reading returned values in Delphi
+    5th February 2012:
+      - Released
 }
 unit L4D.Engine.Main;
 
@@ -39,26 +71,25 @@ uses
   {$ELSE}
     Classes, SysUtils, Variants,
   {$ENDIF}
+  LKSL.Managed.Arrays,
   LKSL.Strings.Conversion, LKSL.Strings.Utils,
-  L4D.Lua.Intf, L4D.Lua.Common, L4D.Engine.Constants;
-
-type
-  { Lua4Delphi-specific Enums }
-  TL4DStackValueType = (svtNone = -1, svtNil = 0, svtBoolean, svtLightUserData, svtNumber, svtString, svtTable, svtFunction, svtUserdata, svtThread);
-
-const
-  // Lua4Delphi-specific Type Constants...
-  LUA_TYPES: Array[0..9] of TL4DStackValueType = (svtNone, svtNil, svtBoolean, svtLightUserData, svtNumber, svtString, svtTable, svtFunction, svtUserdata, svtThread);
-  LUA_TYPE_NAMES: Array[TL4DStackValueType] of String = ('None', 'Nil', 'Boolean', 'Light Userdata', 'Number', 'String', 'Table', 'Function', 'Userdata', 'Thread');
+  L4D.Lua.Intf, L4D.Lua.Common, L4D.Engine.Constants, L4D.Engine.MainIntf;
 
 type
   { Forward Declarations }
+  TL4DEngineMember = class;
   TL4DMethod = class;
   TL4DMethodObject = class;
+  TL4DTableValue = class;
+  TL4DTable = class;
+  TL4DMethodResultStackValue = class;
+  TL4DMethodResultStack = class;
+  TL4DMethodStackValue = class;
   TL4DMethodStack = class;
+  TL4DGlobalStackValue = class;
   TL4DGlobalStack = class;
+  TL4DEngineManager = class;
   TL4DEngine = class;
-  TL4DEngineMember = class;
   TL4DOptions = class;
   TL4DLibraryOptions = class;
   TLua4DelphiCommon = class;
@@ -77,29 +108,39 @@ type
   EL4DExceptionClass = class of EL4DException;
 
   { "OnEvent" Method Types }
-  TL4DExceptionEvent = procedure(const AExceptionType: EL4DExceptionClass; AMessage: String; var ARaise: Boolean) of object;
-  TL4DLuaErrorEvent = procedure(const ATitle, AMessage: String; const ALine: Integer; var ARaise: Boolean) of object;
-
-  { Method Types }
-  PL4DDelphiFunction = ^TL4DDelphiFunction;
-  TL4DDelphiFunction = procedure(var ALuaStack: TL4DMethodStack);
-  PL4DDelphiObjectFunction = ^TL4DDelphiObjectFunction;
-  TL4DDelphiObjectFunction = procedure(var ALuaStack: TL4DMethodStack) of object;
+  TL4DExceptionEvent = procedure(Sender: TObject; const AExceptionType: EL4DExceptionClass; AMessage: String; var ARaise: Boolean) of object;
+  TL4DLuaErrorEvent = procedure(Sender: TObject; const ATitle, AMessage: String; const ALine: Integer; var ARaise: Boolean) of object;
 
   { Array Types }
   TL4DMethodArray = Array of TL4DMethod;
   TL4DMethodObjectArray = Array of TL4DMethodObject;
+  TL4DEngineArray = Array of TL4DEngine;
 
   { Pointer Types }
   PL4DMethod = ^TL4DMethod;
   PL4DMethodObject = ^TL4DMethodObject;
 
   {
+    TL4DEngineMember
+      - An object which links back to TL4DEngine
+  }
+  {$REGION 'TL4DEngineMember - An object which links back to TL4DEngine'}
+    TL4DEngineMember = class(TInterfacedObject, IL4DEngineMember)
+    protected
+      FLua: TL4DEngine;
+      function GetEngine: IL4DEngine;
+    public
+      constructor Create(const ALua: TL4DEngine); virtual;
+      property Engine: IL4DEngine read GetEngine;
+    end;
+  {$ENDREGION}
+
+  {
     TL4DMethod
       - A container for Delphi Methods registered with Lua
   }
   {$REGION 'TL4DMethod - A container for Delphi Methods registered with Lua'}
-    TL4DMethod = class(TPersistent)
+    TL4DMethod = class(TInterfacedObject, IL4DMethod)
     private
       FMethod: TL4DDelphiFunction;
     public
@@ -113,7 +154,7 @@ type
     - A container for Object-bound Delphi Methods registered with Lua
   }
   {$REGION 'TL4DMethodObject - A container for Object-bound Delphi Methods registered with Lua'}
-    TL4DMethodObject = class(TPersistent)
+    TL4DMethodObject = class(TInterfacedObject, IL4DMethodObject)
     private
       FMethod: TL4DDelphiObjectFunction;
     public
@@ -123,16 +164,20 @@ type
   {$ENDREGION}
 
   {
-    TL4DMethodResultStack
+    TL4DTableValue
+      - A reader for Lua Table/Metatable Values
   }
-  {$REGION 'TL4DMethodResultStack - Method Result Stack Type'}
-    PL4DMethodResultStack = ^TL4DMethodResultStack;
-    TL4DMethodResultStack = record
-      type TL4DMethodResultStackValue = record
-      private
-        FIndex: Integer;
-        FStack: PL4DMethodResultStack;
-        // Getters
+  {$REGION 'TL4DTableValue - A reader for Lua Table/Metatable Values'}
+    TL4DTableValue = class(TInterfacedObject, IL4DTableValue)
+    private
+      FIndex: Integer;
+      FKey: AnsiString;
+      FStack: TL4DTable;
+      {$REGION 'IL4DTableValue'}
+        procedure SetIndex(const AIndex: Integer);
+        procedure SetKey(const AKey: AnsiString);
+      {$ENDREGION}
+      {$REGION 'IL4DStackValue'}
         function GetAsAnsiString: AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsChar: Char; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
@@ -144,6 +189,7 @@ type
         function GetAsPointer: Pointer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsSingle: Single; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsString: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsTable: IL4DTable; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsVariant: Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsWideString: WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetCanBeAnsiString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
@@ -157,51 +203,212 @@ type
         function GetCanBePointer: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetCanBeSingle: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetCanBeString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeTable: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetCanBeVariant: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetCanBeWideString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetType: TL4DStackValueType; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetTypeName: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       public
-        function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): TL4DMethodResultStack;
-        property AsAnsiString: AnsiString read GetAsAnsiString;
-        property AsBoolean: Boolean read GetAsBoolean;
-        property AsChar: Char read GetAsChar;
-        property AsDouble: Double read GetAsDouble;
-        property AsExtended: Extended read GetAsExtended;
-        property AsInteger: Integer read GetAsInteger;
-        property AsPAnsiChar: PAnsiChar read GetAsPAnsiChar;
-        property AsPChar: PChar read GetAsPChar;
-        property AsPointer: Pointer read GetAsPointer;
-        property AsSingle: Single read GetAsSingle;
-        property AsString: String read GetAsString;
-        property AsVariant: Variant read GetAsVariant;
-        property AsWideString: WideString read GetAsWideString;
-        property CanBeAnsiString: Boolean read GetCanBeAnsiString;
-        property CanBeBoolean: Boolean read GetCanBeBoolean;
-        property CanBeChar: Boolean read GetCanBeChar;
-        property CanBeDouble: Boolean read GetCanBeDouble;
-        property CanBeExtended: Boolean read GetCanBeExtended;
-        property CanBeInteger: Boolean read GetCanBeInteger;
-        property CanBePAnsiChar: Boolean read GetCanBePAnsiChar;
-        property CanBePChar: Boolean read GetCanBePChar;
-        property CanBePointer: Boolean read GetCanBePointer;
-        property CanBeSingle: Boolean read GetCanBeSingle;
-        property CanBeString: Boolean read GetCanBeString;
-        property CanBeVariant: Boolean read GetCanBeVariant;
-        property CanBeWideString: Boolean read GetCanBeWideString;
-        property LuaType: TL4DStackValueType read GetType;
-        property LuaTypeName: String read GetTypeName;
-      end;
+        function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): IL4DMethodResultStack;
+      {$ENDREGION}
+      constructor Create(const AStack: TL4DTable; const AIndex: Integer);
+    end;
+  {$ENDREGION}
+
+  {
+    TL4DTable
+      - Composer/Reader for Lua Tables/Metatables
+      CRITICAL: DO NOT MODIFY THIS TYPE IN ANY WAY!
+  }
+  {$REGION 'TL4DTable - Composer/Reader for Lua Tables/Metatables'}
+    TL4DTable = class(TL4DEngineMember, IL4DTable)
     private
-      FLua: TL4DEngine;
-      FOffset: Integer;
-      function GetCount: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetValue(const AIndex: Integer): TL4DMethodResultStackValue; {inline;}
+      FClosed: Boolean;
+      FFieldIndex: Integer;
+      FIndex: Integer;
+      FName: AnsiString;
+      FNew: Boolean;
+      FOnPushTable: TL4DTableChangeEvent;
+      FTableSet: Boolean;
+      procedure OnPushTable(const ATable: IL4DTable);
+      {$REGION 'IL4DStack'}
+        function GetCount: Integer;
+      {$ENDREGION}
+      {$REGION 'IL4DTable'}
+        function GetName: AnsiString;
+        function GetValueByIndex(const AIndex: Integer): IL4DTableValue;
+        function GetValueByName(const AName: AnsiString): IL4DTableValue;
+        procedure PushTable; inline;
+        procedure SetIndex(const AIndex: Integer);
+        procedure SetName(const AName: AnsiString);
+        procedure SetOnPushTable(const AEvent: TL4DTableChangeEvent);
+      {$ENDREGION}
     public
+      constructor Create(const ALua: TL4DEngine; const ANew: Boolean = False); reintroduce;
+      destructor Destroy; override;
+      {$REGION 'IL4DStackIndexed'}
+        function NewTable: IL4DTable; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushAnsiChar(const AValue: AnsiChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushAnsiString(const AValue: AnsiString); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushBoolean(const AValue: Boolean); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushChar(const AValue: Char); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushDouble(const AValue: Double); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushExtended(const AValue: Extended); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushFunction(const AValue: TL4DDelphiFunction); overload;  // Stack-Managed Delphi Procedure
+        procedure PushFunction(const AValue: TL4DDelphiObjectFunction); overload;  // Stack-Managed Delphi Object Procedure
+        procedure PushFunction(const AValue: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // Standard Lua "C" Function
+        procedure PushInteger(const AValue: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPAnsiChar(const AValue: PAnsiChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPChar(const AValue: PChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPointer(const AValue: Pointer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushSingle(const AValue: Single); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushString(const AValue: WideString); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushVariant(const AValue: Variant); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushWideString(const AValue: WideString); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      {$ENDREGION}
+      {$REGION 'IL4DStackKeyed'}
+        function NewTable(const AKey: AnsiString): IL4DTable; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushAnsiChar(const AKey: AnsiString; const AValue: AnsiChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushAnsiString(const AKey: AnsiString; const AValue: AnsiString); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushBoolean(const AKey: AnsiString; const AValue: Boolean); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushChar(const AKey: AnsiString; const AValue: Char); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushDouble(const AKey: AnsiString; const AValue: Double); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushExtended(const AKey: AnsiString; const AValue: Extended); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushFunction(const AKey: AnsiString; const AValue: TL4DDelphiFunction); overload;  // Stack-Managed Delphi Procedure
+        procedure PushFunction(const AKey: AnsiString; const AValue: TL4DDelphiObjectFunction); overload;  // Stack-Managed Delphi Object Procedure
+        procedure PushFunction(const AKey: AnsiString; const AValue: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // Standard Lua "C" Function
+        procedure PushInteger(const AKey: AnsiString; const AValue: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPAnsiChar(const AKey: AnsiString; const AValue: PAnsiChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPChar(const AKey: AnsiString; const AValue: PChar); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPointer(const AKey: AnsiString; const AValue: Pointer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushSingle(const AKey: AnsiString; const AValue: Single); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushString(const AKey: AnsiString; const AValue: WideString); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushVariant(const AKey: AnsiString; const AValue: Variant); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushWideString(const AKey: AnsiString; const AValue: WideString); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      {$ENDREGION}
+      {$REGION 'IL4DStack'}
+        property Count: Integer read GetCount;
+      {$ENDREGION}
+      {$REGION 'IL4DTable'}
+        procedure Close;
+        procedure Push;
+        property Value[const AIndex: Integer]: IL4DTableValue read GetValueByIndex; default;
+        property Value[const AName: AnsiString]: IL4DTableValue read GetValueByName; default;
+      {$ENDREGION}
+    end;
+  {$ENDREGION}
+
+  {
+    TL4DMethodResultStackValue
+  }
+  {$REGION 'TL4DMethodResultStackValue - Method Result Stack Value Type'}
+    TL4DMethodResultStackValue = class(TInterfacedObject, IL4DMethodResultStackValue)
+    private
+      FIndex: Integer;
+      FStack: TL4DMethodResultStack;
+      {$REGION 'IL4DMethodResultStackValue'}
+        procedure SetIndex(const AIndex: Integer);
+      {$ENDREGION}
+      {$REGION 'IL4DStackValue'}
+        function GetAsAnsiString: AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsChar: Char; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsDouble: Double; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsExtended: Extended; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsInteger: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPAnsiChar: PAnsiChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPChar: PChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPointer: Pointer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsSingle: Single; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsString: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsTable: IL4DTable; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsVariant: Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsWideString: WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeAnsiString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeDouble: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeExtended: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeInteger: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePAnsiChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePointer: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeSingle: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeTable: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeVariant: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeWideString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetType: TL4DStackValueType; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetTypeName: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      public
+        function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): IL4DMethodResultStack;
+      {$ENDREGION}
+      constructor Create(const AStack: TL4DMethodResultStack; const AIndex: Integer);
+    end;
+  {$ENDREGION}
+
+  {
+    TL4DMethodResultStack
+  }
+  {$REGION 'TL4DMethodResultStack - Method Result Stack Type'}
+    TL4DMethodResultStack = class(TL4DEngineMember, IL4DMethodResultStack)
+    private
+      FCleanedUp: Boolean;
+      function GetCount: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetValue(const AIndex: Integer): IL4DMethodResultStackValue; {inline;}
+    public
+      constructor Create(const ALua: TL4DEngine); override;
+      destructor Destroy; override;
       procedure Cleanup;
-      property Engine : TL4DEngine read FLua;
       property Count: Integer read GetCount;
-      property Value[const AIndex: Integer]: TL4DMethodResultStackValue read GetValue; default;
+      property Value[const AIndex: Integer]: IL4DMethodResultStackValue read GetValue; default;
+    end;
+  {$ENDREGION}
+
+  {
+    TL4DMethodStackValue
+  }
+  {$REGION 'TL4DMethodStackValue - Method Stack Value Type'}
+    TL4DMethodStackValue = class(TInterfacedObject, IL4DMethodStackValue)
+    private
+      FIndex: Integer;
+      FStack: TL4DMethodStack;
+      {$REGION 'IL4DStackValue'}
+        // Getters
+        function GetAsAnsiString: AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsChar: Char; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsDouble: Double; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsExtended: Extended; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsInteger: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPAnsiChar: PAnsiChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPChar: PChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPointer: Pointer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsSingle: Single; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsString: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsTable: IL4DTable; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsVariant: Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsWideString: WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeAnsiString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeDouble: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeExtended: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeInteger: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePAnsiChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePointer: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeSingle: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeTable: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeVariant: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeWideString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetType: TL4DStackValueType; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetTypeName: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      public
+        function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): IL4DMethodResultStack;
+      {$ENDREGION}
+      constructor Create(const AStack: TL4DMethodStack; const AIndex: Integer);
     end;
   {$ENDREGION}
 
@@ -209,78 +416,15 @@ type
     TL4DMethodStack
   }
   {$REGION 'TL4DMethodStack - Method Stack Type'}
-    TL4DMethodStack = class(TPersistent)
-      type TL4DMethodStackValue = record
-      private
-        FIndex: Integer;
-        FStack: TL4DMethodStack;
-        // Getters
-        function GetAsAnsiString: AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsChar: Char; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsDouble: Double; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsExtended: Extended; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsInteger: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsPAnsiChar: PAnsiChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsPChar: PChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsPointer: Pointer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsSingle: Single; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsString: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsVariant: Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetAsWideString: WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBeAnsiString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBeBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBeChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBeDouble: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBeExtended: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBeInteger: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBePAnsiChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBePChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBePointer: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBeSingle: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBeString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBeVariant: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetCanBeWideString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetType: TL4DStackValueType; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function GetTypeName: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      public
-        function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): TL4DMethodResultStack;
-        property AsAnsiString: AnsiString read GetAsAnsiString;
-        property AsBoolean: Boolean read GetAsBoolean;
-        property AsChar: Char read GetAsChar;
-        property AsDouble: Double read GetAsDouble;
-        property AsExtended: Extended read GetAsExtended;
-        property AsInteger: Integer read GetAsInteger;
-        property AsPAnsiChar: PAnsiChar read GetAsPAnsiChar;
-        property AsPChar: PChar read GetAsPChar;
-        property AsPointer: Pointer read GetAsPointer;
-        property AsSingle: Single read GetAsSingle;
-        property AsString: String read GetAsString;
-        property AsVariant: Variant read GetAsVariant;
-        property AsWideString: WideString read GetAsWideString;
-        property CanBeAnsiString: Boolean read GetCanBeAnsiString;
-        property CanBeBoolean: Boolean read GetCanBeBoolean;
-        property CanBeChar: Boolean read GetCanBeChar;
-        property CanBeDouble: Boolean read GetCanBeDouble;
-        property CanBeExtended: Boolean read GetCanBeExtended;
-        property CanBeInteger: Boolean read GetCanBeInteger;
-        property CanBePAnsiChar: Boolean read GetCanBePAnsiChar;
-        property CanBePChar: Boolean read GetCanBePChar;
-        property CanBePointer: Boolean read GetCanBePointer;
-        property CanBeSingle: Boolean read GetCanBeSingle;
-        property CanBeString: Boolean read GetCanBeString;
-        property CanBeVariant: Boolean read GetCanBeVariant;
-        property CanBeWideString: Boolean read GetCanBeWideString;
-        property LuaType: TL4DStackValueType read GetType;
-        property LuaTypeName: String read GetTypeName;
-      end;
+    TL4DMethodStack = class(TL4DEngineMember, IL4DMethodStack)
     private
-      FLua: TL4DEngine;
       FPushCount: Integer;
       function GetCount: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetValue(const AIndex: Integer): TL4DMethodStackValue; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetPushCount: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      function GetValue(const AIndex: Integer): IL4DMethodStackValue; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
     public
-      constructor Create(const ALua: TL4DEngine);
+      constructor Create(const ALua: TL4DEngine); override;
+      function NewTable: IL4DTable; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       procedure PushAnsiChar(const AValue: AnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       procedure PushAnsiString(const AValue: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       procedure PushBoolean(const AValue: Boolean); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
@@ -298,22 +442,20 @@ type
       procedure PushString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       procedure PushVariant(const AValue: Variant); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       procedure PushWideString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      property Engine : TL4DEngine read FLua;
       property Count: Integer read GetCount;
-      property Value[const AIndex: Integer]: TL4DMethodStackValue read GetValue; default;
+      property Value[const AIndex: Integer]: IL4DMethodStackValue read GetValue; default;
     end;
   {$ENDREGION}
 
   {
-    TL4DGlobalStack
-      - Manages the stack for Globals
+    TL4DGlobalStackValue
   }
-  {$REGION 'TL4DGlobalStack - Global Stack Type'}
-    TL4DGlobalStack = class(TPersistent)
-      type TL4DGlobalStackValue = record
-      private
-        FKey: AnsiString;
-        FStack: TL4DGlobalStack;
+  {$REGION 'TL4DGlobalStackValue - Global Stack Value Type'}
+    TL4DGlobalStackValue = class(TInterfacedObject, IL4DGlobalStackValue)
+    private
+      FKey: AnsiString;
+      FStack: TL4DGlobalStack;
+      {$REGION 'IL4DStackValue'}
         // Getters
         function GetAsAnsiString: AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
@@ -326,10 +468,26 @@ type
         function GetAsPointer: Pointer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsSingle: Single; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsString: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsTable: IL4DTable; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsVariant: Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsWideString: WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetType: TL4DStackValueType; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetTypeName: String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        // Type Check
+        function GetCanBeAnsiString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeDouble: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeExtended: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeInteger: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePAnsiChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePChar: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBePointer: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeSingle: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeTable: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeVariant: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetCanBeWideString: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         // Setters
         procedure SetAnsiString(const AValue: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         procedure SetBoolean(const AValue: Boolean); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
@@ -346,57 +504,80 @@ type
         procedure SetWideString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
       public
         procedure Delete; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): TL4DMethodResultStack;
-        property AsAnsiString: AnsiString read GetAsAnsiString write SetAnsiString;
-        property AsBoolean: Boolean read GetAsBoolean write SetBoolean;
-        property AsChar: Char read GetAsChar write SetChar;
-        property AsDouble: Double read GetAsDouble write SetDouble;
-        property AsExtended: Extended read GetAsExtended write SetExtended;
-        property AsInteger: Integer read GetAsInteger write SetInteger;
-        property AsPAnsiChar: PAnsiChar read GetAsPAnsiChar write SetPAnsiChar;
-        property AsPChar: PChar read GetAsPChar write SetPChar;
-        property AsPointer: Pointer read GetAsPointer write SetPointer;
-        property AsSingle: Single read GetAsSingle write SetSingle;
-        property AsString: String read GetAsString write SetString;
-        property AsVariant: Variant read GetAsVariant write SetVariant;
-        property AsWideString: WideString read GetAsWideString write SetWideString;
-        property LuaType: TL4DStackValueType read GetType;
-        property LuaTypeName: String read GetTypeName;
-      end;
+        function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): IL4DMethodResultStack;
+      {$ENDREGION}
+      constructor Create(const AStack: TL4DGlobalStack; const AKey: AnsiString);
+    end;
+  {$ENDREGION}
+
+  {
+    TL4DGlobalStack
+      - Manages the stack for Globals
+  }
+  {$REGION 'TL4DGlobalStack - Global Stack Type'}
+    TL4DGlobalStack = class(TL4DEngineMember, IL4DGlobalStack, IL4DStackKeyed)
     private
-      FLua: TL4DEngine;
-      function GetGlobal(const AKey: AnsiString): TL4DGlobalStackValue; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure SetGlobal(const AKey: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      {$REGION 'IL4DStack'}
+        function GetCount: Integer;
+        procedure OnPushTable(const ATable: IL4DTable);
+      {$ENDREGION}
+      {$REGION 'IL4DGlobalStack'}
+        function GetGlobal(const AKey: AnsiString): IL4DGlobalStackValue; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure SetGlobal(const AKey: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
     public
-      constructor Create(const ALua: TL4DEngine);
-      procedure PushAnsiChar(const AKey: AnsiString; const AValue: AnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushAnsiString(const AKey: AnsiString; const AValue: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushBoolean(const AKey: AnsiString; const AValue: Boolean); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushChar(const AKey: AnsiString; const AValue: Char); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushDouble(const AKey: AnsiString; const AValue: Double); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushExtended(const AKey: AnsiString; const AValue: Extended); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushFunction(const AKey: AnsiString; const AValue: TL4DDelphiFunction); overload;  // Stack-Managed Delphi Procedure
-      procedure PushFunction(const AKey: AnsiString; const AValue: TL4DDelphiObjectFunction); overload;  // Stack-Managed Delphi Object Procedure
-      procedure PushFunction(const AKey: AnsiString; const AValue: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // Standard Lua "C" Function
-      procedure PushInteger(const AKey: AnsiString; const AValue: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushPAnsiChar(const AKey: AnsiString; const AValue: PAnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushPChar(const AKey: AnsiString; const AValue: PChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushPointer(const AKey: AnsiString; const AValue: Pointer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushSingle(const AKey: AnsiString; const AValue: Single); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushString(const AKey: AnsiString; const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushVariant(const AKey: AnsiString; const AValue: Variant); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushWideString(const AKey: AnsiString; const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      property Lua: TL4DEngine read FLua;
-      property Value[const AKey: AnsiString]: TL4DGlobalStackValue read GetGlobal; default;
+        property Value[const AKey: AnsiString]: IL4DGlobalStackValue read GetGlobal; default;
+      {$ENDREGION}
+    public
+      {$REGION 'IL4DStackKeyed'}
+        function NewTable(const AKey: AnsiString): IL4DTable; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushAnsiChar(const AKey: AnsiString; const AValue: AnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushAnsiString(const AKey: AnsiString; const AValue: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushBoolean(const AKey: AnsiString; const AValue: Boolean); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushChar(const AKey: AnsiString; const AValue: Char); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushDouble(const AKey: AnsiString; const AValue: Double); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushExtended(const AKey: AnsiString; const AValue: Extended); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushFunction(const AKey: AnsiString; const AValue: TL4DDelphiFunction); overload;  // Stack-Managed Delphi Procedure
+        procedure PushFunction(const AKey: AnsiString; const AValue: TL4DDelphiObjectFunction); overload;  // Stack-Managed Delphi Object Procedure
+        procedure PushFunction(const AKey: AnsiString; const AValue: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // Standard Lua "C" Function
+        procedure PushInteger(const AKey: AnsiString; const AValue: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPAnsiChar(const AKey: AnsiString; const AValue: PAnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPChar(const AKey: AnsiString; const AValue: PChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPointer(const AKey: AnsiString; const AValue: Pointer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushSingle(const AKey: AnsiString; const AValue: Single); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushString(const AKey: AnsiString; const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushVariant(const AKey: AnsiString; const AValue: Variant); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushWideString(const AKey: AnsiString; const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      {$ENDREGION}
+    end;
+  {$ENDREGION}
+
+  {
+    TL4DEngineManager
+      - A simple Array to hold TL4DEngine instances. Needed to prevent lost Method and Object references!
+      CRITICAL: DO NOT MODIFY THIS TYPE IN ANY WAY!
+  }
+  {$REGION 'TL4DEngineManager - A simple Array to hold TL4DEngine instances'}
+    TL4DEngineManager = class(TPersistent)
+    private
+      FEngines: TL4DEngineArray;
+      function GetEngineIdByState(const ALuaState: PLuaState): Integer;
+      procedure DeleteItemByIndex(const AIndex: Integer);
+    public
+      destructor Destroy; override;
+      procedure AddExistingEngine(const AEngine: TL4DEngine);
+      procedure DeleteItem(const ALuaState: PLuaState);
+      function EngineExists(const ALuaState: PLuaState): Boolean;
+      function GetEngineByState(const ALuaState: PLuaState; const ACreateIfNecessary: Boolean = True): TL4DEngine;
     end;
   {$ENDREGION}
 
   {
     TL4DEngine
       - Sits Lua4Delphi methods on top of Lua API
+      CRITICAL: DO NOT MODIFY THIS TYPE IN ANY WAY!
   }
   {$REGION 'TL4DEngine - Sits Lua4Delphi methods on top of Lua API'}
-    TL4DEngine = class(TPersistent)
+    TL4DEngine = class(TInterfacedObject, IL4DEngine)
     private
       FDesignMode: Boolean;
       FGlobals: TL4DGlobalStack;
@@ -407,51 +588,56 @@ type
       FOptions: TL4DOptions;
       FOnException: TL4DExceptionEvent;
       FOnLuaError: TL4DLuaErrorEvent;
+      {$REGION 'IL4DEngine'}
+        // Lua4Delphi Custom Macros
+        function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): IL4DMethodResultStack;
+        function GetAsAnsiString(const AIndex: Integer): AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsBoolean(const AIndex: Integer): Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsChar(const AIndex: Integer): Char; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsDouble(const AIndex: Integer): Double; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsExtended(const AIndex: Integer): Extended; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsInteger(const AIndex: Integer): Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPAnsiChar(const AIndex: Integer): PAnsiChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPChar(const AIndex: Integer): PChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsPointer(const AIndex: Integer): Pointer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsSingle(const AIndex: Integer): Single; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsString(const AIndex: Integer): WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsTable(const AIndex: Integer): IL4DTable; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsWideString(const AIndex: Integer): WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetAsVariant(const AIndex: Integer): Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function LoadLuaCode(const ACode, AName: WideString; const AAutoExecute: Boolean = True): Boolean;
+        function LoadLuaFile(const AFileName: WideString; const AAutoExecute: Boolean = True): Boolean;
+        function NewTable: IL4DTable;
+        procedure Pop(const ANumber: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushAnsiChar(const AValue: AnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushAnsiString(const AValue: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushBoolean(const AValue: Boolean); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushChar(const AValue: Char); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushDouble(const AValue: Double); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushExtended(const AValue: Extended); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushFunction(const AValue: TL4DDelphiFunction); overload;         // Stack-Managed Delphi Procedure
+        procedure PushFunction(const AValue: TL4DDelphiObjectFunction); overload;   // Stack-Managed Delphi Object Procedure
+        procedure PushFunction(const AValue: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // Standard Lua "C" Function
+        procedure PushInteger(const AValue: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPAnsiChar(const AValue: PAnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPChar(const AValue: PChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushPointer(const AValue: Pointer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushSingle(const AValue: Single); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushVariant(const AValue: Variant); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure PushWideString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        procedure Remove(const AIndex: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function SafeLuaExecute(const ANumArgs: Integer = 0; const ANumResults: Integer = 0; const AErrorFunc: Integer = 0): Integer; // Handles exceptions when executing Lua code
+      {$ENDREGION}
     public
-      // Lua4Delphi Custom Macros
-      function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): TL4DMethodResultStack;
-      function GetAsAnsiString(const AIndex: Integer): AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsBoolean(const AIndex: Integer): Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsChar(const AIndex: Integer): Char; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsDouble(const AIndex: Integer): Double; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsExtended(const AIndex: Integer): Extended; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsInteger(const AIndex: Integer): Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsPAnsiChar(const AIndex: Integer): PAnsiChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsPChar(const AIndex: Integer): PChar; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsPointer(const AIndex: Integer): Pointer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsSingle(const AIndex: Integer): Single; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsString(const AIndex: Integer): WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsWideString(const AIndex: Integer): WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetAsVariant(const AIndex: Integer): Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function GetLuaType(const AIndex: Integer): TL4DStackValueType; //inline;
-      function GetLuaTypeName(const AIndex: Integer): String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function LoadLuaCode(const ACode, AName: WideString; const AAutoExecute: Boolean = True): Boolean;
-      function LoadLuaFile(const AFileName: WideString; const AAutoExecute: Boolean = True): Boolean;
-      procedure Pop(const ANumber: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushAnsiChar(const AValue: AnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushAnsiString(const AValue: AnsiString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushBoolean(const AValue: Boolean); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushChar(const AValue: Char); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushDouble(const AValue: Double); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushExtended(const AValue: Extended); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushFunction(const AValue: TL4DDelphiFunction); overload;         // Stack-Managed Delphi Procedure
-      procedure PushFunction(const AValue: TL4DDelphiObjectFunction); overload;   // Stack-Managed Delphi Object Procedure
-      procedure PushFunction(const AValue: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF} // Standard Lua "C" Function
-      procedure PushInteger(const AValue: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushPAnsiChar(const AValue: PAnsiChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushPChar(const AValue: PChar); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushPointer(const AValue: Pointer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushSingle(const AValue: Single); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushVariant(const AValue: Variant); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure PushWideString(const AValue: WideString); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      procedure Remove(const AIndex: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      function SafeLuaExecute(const ANumArgs: Integer = 0; const ANumResults: Integer = 0; const AErrorFunc: Integer = 0): Integer; // Handles exceptions when executing Lua code
       // Base Methods
       constructor Create(ALuaType: TLuaBaseType); overload;
       constructor Create(ALuaType: TLuaBaseType; const ALuaState: PLuaState); overload;
       destructor Destroy; override;
-    published
+      {$REGION 'IL4DEngine'}
+        function GetLuaType(const AIndex: Integer): TL4DStackValueType; //inline;
+        function GetLuaTypeName(const AIndex: Integer): String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+      {$ENDREGION}
       property Globals: TL4DGlobalStack read FGlobals write FGlobals;
       property Lua: TLuaCommon read FLua write FLua;
       property Options: TL4DOptions read FOptions write FOptions;
@@ -461,34 +647,20 @@ type
   {$ENDREGION}
 
   {
-    TL4DEngineMember
-      - An object which links back to TL4DEngine
-  }
-  {$REGION 'TL4DEngineMember - An object which links back to TL4DEngine'}
-  TL4DEngineMember = class(TPersistent)
-  protected
-    FLua: TL4DEngine;
-  public
-    constructor Create(const ALua: TL4DEngine); virtual;
-    property Lua: TL4DEngine read FLua write FLua;
-  end;
-  {$ENDREGION}
-
-    {
     TL4DOptions
       - Contains our various Instance Options
   }
   {$REGION 'TL4DOptions - Lua4Delphi Options Type'}
-    TL4DOptions = class(TL4DEngineMember)
+    TL4DOptions = class(TPersistent)
     private
       FLibraries: TL4DLibraryOptions;
+      FLua: TL4DEngine;
     public
-      constructor Create(const ALua: TL4DEngine); override;
+      constructor Create(const ALua: TL4DEngine);
       destructor Destroy; override;
+      property Engine: TL4DEngine read FLua write FLua;
     published
       property Libraries: TL4DLibraryOptions read FLibraries write FLibraries;
-    published
-
     end;
   {$ENDREGION}
 
@@ -497,8 +669,9 @@ type
       - Object containing Boolean Switches for the various Lua Libraries
   }
   {$REGION 'TL4DLibraryOptions - Lua4Delphi Library Options Type'}
-    TL4DLibraryOptions = class(TL4DEngineMember)
+    TL4DLibraryOptions = class(TPersistent)
     private
+      FLua: TL4DEngine;
       FBase,
       FDebug,
       FIO,
@@ -524,7 +697,8 @@ type
       procedure SetString(const AValue: Boolean);
       procedure SetTable(const AValue: Boolean);
     public
-      constructor Create(const ALua: TL4DEngine); override;
+      constructor Create(const ALua: TL4DEngine);
+      property Engine: TL4DEngine read FLua;
     published
       property Base: Boolean read GetBase write SetBase default True;
       property Debug: Boolean read GetDebug write SetDebug default False;
@@ -581,59 +755,54 @@ type
 
 implementation
 
+var
+  EngineManager: TL4DEngineManager;
+
 {$REGION 'Lua Call Methods'}
   function L4D_CallDelphiFunction(L: PLuaState): Integer; cdecl;
   var
     LLua: TL4DEngine;
-    LMethod: PL4DDelphiFunction;
-    LMethodStack: TL4DMethodStack;
+    LMethod: PL4DMethod;
+    LMethodStack: IL4DMethodStack;
   begin
-    LLua := TL4DEngine.Create(LuaLinkType, L);
-    try
-      LMethodStack := TL4DMethodStack.Create(LLua);
-      try
-        LMethodStack.FPushCount := 0;
-        LMethod := PL4DDelphiFunction(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
-        TL4DDelphiFunction(LMethod^)(LMethodStack);
-        Result := LMethodStack.FPushCount;
-      finally
-        LMethodStack.Free;
-      end;
-    finally
-      LLua.Free;
-    end;
+    LLua := EngineManager.GetEngineByState(L);
+    LMethodStack := TL4DMethodStack.Create(LLua);
+    LMethod := PL4DMethod(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
+    LMethod^.FMethod(LMethodStack);
+    Result := LMethodStack.GetPushCount;
   end;
 
   function L4D_CallClassFunction(L: PLuaState): Integer; cdecl;
   var
     LLua: TL4DEngine;
-//    LMethod: PL4DDelphiObjectFunction;
     LMethod: PL4DMethodObject;
-    LMethodStack: TL4DMethodStack;
+    LMethodStack: IL4DMethodStack;
   begin
-    LLua := TL4DEngine.Create(LuaLinkType, L);
-    try
-      LMethodStack := TL4DMethodStack.Create(LLua);
-      try
-        LMethodStack.FPushCount := 0;
-        LMethod := PL4DMethodObject(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
-        LMethod^.FMethod(LMethodStack);
-{
-        LMethod := PL4DDelphiObjectFunction(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
-        TL4DDelphiObjectFunction(LMethod^)(LMethodStack);
-}
-        Result := LMethodStack.FPushCount;
-      finally
-        LMethodStack.Free;
-      end;
-    finally
-      LLua.Free;
-    end;
+    LLua := EngineManager.GetEngineByState(L);
+    LMethodStack := TL4DMethodStack.Create(LLua);
+    LMethod := PL4DMethodObject(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
+    LMethod^.FMethod(LMethodStack);
+    Result := LMethodStack.GetPushCount;
+  end;
+{$ENDREGION}
+
+{$REGION 'TL4DEngineMember - An object which links back to TL4DEngine'}
+  { TL4DEngineMember }
+
+  constructor TL4DEngineMember.Create(const ALua: TL4DEngine);
+  begin
+    inherited Create;
+    FLua := ALua;
   end;
 {$ENDREGION}
 
 {$REGION 'TL4DMethod - A container for Delphi Methods registered with Lua'}
-  { TL4DMethod }
+  function TL4DEngineMember.GetEngine: IL4DEngine;
+  begin
+    Result := FLua;
+  end;
+
+{ TL4DMethod }
 
   constructor TL4DMethod.Create(const AMethod: TL4DDelphiFunction);
   begin
@@ -652,105 +821,97 @@ implementation
   end;
 {$ENDREGION}
 
-{$REGION 'TL4DMethodResultStack - Method Result Stack Type'}
-  { TL4DMethodResultStack }
+{$REGION 'TL4DMethodResultStackValue - Method Result Stack Value Type'}
+  { TL4DMethodResultStackValue }
 
-  procedure TL4DMethodResultStack.Cleanup;
-  begin
-    FLua.Pop(-FLua.FLua.lua_gettop);
-  end;
-
-  function TL4DMethodResultStack.GetCount: Integer;
-  begin
-    Result := FLua.FLua.lua_gettop - FOffset;
-  end;
-
-  function TL4DMethodResultStack.GetValue(const AIndex: Integer): TL4DMethodResultStackValue;
-  begin
-    Result.FStack := @Self;
-    Result.FIndex := AIndex + FOffset;
-  end;
-{$ENDREGION}
-
-{$REGION 'TL4DMethodResultStack.TL4DMethodResultStackValue - Method Result Stack Value Type'}
-  { TL4DMethodResultStack.TL4DMethodResultStackValue }
-
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): TL4DMethodResultStack;
+  function TL4DMethodResultStackValue.CallFunction(AParameters: array of const; const AResultCount: Integer): IL4DMethodResultStack;
   begin
     Result := FStack.FLua.CallFunction(AParameters, AResultCount);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsAnsiString: AnsiString;
+  constructor TL4DMethodResultStackValue.Create(const AStack: TL4DMethodResultStack; const AIndex: Integer);
+  begin
+    inherited Create;
+    FStack := AStack;
+    FIndex := AIndex;
+  end;
+
+  function TL4DMethodResultStackValue.GetAsAnsiString: AnsiString;
   begin
     Result := FStack.FLua.GetAsAnsiString(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsBoolean: Boolean;
+  function TL4DMethodResultStackValue.GetAsBoolean: Boolean;
   begin
     Result := FStack.FLua.GetAsBoolean(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsChar: Char;
+  function TL4DMethodResultStackValue.GetAsChar: Char;
   begin
     Result := FStack.FLua.GetAsChar(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsDouble: Double;
+  function TL4DMethodResultStackValue.GetAsDouble: Double;
   begin
     Result := FStack.FLua.GetAsDouble(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsExtended: Extended;
+  function TL4DMethodResultStackValue.GetAsExtended: Extended;
   begin
     Result := FStack.FLua.GetAsExtended(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsInteger: Integer;
+  function TL4DMethodResultStackValue.GetAsInteger: Integer;
   begin
     Result := FStack.FLua.GetAsInteger(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsPAnsiChar: PAnsiChar;
+  function TL4DMethodResultStackValue.GetAsPAnsiChar: PAnsiChar;
   begin
     Result := FStack.FLua.GetAsPAnsiChar(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsPChar: PChar;
+  function TL4DMethodResultStackValue.GetAsPChar: PChar;
   begin
     Result := FStack.FLua.GetAsPChar(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsPointer: Pointer;
+  function TL4DMethodResultStackValue.GetAsPointer: Pointer;
   begin
     Result := FStack.FLua.GetAsPointer(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsSingle: Single;
+  function TL4DMethodResultStackValue.GetAsSingle: Single;
   begin
     Result := FStack.FLua.GetAsSingle(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsString: String;
+  function TL4DMethodResultStackValue.GetAsString: String;
   begin
     Result := FStack.FLua.GetAsString(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsVariant: Variant;
+  function TL4DMethodResultStackValue.GetAsTable: IL4DTable;
+  begin
+    Result := FStack.FLua.GetAsTable(FIndex);
+  end;
+
+  function TL4DMethodResultStackValue.GetAsVariant: Variant;
   begin
     Result := FStack.FLua.GetAsVariant(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetAsWideString: WideString;
+  function TL4DMethodResultStackValue.GetAsWideString: WideString;
   begin
     Result := FStack.FLua.GetAsWideString(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBeAnsiString: Boolean;
+  function TL4DMethodResultStackValue.GetCanBeAnsiString: Boolean;
   begin
     Result := GetCanBeString;
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBeBoolean: Boolean;
+  function TL4DMethodResultStackValue.GetCanBeBoolean: Boolean;
   var
     LLuaType: TL4DStackValueType;
   begin
@@ -758,37 +919,37 @@ implementation
     Result := (LLuaType = svtNumber) or (LLuaType = svtBoolean);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBeChar: Boolean;
+  function TL4DMethodResultStackValue.GetCanBeChar: Boolean;
   begin
     Result := GetCanBeString;
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBeDouble: Boolean;
+  function TL4DMethodResultStackValue.GetCanBeDouble: Boolean;
   begin
     Result := (GetType = svtNumber);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBeExtended: Boolean;
+  function TL4DMethodResultStackValue.GetCanBeExtended: Boolean;
   begin
     Result := (GetType = svtNumber);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBeInteger: Boolean;
+  function TL4DMethodResultStackValue.GetCanBeInteger: Boolean;
   begin
     Result := (GetType = svtNumber);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBePAnsiChar: Boolean;
+  function TL4DMethodResultStackValue.GetCanBePAnsiChar: Boolean;
   begin
     Result := GetCanBeString;
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBePChar: Boolean;
+  function TL4DMethodResultStackValue.GetCanBePChar: Boolean;
   begin
     Result := GetCanBeString;
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBePointer: Boolean;
+  function TL4DMethodResultStackValue.GetCanBePointer: Boolean;
   var
     LLuaType: TL4DStackValueType;
   begin
@@ -796,12 +957,12 @@ implementation
     Result := (LLuaType = svtLightUserData) or (LLuaType = svtUserdata);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBeSingle: Boolean;
+  function TL4DMethodResultStackValue.GetCanBeSingle: Boolean;
   begin
     Result := (GetType = svtNumber);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBeString: Boolean;
+  function TL4DMethodResultStackValue.GetCanBeString: Boolean;
   var
     LLuaType: TL4DStackValueType;
   begin
@@ -809,7 +970,12 @@ implementation
     Result := (LLuaType = svtNumber) or (LLuaType = svtString);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBeVariant: Boolean;
+  function TL4DMethodResultStackValue.GetCanBeTable: Boolean;
+  begin
+    Result := (GetType = svtTable);
+  end;
+
+  function TL4DMethodResultStackValue.GetCanBeVariant: Boolean;
   var
     LLuaType: TL4DStackValueType;
   begin
@@ -817,17 +983,794 @@ implementation
     Result := (LLuaType = svtBoolean) or (LLuaType = svtNumber) or (LLuaType = svtString);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetCanBeWideString: Boolean;
+  function TL4DMethodResultStackValue.GetCanBeWideString: Boolean;
   begin
     Result := GetCanBeString;
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetType: TL4DStackValueType;
+  function TL4DMethodResultStackValue.GetType: TL4DStackValueType;
   begin
     Result := FStack.FLua.GetLuaType(FIndex);
   end;
 
-  function TL4DMethodResultStack.TL4DMethodResultStackValue.GetTypeName: String;
+  function TL4DMethodResultStackValue.GetTypeName: String;
+  begin
+    Result := FStack.FLua.GetLuaTypeName(FIndex);
+  end;
+
+  procedure TL4DMethodResultStackValue.SetIndex(const AIndex: Integer);
+  begin
+    FIndex := AIndex;
+  end;
+
+{$ENDREGION}
+
+{$REGION 'TL4DMethodResultStack - Method Result Stack Type'}
+  { TL4DMethodResultStack }
+
+  procedure TL4DMethodResultStack.Cleanup;
+  begin
+    FLua.Pop(FLua.FLua.lua_gettop);
+    FCleanedUp := True;
+  end;
+
+  constructor TL4DMethodResultStack.Create(const ALua: TL4DEngine);
+  begin
+    inherited;
+    FCleanedUp := False;
+  end;
+
+  destructor TL4DMethodResultStack.Destroy;
+  begin
+    if not (FCleanedUp) then
+      Cleanup;
+    inherited;
+  end;
+
+  function TL4DMethodResultStack.GetCount: Integer;
+  begin
+    Result := FLua.FLua.lua_gettop;
+  end;
+
+  function TL4DMethodResultStack.GetValue(const AIndex: Integer): IL4DMethodResultStackValue;
+  begin
+    Result := TL4DMethodResultStackValue.Create(Self, AIndex);
+  end;
+
+{$ENDREGION}
+
+{$REGION 'TL4DTableValue - A reader for Lua Table/Metatable Values'}
+  { TL4DTableValue }
+
+  function TL4DTableValue.CallFunction(AParameters: array of const; const AResultCount: Integer): IL4DMethodResultStack;
+  begin
+    Result := FStack.FLua.CallFunction(AParameters, AResultCount);
+  end;
+
+  constructor TL4DTableValue.Create(const AStack: TL4DTable; const AIndex: Integer);
+  begin
+    inherited Create;
+    FStack := AStack;
+    FIndex := AIndex;
+  end;
+
+  function TL4DTableValue.GetAsAnsiString: AnsiString;
+  begin
+    Result := FStack.FLua.GetAsAnsiString(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsBoolean: Boolean;
+  begin
+    Result := FStack.FLua.GetAsBoolean(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsChar: Char;
+  begin
+    Result := FStack.FLua.GetAsChar(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsDouble: Double;
+  begin
+    Result := FStack.FLua.GetAsDouble(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsExtended: Extended;
+  begin
+    Result := FStack.FLua.GetAsExtended(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsInteger: Integer;
+  begin
+    Result := FStack.FLua.GetAsInteger(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsPAnsiChar: PAnsiChar;
+  begin
+    Result := FStack.FLua.GetAsPAnsiChar(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsPChar: PChar;
+  begin
+    Result := FStack.FLua.GetAsPChar(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsPointer: Pointer;
+  begin
+    Result := FStack.FLua.GetAsPointer(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsSingle: Single;
+  begin
+    Result := FStack.FLua.GetAsSingle(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsString: String;
+  begin
+    Result := FStack.FLua.GetAsString(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsTable: IL4DTable;
+  begin
+    Result := FStack.FLua.GetAsTable(FIndex);
+  end;
+
+  function TL4DTableValue.GetAsVariant: Variant;
+  begin
+    Result := FStack.FLua.GetAsVariant(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetAsWideString: WideString;
+  begin
+    Result := FStack.FLua.GetAsWideString(FIndex);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DTableValue.GetCanBeAnsiString: Boolean;
+  begin
+    Result := GetCanBeString;
+  end;
+
+  function TL4DTableValue.GetCanBeBoolean: Boolean;
+  var
+    LLuaType: TL4DStackValueType;
+  begin
+    LLuaType := GetType;
+    Result := (LLuaType = svtNumber) or (LLuaType = svtBoolean);
+  end;
+
+  function TL4DTableValue.GetCanBeChar: Boolean;
+  begin
+    Result := GetCanBeString;
+  end;
+
+  function TL4DTableValue.GetCanBeDouble: Boolean;
+  begin
+    Result := (GetType = svtNumber);
+  end;
+
+  function TL4DTableValue.GetCanBeExtended: Boolean;
+  begin
+    Result := (GetType = svtNumber);
+  end;
+
+  function TL4DTableValue.GetCanBeInteger: Boolean;
+  begin
+    Result := (GetType = svtNumber);
+  end;
+
+  function TL4DTableValue.GetCanBePAnsiChar: Boolean;
+  begin
+    Result := GetCanBeString;
+  end;
+
+  function TL4DTableValue.GetCanBePChar: Boolean;
+  begin
+    Result := GetCanBeString;
+  end;
+
+  function TL4DTableValue.GetCanBePointer: Boolean;
+  var
+    LLuaType: TL4DStackValueType;
+  begin
+    LLuaType := GetType;
+    Result := (LLuaType = svtLightUserData) or (LLuaType = svtUserdata);
+  end;
+
+  function TL4DTableValue.GetCanBeSingle: Boolean;
+  begin
+    Result := (GetType = svtNumber);
+  end;
+
+  function TL4DTableValue.GetCanBeString: Boolean;
+  var
+    LLuaType: TL4DStackValueType;
+  begin
+    LLuaType := GetType;
+    Result := (LLuaType = svtNumber) or (LLuaType = svtString);
+  end;
+
+  function TL4DTableValue.GetCanBeTable: Boolean;
+  begin
+    Result := (GetType = svtTable);
+  end;
+
+  function TL4DTableValue.GetCanBeVariant: Boolean;
+  var
+    LLuaType: TL4DStackValueType;
+  begin
+    LLuaType := GetType;
+    Result := (LLuaType = svtBoolean) or (LLuaType = svtNumber) or (LLuaType = svtString);
+  end;
+
+  function TL4DTableValue.GetCanBeWideString: Boolean;
+  begin
+    Result := GetCanBeString;
+  end;
+
+  function TL4DTableValue.GetType: TL4DStackValueType;
+  begin
+    Result := FStack.FLua.GetLuaType(FIndex);
+  end;
+
+  function TL4DTableValue.GetTypeName: String;
+  begin
+    Result := FStack.FLua.GetLuaTypeName(FIndex);
+  end;
+
+  procedure TL4DTableValue.SetIndex(const AIndex: Integer);
+  begin
+    FIndex := AIndex;
+  end;
+
+  procedure TL4DTableValue.SetKey(const AKey: AnsiString);
+  begin
+    FKey := AKey;
+  end;
+
+{$ENDREGION}
+
+{$REGION 'TL4DTable - Composer/Reader for Lua Tables/Metatables'}
+  { TL4DTable }
+
+  procedure TL4DTable.Push;
+  begin
+    PushTable;
+    FTableSet := True;
+  end;
+
+  procedure TL4DTable.Close;
+  begin
+    FLua.Pop(1);
+    FClosed := True;
+  end;
+
+  constructor TL4DTable.Create(const ALua: TL4DEngine; const ANew: Boolean = False);
+  begin
+    inherited Create(ALua);
+    FFieldIndex := 0;
+    FTableSet := False;
+    FNew := ANew;
+    FClosed := False;
+  end;
+
+  destructor TL4DTable.Destroy;
+  begin
+    if (FNew) and (not FTableSet) then
+      PushTable;
+    if (not FNew) and (not FClosed) then
+      Close;
+    inherited;
+  end;
+
+  function TL4DTable.GetCount: Integer;
+  begin
+    Result := FLua.FLua.lua_objlen(FIndex);
+  end;
+
+  function TL4DTable.GetName: AnsiString;
+  begin
+    Result := FName;
+  end;
+
+  function TL4DTable.GetValueByIndex(const AIndex: Integer): IL4DTableValue;
+  begin
+    FLua.PushInteger(AIndex);
+    FLua.FLua.lua_gettable(FIndex);
+    Result := TL4DTableValue.Create(Self, AIndex);
+  end;
+
+  function TL4DTable.GetValueByName(const AName: AnsiString): IL4DTableValue;
+  begin
+    FLua.FLua.lua_getfield(-1, PAnsiChar(AName));
+    Result := TL4DTableValue.Create(Self, -1);
+    Result.SetKey(AName);
+  end;
+
+  function TL4DTable.NewTable(const AKey: AnsiString): IL4DTable;
+  begin
+    FLua.PushAnsiString(AKey);
+    Result := FLua.NewTable;
+    Result.SetOnPushTable(OnPushTable);
+  end;
+
+  procedure TL4DTable.OnPushTable(const ATable: IL4DTable);
+  begin
+    FLua.FLua.lua_settable(FIndex);
+  end;
+
+  function TL4DTable.NewTable: IL4DTable;
+  begin
+    FLua.PushInteger(FFieldIndex);
+    Result := FLua.NewTable;
+    Result.SetOnPushTable(OnPushTable);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushAnsiChar(const AValue: AnsiChar);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushAnsiChar(AValue);
+//    FLua.FLua.lua_settable(FIndex);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushAnsiChar(const AKey: AnsiString; const AValue: AnsiChar);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushAnsiChar(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushAnsiString(const AKey, AValue: AnsiString);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushAnsiString(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushAnsiString(const AValue: AnsiString);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushAnsiString(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushBoolean(const AValue: Boolean);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushBoolean(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushBoolean(const AKey: AnsiString; const AValue: Boolean);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushBoolean(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushChar(const AKey: AnsiString; const AValue: Char);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushChar(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushChar(const AValue: Char);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushChar(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushDouble(const AKey: AnsiString; const AValue: Double);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushDouble(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushDouble(const AValue: Double);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushDouble(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushExtended(const AValue: Extended);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushExtended(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushExtended(const AKey: AnsiString; const AValue: Extended);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushExtended(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushFunction(const AValue: TLuaDelphiFunction);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushFunction(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushFunction(const AKey: AnsiString; const AValue: TL4DDelphiFunction);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushFunction(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushFunction(const AValue: TL4DDelphiFunction);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushFunction(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushFunction(const AKey: AnsiString; const AValue: TL4DDelphiObjectFunction);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushFunction(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushFunction(const AValue: TL4DDelphiObjectFunction);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushFunction(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushFunction(const AKey: AnsiString; const AValue: TLuaDelphiFunction);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushFunction(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushInteger(const AValue: Integer);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushInteger(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushInteger(const AKey: AnsiString; const AValue: Integer);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushInteger(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushPAnsiChar(const AKey: AnsiString; const AValue: PAnsiChar);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushPAnsiChar(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushPAnsiChar(const AValue: PAnsiChar);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushPAnsiChar(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushPChar(const AValue: PChar);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushPChar(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushPChar(const AKey: AnsiString; const AValue: PChar);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushPChar(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushPointer(const AKey: AnsiString; const AValue: Pointer);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushPointer(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushPointer(const AValue: Pointer);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushPointer(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushSingle(const AValue: Single);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushSingle(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushSingle(const AKey: AnsiString; const AValue: Single);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushSingle(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushString(const AKey: AnsiString; const AValue: WideString);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushString(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushString(const AValue: WideString);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushString(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushVariant(const AValue: Variant);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushVariant(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushVariant(const AKey: AnsiString; const AValue: Variant);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushVariant(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.PushWideString(const AKey: AnsiString; const AValue: WideString);
+  begin
+    FLua.PushAnsiString(AKey);
+    FLua.PushWideString(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+  end;
+
+  procedure TL4DTable.SetIndex(const AIndex: Integer);
+  begin
+    FIndex := AIndex;
+  end;
+
+  procedure TL4DTable.SetName(const AName: AnsiString);
+  begin
+    FName := AName;
+  end;
+
+  procedure TL4DTable.SetOnPushTable(const AEvent: TL4DTableChangeEvent);
+  begin
+    FOnPushTable := AEvent;
+  end;
+
+  procedure TL4DTable.PushWideString(const AValue: WideString);
+  begin
+    FLua.PushInteger(FFieldIndex);
+    FLua.PushWideString(AValue);
+    FLua.FLua.lua_rawset(FIndex);
+    Inc(FFieldIndex);
+  end;
+
+  procedure TL4DTable.PushTable;
+  begin
+//    FLua.FLua.lua_rawset(FIndex);
+    if Assigned(FOnPushTable) then
+      FOnPushTable(Self);
+  end;
+
+{$ENDREGION}
+
+{$REGION 'TL4DMethodStackValue - Method Stack Value Type'}
+  { TL4DMethodStackValue }
+
+  function TL4DMethodStackValue.CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): IL4DMethodResultStack;
+  begin
+    Result := FStack.FLua.CallFunction(AParameters, AResultCount);
+  end;
+
+  constructor TL4DMethodStackValue.Create(const AStack: TL4DMethodStack; const AIndex: Integer);
+  begin
+    inherited Create;
+    FStack := AStack;
+    FIndex := AIndex;
+  end;
+
+  function TL4DMethodStackValue.GetAsAnsiString: AnsiString;
+  begin
+    Result := FStack.FLua.GetAsAnsiString(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsBoolean: Boolean;
+  begin
+    Result := FStack.FLua.GetAsBoolean(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsChar: Char;
+  begin
+    Result := FStack.FLua.GetAsChar(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsDouble: Double;
+  begin
+    Result := FStack.FLua.GetAsDouble(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsExtended: Extended;
+  begin
+    Result := FStack.FLua.GetAsExtended(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsInteger: Integer;
+  begin
+    Result := FStack.FLua.GetAsInteger(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsPAnsiChar: PAnsiChar;
+  begin
+    Result := FStack.FLua.GetAsPAnsiChar(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsPChar: PChar;
+  begin
+    Result := FStack.FLua.GetAsPChar(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsPointer: Pointer;
+  begin
+    Result := FStack.FLua.GetAsPointer(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsSingle: Single;
+  begin
+    Result := FStack.FLua.GetAsSingle(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsString: String;
+  begin
+    Result := FStack.FLua.GetAsString(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsTable: IL4DTable;
+  begin
+    Result := FStack.FLua.GetAsTable(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsVariant: Variant;
+  begin
+    Result := FStack.FLua.GetAsVariant(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetAsWideString: WideString;
+  begin
+    Result := FStack.FLua.GetAsWideString(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetCanBeAnsiString: Boolean;
+  begin
+    Result := GetCanBeString;
+  end;
+
+  function TL4DMethodStackValue.GetCanBeBoolean: Boolean;
+  var
+    LLuaType: TL4DStackValueType;
+  begin
+    LLuaType := GetType;
+    Result := (LLuaType = svtNumber) or (LLuaType = svtBoolean);
+  end;
+
+  function TL4DMethodStackValue.GetCanBeChar: Boolean;
+  begin
+    Result := GetCanBeString;
+  end;
+
+  function TL4DMethodStackValue.GetCanBeDouble: Boolean;
+  begin
+    Result := (GetType = svtNumber);
+  end;
+
+  function TL4DMethodStackValue.GetCanBeExtended: Boolean;
+  begin
+    Result := (GetType = svtNumber);
+  end;
+
+  function TL4DMethodStackValue.GetCanBeInteger: Boolean;
+  begin
+    Result := (GetType = svtNumber);
+  end;
+
+  function TL4DMethodStackValue.GetCanBePAnsiChar: Boolean;
+  begin
+    Result := GetCanBeString;
+  end;
+
+  function TL4DMethodStackValue.GetCanBePChar: Boolean;
+  begin
+    Result := GetCanBeString;
+  end;
+
+  function TL4DMethodStackValue.GetCanBePointer: Boolean;
+  var
+    LLuaType: TL4DStackValueType;
+  begin
+    LLuaType := GetType;
+    Result := (LLuaType = svtLightUserData) or (LLuaType = svtUserdata);
+  end;
+
+  function TL4DMethodStackValue.GetCanBeSingle: Boolean;
+  begin
+    Result := (GetType = svtNumber);
+  end;
+
+  function TL4DMethodStackValue.GetCanBeString: Boolean;
+  var
+    LLuaType: TL4DStackValueType;
+  begin
+    LLuaType := GetType;
+    Result := (LLuaType = svtNumber) or (LLuaType = svtString);
+  end;
+
+  function TL4DMethodStackValue.GetCanBeTable: Boolean;
+  begin
+    Result := (GetType = svtTable);
+  end;
+
+  function TL4DMethodStackValue.GetCanBeVariant: Boolean;
+  var
+    LLuaType: TL4DStackValueType;
+  begin
+    LLuaType := GetType;
+    Result := (LLuaType = svtBoolean) or (LLuaType = svtNumber) or (LLuaType = svtString);
+  end;
+
+  function TL4DMethodStackValue.GetCanBeWideString: Boolean;
+  begin
+    Result := GetCanBeString;
+  end;
+
+  function TL4DMethodStackValue.GetType: TL4DStackValueType;
+  begin
+    Result := FStack.FLua.GetLuaType(FIndex);
+  end;
+
+  function TL4DMethodStackValue.GetTypeName: String;
   begin
     Result := FStack.FLua.GetLuaTypeName(FIndex);
   end;
@@ -836,10 +1779,15 @@ implementation
 {$REGION 'TL4DMethodStack - Method Stack Type'}
 { TL4DMethodStack }
 
-  function TL4DMethodStack.GetValue(const AIndex: Integer): TL4DMethodStackValue;
+  function TL4DMethodStack.GetValue(const AIndex: Integer): IL4DMethodStackValue;
   begin
-    Result.FIndex := AIndex;
-    Result.FStack := Self;
+    Result := TL4DMethodStackValue.Create(Self, AIndex);
+  end;
+
+  function TL4DMethodStack.NewTable: IL4DTable;
+  begin
+    Result := FLua.NewTable;
+    Inc(FPushCount);
   end;
 
   procedure TL4DMethodStack.PushAnsiChar(const AValue: AnsiChar);
@@ -946,95 +1894,207 @@ implementation
 
   constructor TL4DMethodStack.Create(const ALua: TL4DEngine);
   begin
-    inherited Create;
-    FLua := ALua;
+  inherited;
+    FPushCount := 0;
   end;
 
   function TL4DMethodStack.GetCount: Integer;
   begin
     Result := FLua.FLua.lua_gettop;
   end;
+
+  function TL4DMethodStack.GetPushCount: Integer;
+  begin
+    Result := FPushCount;
+  end;
+
 {$ENDREGION}
 
-{$REGION 'TL4DMethodStack.TL4DMethodStackValue - Method Stack Value Type'}
-  { TL4DMethodStack.TL4DMethodStackValue }
+{$REGION 'TL4DGlobalStackValue - Global Stack Value Type'}
+  { TL4DGlobalStack.TL4DGlobalStackValue }
 
-  function TL4DMethodStack.TL4DMethodStackValue.CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): TL4DMethodResultStack;
+  function TL4DGlobalStackValue.CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): IL4DMethodResultStack;
   begin
     Result := FStack.FLua.CallFunction(AParameters, AResultCount);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsAnsiString: AnsiString;
+  constructor TL4DGlobalStackValue.Create(const AStack: TL4DGlobalStack; const AKey: AnsiString);
   begin
-    Result := FStack.FLua.GetAsAnsiString(FIndex);
+    inherited Create;
+    FStack := AStack;
+    FKey := AKey;
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsBoolean: Boolean;
+  procedure TL4DGlobalStackValue.Delete;
   begin
-    Result := FStack.FLua.GetAsBoolean(FIndex);
+    FStack.FLua.Remove(-1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsChar: Char;
+  function TL4DGlobalStackValue.GetAsAnsiString: AnsiString;
   begin
-    Result := FStack.FLua.GetAsChar(FIndex);
+    Result := FStack.FLua.GetAsAnsiString(-1);
+    FStack.FLua.Pop(1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsDouble: Double;
+  function TL4DGlobalStackValue.GetAsBoolean: Boolean;
   begin
-    Result := FStack.FLua.GetAsDouble(FIndex);
+    Result := FStack.FLua.GetAsBoolean(-1);
+    FStack.FLua.Pop(1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsExtended: Extended;
+  function TL4DGlobalStackValue.GetAsChar: Char;
   begin
-    Result := FStack.FLua.GetAsExtended(FIndex);
+    Result := FStack.FLua.GetAsChar(-1);
+    FStack.FLua.Pop(1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsInteger: Integer;
+  function TL4DGlobalStackValue.GetAsDouble: Double;
   begin
-    Result := FStack.FLua.GetAsInteger(FIndex);
+    Result := FStack.FLua.GetAsDouble(-1);
+    FStack.FLua.Pop(1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsPAnsiChar: PAnsiChar;
+  function TL4DGlobalStackValue.GetAsExtended: Extended;
   begin
-    Result := FStack.FLua.GetAsPAnsiChar(FIndex);
+    Result := FStack.FLua.GetAsExtended(-1);
+    FStack.FLua.Pop(1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsPChar: PChar;
+  function TL4DGlobalStackValue.GetAsInteger: Integer;
   begin
-    Result := FStack.FLua.GetAsPChar(FIndex);
+    Result := FStack.FLua.GetAsInteger(-1);
+    FStack.FLua.Pop(1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsPointer: Pointer;
+  function TL4DGlobalStackValue.GetAsPAnsiChar: PAnsiChar;
   begin
-    Result := FStack.FLua.GetAsPointer(FIndex);
+    Result := FStack.FLua.GetAsPAnsiChar(-1);
+    FStack.FLua.Pop(1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsSingle: Single;
+  function TL4DGlobalStackValue.GetAsPChar: PChar;
   begin
-    Result := FStack.FLua.GetAsSingle(FIndex);
+    Result := FStack.FLua.GetAsPChar(-1);
+    FStack.FLua.Pop(1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsString: String;
+  function TL4DGlobalStackValue.GetAsPointer: Pointer;
   begin
-    Result := FStack.FLua.GetAsString(FIndex);
+    Result := FStack.FLua.GetAsPointer(-1);
+    FStack.FLua.Pop(1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsVariant: Variant;
+  function TL4DGlobalStackValue.GetAsSingle: Single;
   begin
-    Result := FStack.FLua.GetAsVariant(FIndex);
+    Result := FStack.FLua.GetAsSingle(-1);
+    FStack.FLua.Pop(1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetAsWideString: WideString;
+  function TL4DGlobalStackValue.GetAsString: String;
   begin
-    Result := FStack.FLua.GetAsWideString(FIndex);
+    Result := FStack.FLua.GetAsString(-1);
+    FStack.FLua.Pop(1);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBeAnsiString: Boolean;
+  function TL4DGlobalStackValue.GetAsTable: IL4DTable;
+  begin
+    Result := FStack.FLua.GetAsTable(-1);
+  end;
+
+  function TL4DGlobalStackValue.GetAsVariant: Variant;
+  begin
+    Result := FStack.FLua.GetAsVariant(-1);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DGlobalStackValue.GetAsWideString: WideString;
+  begin
+    Result := FStack.FLua.GetAsWideString(-1);
+    FStack.FLua.Pop(1);
+  end;
+
+  function TL4DGlobalStackValue.GetType: TL4DStackValueType;
+  begin
+    Result := FStack.FLua.GetLuaType(-1);
+    FStack.FLua.Pop(-1);
+  end;
+
+  function TL4DGlobalStackValue.GetTypeName: String;
+  begin
+    Result := FStack.FLua.GetLuaTypeName(-1);
+  end;
+
+  procedure TL4DGlobalStackValue.SetAnsiString(const AValue: AnsiString);
+  begin
+    FStack.PushAnsiString(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetBoolean(const AValue: Boolean);
+  begin
+    FStack.PushBoolean(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetChar(const AValue: Char);
+  begin
+    FStack.PushChar(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetDouble(const AValue: Double);
+  begin
+    FStack.PushDouble(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetExtended(const AValue: Extended);
+  begin
+    FStack.PushExtended(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetInteger(const AValue: Integer);
+  begin
+    FStack.PushInteger(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetPAnsiChar(const AValue: PAnsiChar);
+  begin
+    FStack.PushPAnsiChar(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetPChar(const AValue: PChar);
+  begin
+    FStack.PushPChar(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetPointer(const AValue: Pointer);
+  begin
+    FStack.PushPointer(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetSingle(const AValue: Single);
+  begin
+    FStack.PushSingle(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetString(const AValue: String);
+  begin
+    FStack.PushString(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetVariant(const AValue: Variant);
+  begin
+    FStack.PushVariant(FKey, AValue);
+  end;
+
+  procedure TL4DGlobalStackValue.SetWideString(const AValue: WideString);
+  begin
+    FStack.PushWideString(FKey, AValue);
+  end;
+
+  function TL4DGlobalStackValue.GetCanBeAnsiString: Boolean;
   begin
     Result := GetCanBeString;
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBeBoolean: Boolean;
+  function TL4DGlobalStackValue.GetCanBeBoolean: Boolean;
   var
     LLuaType: TL4DStackValueType;
   begin
@@ -1042,37 +2102,37 @@ implementation
     Result := (LLuaType = svtNumber) or (LLuaType = svtBoolean);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBeChar: Boolean;
+  function TL4DGlobalStackValue.GetCanBeChar: Boolean;
   begin
     Result := GetCanBeString;
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBeDouble: Boolean;
+  function TL4DGlobalStackValue.GetCanBeDouble: Boolean;
   begin
     Result := (GetType = svtNumber);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBeExtended: Boolean;
+  function TL4DGlobalStackValue.GetCanBeExtended: Boolean;
   begin
     Result := (GetType = svtNumber);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBeInteger: Boolean;
+  function TL4DGlobalStackValue.GetCanBeInteger: Boolean;
   begin
     Result := (GetType = svtNumber);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBePAnsiChar: Boolean;
+  function TL4DGlobalStackValue.GetCanBePAnsiChar: Boolean;
   begin
     Result := GetCanBeString;
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBePChar: Boolean;
+  function TL4DGlobalStackValue.GetCanBePChar: Boolean;
   begin
     Result := GetCanBeString;
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBePointer: Boolean;
+  function TL4DGlobalStackValue.GetCanBePointer: Boolean;
   var
     LLuaType: TL4DStackValueType;
   begin
@@ -1080,12 +2140,12 @@ implementation
     Result := (LLuaType = svtLightUserData) or (LLuaType = svtUserdata);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBeSingle: Boolean;
+  function TL4DGlobalStackValue.GetCanBeSingle: Boolean;
   begin
     Result := (GetType = svtNumber);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBeString: Boolean;
+  function TL4DGlobalStackValue.GetCanBeString: Boolean;
   var
     LLuaType: TL4DStackValueType;
   begin
@@ -1093,7 +2153,12 @@ implementation
     Result := (LLuaType = svtNumber) or (LLuaType = svtString);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBeVariant: Boolean;
+  function TL4DGlobalStackValue.GetCanBeTable: Boolean;
+  begin
+    Result := (GetType = svtTable);
+  end;
+
+  function TL4DGlobalStackValue.GetCanBeVariant: Boolean;
   var
     LLuaType: TL4DStackValueType;
   begin
@@ -1101,36 +2166,36 @@ implementation
     Result := (LLuaType = svtBoolean) or (LLuaType = svtNumber) or (LLuaType = svtString);
   end;
 
-  function TL4DMethodStack.TL4DMethodStackValue.GetCanBeWideString: Boolean;
+  function TL4DGlobalStackValue.GetCanBeWideString: Boolean;
   begin
     Result := GetCanBeString;
-  end;
-
-  function TL4DMethodStack.TL4DMethodStackValue.GetType: TL4DStackValueType;
-  begin
-    Result := FStack.FLua.GetLuaType(FIndex);
-  end;
-
-  function TL4DMethodStack.TL4DMethodStackValue.GetTypeName: String;
-  begin
-    Result := FStack.FLua.GetLuaTypeName(FIndex);
   end;
 {$ENDREGION}
 
 {$REGION 'TL4DGlobalStack - Global Stack Type'}
   { TL4DGlobalStack }
 
-  constructor TL4DGlobalStack.Create(const ALua: TL4DEngine);
+  function TL4DGlobalStack.GetCount: Integer;
   begin
-    inherited Create;
-    FLua := ALua;
+    Result := FLua.FLua.lua_gettop;
   end;
 
-  function TL4DGlobalStack.GetGlobal(const AKey: AnsiString): TL4DGlobalStackValue;
+  function TL4DGlobalStack.GetGlobal(const AKey: AnsiString): IL4DGlobalStackValue;
   begin
-    Result.FKey := AKey;
-    Result.FStack := Self;
+    Result := TL4DGlobalStackValue.Create(Self, AKey);
     FLua.FLua.lua_getglobal(PAnsiChar(AKey));
+  end;
+
+  function TL4DGlobalStack.NewTable(const AKey: AnsiString): IL4DTable;
+  begin
+    Result := FLua.NewTable;
+    Result.SetName(AKey);
+    Result.SetOnPushTable(OnPushTable);
+  end;
+
+  procedure TL4DGlobalStack.OnPushTable(const ATable: IL4DTable);
+  begin
+    SetGlobal(ATable.GetName);
   end;
 
   procedure TL4DGlobalStack.PushAnsiChar(const AKey: AnsiString; const AValue: AnsiChar);
@@ -1238,181 +2303,98 @@ implementation
   procedure TL4DGlobalStack.SetGlobal(const AKey: AnsiString);
   begin
       FLua.FLua.lua_setglobal(PAnsiChar(AKey));
-      FLua.Pop(1);
+//      FLua.Pop(1);
   end;
 {$ENDREGION}
 
-{$REGION 'TL4DGlobalStack.TL4DGlobalStackValue - Global Stack Value Type'}
-  { TL4DGlobalStack.TL4DGlobalStackValue }
-
-  function TL4DGlobalStack.TL4DGlobalStackValue.CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): TL4DMethodResultStack;
+{$REGION 'TL4DEngineMember - A simple Array to hold TL4DEngine instances'}
+  { TL4DEngineManager }
+  procedure TL4DEngineManager.AddExistingEngine(const AEngine: TL4DEngine);
+  var
+    LIndex: Integer;
   begin
-    Result := FStack.FLua.CallFunction(AParameters, AResultCount);
+    LIndex := GetEngineIdByState(AEngine.FLua.LuaState);
+    if LIndex = -1 then
+    begin
+      LIndex := Length(FEngines);
+      SetLength(FEngines, LIndex + 1);
+      FEngines[LIndex] := AEngine;
+    end;
   end;
 
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.Delete;
+  procedure TL4DEngineManager.DeleteItem(const ALuaState: PLuaState);
+  var
+    LIndex: Integer;
   begin
-    FStack.FLua.Remove(-1);
+    LIndex := GetEngineIdByState(ALuaState);
+    if LIndex > -1 then
+      DeleteItemByIndex(LIndex);
   end;
 
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsAnsiString: AnsiString;
+  procedure TL4DEngineManager.DeleteItemByIndex(const AIndex: Integer);
+  var
+   LCount, I: Integer;
   begin
-    Result := FStack.FLua.GetAsAnsiString(-1);
-    FStack.FLua.Pop(1);
+   LCount := Length(FEngines);
+   if (AIndex < 0) or (AIndex > LCount - 1) then
+     Exit;
+   if (AIndex < (LCount - 1)) then
+     for I := AIndex to LCount - 2 do
+       FEngines[I] := FEngines[I + 1];
+   SetLength(FEngines, LCount - 1);
   end;
 
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsBoolean: Boolean;
+  destructor TL4DEngineManager.Destroy;
+  var
+    I: Integer;
   begin
-    Result := FStack.FLua.GetAsBoolean(-1);
-    FStack.FLua.Pop(1);
+    for I := High(FEngines) downto Low(FEngines) do
+      FEngines[I].Free;
+    inherited;
   end;
 
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsChar: Char;
+  function TL4DEngineManager.EngineExists(const ALuaState: PLuaState): Boolean;
   begin
-    Result := FStack.FLua.GetAsChar(-1);
-    FStack.FLua.Pop(1);
+    Result := (GetEngineIdByState(ALuaState) > -1);
   end;
 
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsDouble: Double;
+  function TL4DEngineManager.GetEngineByState(const ALuaState: PLuaState; const ACreateIfNecessary: Boolean = True): TL4DEngine;
+  var
+    LIndex: Integer;
   begin
-    Result := FStack.FLua.GetAsDouble(-1);
-    FStack.FLua.Pop(1);
+    LIndex := GetEngineIdByState(ALuaState);
+    if LIndex = -1 then
+    begin
+      if ACreateIfNecessary then
+      begin
+        LIndex := Length(FEngines);
+        SetLength(FEngines, LIndex + 1);
+        FEngines[LIndex] := TL4DEngine.Create(LuaLinkType, ALuaState);
+        Result := FEngines[LIndex];
+      end else
+        Result := nil;
+    end else
+      Result := FEngines[LIndex];
   end;
 
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsExtended: Extended;
+  function TL4DEngineManager.GetEngineIdByState(const ALuaState: PLuaState): Integer;
+  var
+    I: Integer;
   begin
-    Result := FStack.FLua.GetAsExtended(-1);
-    FStack.FLua.Pop(1);
-  end;
-
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsInteger: Integer;
-  begin
-    Result := FStack.FLua.GetAsInteger(-1);
-    FStack.FLua.Pop(1);
-  end;
-
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsPAnsiChar: PAnsiChar;
-  begin
-    Result := FStack.FLua.GetAsPAnsiChar(-1);
-    FStack.FLua.Pop(1);
-  end;
-
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsPChar: PChar;
-  begin
-    Result := FStack.FLua.GetAsPChar(-1);
-    FStack.FLua.Pop(1);
-  end;
-
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsPointer: Pointer;
-  begin
-    Result := FStack.FLua.GetAsPointer(-1);
-    FStack.FLua.Pop(1);
-  end;
-
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsSingle: Single;
-  begin
-    Result := FStack.FLua.GetAsSingle(-1);
-    FStack.FLua.Pop(1);
-  end;
-
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsString: String;
-  begin
-    Result := FStack.FLua.GetAsString(-1);
-    FStack.FLua.Pop(1);
-  end;
-
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsVariant: Variant;
-  begin
-    Result := FStack.FLua.GetAsVariant(-1);
-    FStack.FLua.Pop(1);
-  end;
-
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetAsWideString: WideString;
-  begin
-    Result := FStack.FLua.GetAsWideString(-1);
-    FStack.FLua.Pop(1);
-  end;
-
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetType: TL4DStackValueType;
-  begin
-    Result := FStack.FLua.GetLuaType(-1);
-  end;
-
-  function TL4DGlobalStack.TL4DGlobalStackValue.GetTypeName: String;
-  begin
-    Result := FStack.FLua.GetLuaTypeName(-1);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetAnsiString(const AValue: AnsiString);
-  begin
-    FStack.PushAnsiString(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetBoolean(const AValue: Boolean);
-  begin
-    FStack.PushBoolean(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetChar(const AValue: Char);
-  begin
-    FStack.PushChar(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetDouble(const AValue: Double);
-  begin
-    FStack.PushDouble(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetExtended(const AValue: Extended);
-  begin
-    FStack.PushExtended(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetInteger(const AValue: Integer);
-  begin
-    FStack.PushInteger(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetPAnsiChar(const AValue: PAnsiChar);
-  begin
-    FStack.PushPAnsiChar(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetPChar(const AValue: PChar);
-  begin
-    FStack.PushPChar(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetPointer(const AValue: Pointer);
-  begin
-    FStack.PushPointer(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetSingle(const AValue: Single);
-  begin
-    FStack.PushSingle(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetString(const AValue: String);
-  begin
-    FStack.PushString(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetVariant(const AValue: Variant);
-  begin
-    FStack.PushVariant(FKey, AValue);
-  end;
-
-  procedure TL4DGlobalStack.TL4DGlobalStackValue.SetWideString(const AValue: WideString);
-  begin
-    FStack.PushWideString(FKey, AValue);
+    Result := -1;
+    for I := Low(FEngines) to High(FEngines) do
+      if (FEngines[I].FLua.LuaState = ALuaState) then
+      begin
+        Result := I;
+        Break;
+      end;
   end;
 {$ENDREGION}
 
 {$REGION 'TL4DEngine - Sits Lua4Delphi methods on top of Lua API'}
   { TL4DEngine }
 
-  function TL4DEngine.CallFunction(AParameters: array of const; const AResultCount: Integer): TL4DMethodResultStack;
+  function TL4DEngine.CallFunction(AParameters: array of const; const AResultCount: Integer): IL4DMethodResultStack;
   var
     I: Integer;
   begin
@@ -1438,14 +2420,7 @@ implementation
         vtInterface: ; // TODO -oSimon -cL4D Core Stack : Insert Interface-type Push Handler Here
       end;
     SafeLuaExecute(High(AParameters) + 1, AResultCount);
-    // Offset Calculation
-    Result.FOffset := 0;
-    for I := 1 to FLua.lua_gettop do
-      if GetLuaType(I) = svtNil then
-        Inc(Result.FOffset)
-      else
-        Break;
-    Result.FLua := Self;
+    Result := TL4DMethodResultStack.Create(Self);
   end;
 
   constructor TL4DEngine.Create(ALuaType: TLuaBaseType; const ALuaState: PLuaState);
@@ -1468,6 +2443,7 @@ implementation
     FLua := ALuaType.Create;
     FGlobals := TL4DGlobalStack.Create(Self);
     FOptions := TL4DOptions.Create(Self);
+    EngineManager.AddExistingEngine(Self);
   end;
 
   destructor TL4DEngine.Destroy;
@@ -1485,6 +2461,8 @@ implementation
     FOptions.Free;
     FGlobals.Free;
     FLua.Free;
+
+    EngineManager.DeleteItem(FLua.LuaState);
     inherited;
   end;
 
@@ -1543,6 +2521,12 @@ implementation
     Result := UTF8ToWideString(GetAsAnsiString(AIndex));
   end;
 
+  function TL4DEngine.GetAsTable(const AIndex: Integer): IL4DTable;
+  begin
+    Result := TL4DTable.Create(Self, False);
+//    FLua.lua_gettable(AIndex);
+  end;
+
   function TL4DEngine.GetAsVariant(const AIndex: Integer): Variant;
   begin
     case GetLuaType(AIndex) of
@@ -1592,6 +2576,13 @@ implementation
       Result := (SafeLuaExecute = 0);
       FLua.lua_pop(FLua.lua_gettop);
     end;
+  end;
+
+  function TL4DEngine.NewTable: IL4DTable;
+  begin
+    Result := TL4DTable.Create(Self, True);
+    FLua.lua_newtable;
+    Result.SetIndex(FLua.lua_gettop);
   end;
 
   procedure TL4DEngine.Pop(const ANumber: Integer);
@@ -1761,7 +2752,7 @@ implementation
       if Assigned(FOnLuaError) then
       begin
         LRaise := False;
-        FOnLuaError(LTitle, LMessage, LLine, LRaise);
+        FOnLuaError(Self, LTitle, LMessage, LLine, LRaise);
         if LRaise then
           RaiseException(LTitle, LMessage, LLine);
       end
@@ -1771,22 +2762,13 @@ implementation
   end;
 {$ENDREGION}
 
-{$REGION 'TL4DEngineMember - An object which links back to TL4DEngine'}
-  { TL4DEngineMember }
-  
-  constructor TL4DEngineMember.Create(const ALua: TL4DEngine);
-  begin
-    inherited Create;
-    FLua := ALua;
-  end;
-{$ENDREGION}
-
 {$REGION 'TL4DOptions - Lua4Delphi Options Type'}
   { TL4DOptions }
 
   constructor TL4DOptions.Create(const ALua: TL4DEngine);
   begin
-    inherited;
+    inherited Create;
+    FLua := ALua;
     FLibraries := TL4DLibraryOptions.Create(FLua);
   end;
 
@@ -1802,18 +2784,19 @@ implementation
 
   constructor TL4DLibraryOptions.Create(const ALua: TL4DEngine);
   begin
-    inherited;
-      if FLua.FInstanceType = litNew then
-      begin
-        SetBase(True);
-        SetDebug(False);
-        SetIO(True);
-        SetMath(True);
-        SetOS(True);
-        SetPackage(True);
-        SetString(True);
-        SetTable(True);
-      end;
+    inherited Create;
+    FLua := ALua;
+    if FLua.FInstanceType = litNew then
+    begin
+      SetBase(True);
+      SetDebug(False);
+      SetIO(True);
+      SetMath(True);
+      SetOS(True);
+      SetPackage(True);
+      SetString(True);
+      SetTable(True);
+    end;
   end;
 
   function TL4DLibraryOptions.GetBase: Boolean;
@@ -2029,7 +3012,7 @@ implementation
     LRaise := False;
     if Assigned(OnException) then
     begin
-      OnException(AExceptionType, AMessage, LRaise);
+      OnException(Self, AExceptionType, AMessage, LRaise);
       if LRaise then
         raise AExceptionType.Create(AMessage);
     end else
@@ -2056,7 +3039,7 @@ implementation
     Result := FEngine.FOptions;
   end;
 
-function TLua4DelphiCommon.InjectLuaCode(const ACode, AName: WideString; const AAutoExecute: Boolean): Boolean;
+  function TLua4DelphiCommon.InjectLuaCode(const ACode, AName: WideString; const AAutoExecute: Boolean): Boolean;
   begin
     Result := FEngine.LoadLuaCode(ACode, AName, AAutoExecute);
   end;
@@ -2094,5 +3077,10 @@ function TLua4DelphiCommon.InjectLuaCode(const ACode, AName: WideString; const A
   end;
 
 {$ENDREGION}
+
+initialization
+  EngineManager := TL4DEngineManager.Create;
+finalization
+  EngineManager.Free;
 
 end.

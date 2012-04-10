@@ -2,11 +2,13 @@
 
 interface
 
+{$I Lua4Delphi.inc}
+
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Layouts, FMX.Memo, FMX.TabControl, FMX.Edit, FMX.ListBox,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.Ani,
-  L4D.Engine.Main, L4D.Engine.StaticLua51;
+  L4D.Engine.MainIntf, L4D.Engine.Main, L4D.Engine.StaticLua51{$IFDEF L4D_API_LOGGING}, L4D.Debug.Logging{$ENDIF};
 
 type
   TfrmMain = class(TForm)
@@ -46,9 +48,11 @@ type
     btnGlobalCancel: TButton;
     GradientAnimation1: TGradientAnimation;
     Lua4Delphi1: TL4D51Static;
+    Button1: TButton;
+    Button2: TButton;
     procedure btnExecuteClick(Sender: TObject);
-    procedure Lua4Delphi1Exception(const AExceptionType: EL4DExceptionClass; AMessage: string; var ARaise: Boolean);
-    procedure Lua4Delphi1LuaError(const ATitle, AMessage: string; const ALine: Integer; var ARaise: Boolean);
+    procedure Lua4Delphi1Exception(Sender: TObject; const AExceptionType: EL4DExceptionClass; AMessage: string; var ARaise: Boolean);
+    procedure Lua4Delphi1LuaError(Sender: TObject; const ATitle, AMessage: string; const ALine: Integer; var ARaise: Boolean);
     procedure btnLoadFromFileClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
@@ -59,11 +63,16 @@ type
     procedure btnGlobalSetValueClick(Sender: TObject);
     procedure edGlobalNameChange(Sender: TObject);
     procedure cbGlobalTypeChange(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
     FPrints: Integer;
     procedure ShowExceptionPanel;
-    procedure LuaPrint(var AStack: TL4DMethodStack); // < Called exclusively from Lua!
+    procedure LuaPrint(var AStack: IL4DMethodStack); // < Called exclusively from Lua!
+    procedure LuaTableTest(var AStack: IL4DMethodStack); // < Called exclusively from Lua!
+    procedure LuaTableRead(var AStack: IL4DMethodStack); // < Called exclusively from Lua!
     procedure NewGlobalEnablement(const AEnabled: Boolean);
+    procedure LogCount;
   public
     { Public declarations }
   end;
@@ -75,17 +84,72 @@ implementation
 
 {$R *.fmx}
 
-procedure TfrmMain.LuaPrint(var AStack: TL4DMethodStack);
+procedure TfrmMain.LogCount;
+{$IFDEF L4D_API_LOGGING}
+  const
+    COUNT_STR = 'Top is %d %s';
+    TYPE_STR = #13#10 + '%d - %s';
+  var
+    I: Integer;
+    LTypes: String;
+    LState: Boolean;
+{$ENDIF}
+begin
+  {$IFDEF L4D_API_LOGGING}
+    LState := L4DLogger.Active;
+    L4DLogger.Active := False;
+    for I := 1 to Lua4Delphi1.Engine.Lua.lua_gettop do
+      LTypes := LTypes + Format(TYPE_STR, [-I, Lua4Delphi1.Engine.GetLuaTypeName(-I)]);
+    L4DLogger.AddCustomMessage(Format(COUNT_STR, [Lua4Delphi1.Engine.Lua.lua_Gettop, LTypes]));
+    L4DLogger.Active := LState;
+  {$ENDIF}
+end;
+
+procedure TfrmMain.LuaPrint(var AStack: IL4DMethodStack);
 var
   I: Integer;
 begin
   Inc(FPrints);
+  {$IFDEF L4D_API_LOGGING}L4DLogger.AddCustomMessage('Print #' + IntToStr(FPrints));{$ENDIF}
+  LogCount;
   for I := 1 to AStack.Count do
   begin
     if AStack[I].CanBeString then
       memOutput.Lines.Add(Format('Call %d - [Value %d] %s = %s', [FPrints, I, AStack[I].LuaTypeName, AStack[I].AsString]))
     else
       memOutput.Lines.Add(Format('Call %d - [Value %d] %s (cannot be printed)', [FPrints, I, AStack[I].LuaTypeName]));
+  end;
+  LogCount;
+end;
+
+procedure TfrmMain.LuaTableRead(var AStack: IL4DMethodStack);
+begin
+  if AStack[1].CanBeTable then
+  begin
+    ShowMessage(AStack[1].AsTable['Hello'].AsString);
+  end;
+end;
+
+procedure TfrmMain.LuaTableTest(var AStack: IL4DMethodStack);
+begin
+  with AStack.NewTable do
+  begin
+    PushString('Field1', 'Value1');
+    PushString('Field2', 'Value2');
+    PushString('Field3', 'Value3');
+    PushString('Field4', 'Value4');
+    PushFunction('print', LuaPrint);
+    with NewTable('Field5') do
+    begin
+      PushString('FieldA', 'ValueA');
+      PushString('FieldB', 'ValueB');
+      PushString('FieldC', 'ValueC');
+      PushString('FieldD', 'ValueD');
+      Push;
+    end;
+    PushString('Field6', 'Value6');
+    PushString('Field6', 'Value7');
+    Push;
   end;
 end;
 
@@ -134,6 +198,37 @@ begin
     Lua4Delphi1.InjectLuaFile(OpenDialog1.FileName);
 end;
 
+procedure TfrmMain.Button1Click(Sender: TObject);
+begin
+  with Lua4Delphi1.Globals['Add'].CallFunction([10, 1337, 3.14159]) do
+    memOutput.Lines.Add(IntToStr(Count) + ' - ' + Value[1].AsString);
+end;
+
+procedure TfrmMain.Button2Click(Sender: TObject);
+begin
+  {$IFDEF L4D_API_LOGGING}L4DLogger.Active := True;{$ENDIF}
+ with Lua4Delphi1.Globals['ATable'].AsTable do
+  begin
+    with Value['a'].AsTable do
+    begin
+      with Value['c'].AsTable do
+      begin
+        with Value['c'].AsTable do
+        begin
+          ShowMessage(Value['Field1'].AsString);
+          ShowMessage(Value['Field2'].AsString);
+          Close; // Must be called to correctly align the Lua stack
+        end;
+        ShowMessage(Value['a'].AsString);
+        Close; // Must be called to correctly align the Lua stack
+      end;
+      ShowMessage(Value['a'].AsString);
+      Close; // As this is the end of the method, we need not necessarily call "Close" here, but it's best to call it anyway!
+    end;
+  end;
+  {$IFDEF L4D_API_LOGGING}L4DLogger.Active := False;{$ENDIF}
+end;
+
 procedure TfrmMain.cbGlobalTypeChange(Sender: TObject);
 const
   STYLE_NAME: Array[Boolean] of String = ('cbGlobalTypeStyleInvalid', 'cbGlobalTypeStyleHighlight');
@@ -170,15 +265,49 @@ procedure TfrmMain.Lua4Delphi1Create(Sender: TObject);
 begin
   Lua4Delphi1.Globals.PushString('Symbols', '♫♪☺');
   Lua4Delphi1.Globals.PushFunction('print', LuaPrint);
+  Lua4Delphi1.Globals.PushFunction('TableTest', LuaTableTest);
+  Lua4Delphi1.Globals.PushFunction('TableRead', LuaTableRead);
+  {$IFDEF L4D_API_LOGGINGz}L4DLogger.Active := True;{$ENDIF}
+  with Lua4Delphi1.Globals.NewTable('ATable') do
+  begin
+    PushString('Hello', 'World');
+    with NewTable('a') do
+    begin
+      PushDouble('a', 4);
+      PushDouble('b', 2);
+      with NewTable('c') do
+      begin
+        PushDouble('a', 55);
+        PushDouble('b', 66);
+        with NewTable('c') do
+        begin
+          PushString('Field1', 'Value1');
+          PushString('Field2', 'Value2');
+          PushFunction('TestMethod', LuaPrint);
+          Push;
+        end;
+        Push;
+      end;
+      Push;
+    end;
+    with NewTable('b') do
+    begin
+      PushDouble('a', 13);
+      PushDouble('b', 37);
+      Push;
+    end;
+    Push;
+  end;
+  {$IFDEF L4D_API_LOGGINGz}L4DLogger.Active := False;{$ENDIF}
 end;
 
-procedure TfrmMain.Lua4Delphi1Exception(const AExceptionType: EL4DExceptionClass; AMessage: string; var ARaise: Boolean);
+procedure TfrmMain.Lua4Delphi1Exception(Sender: TObject; const AExceptionType: EL4DExceptionClass; AMessage: string; var ARaise: Boolean);
 begin
   lblException.Text := TimeToStr(Now) + ' [' + AExceptionType.ClassName + '] - ' + AMessage;
   ShowExceptionPanel;
 end;
 
-procedure TfrmMain.Lua4Delphi1LuaError(const ATitle, AMessage: string; const ALine: Integer; var ARaise: Boolean);
+procedure TfrmMain.Lua4Delphi1LuaError(Sender: TObject; const ATitle, AMessage: string; const ALine: Integer; var ARaise: Boolean);
 begin
   lblException.Text := Format('%s [Lua Error] Title: "%s", Line: %d, Message: %s', [TimeToStr(Now), ATitle, ALine, AMessage]);
   ShowExceptionPanel;

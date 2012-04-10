@@ -40,6 +40,8 @@ contains
   L4D.Lua.Lua51 in 'E:\Source\Lua\L4D.Lua.Lua51.pas',
   L4D.Lua.Lua52 in 'E:\Source\Lua\L4D.Lua.Lua52.pas',
   L4D.Lua.StaticLua51 in 'E:\Source\Lua\L4D.Lua.StaticLua51.pas',
-  L4D.Engine.Reg in 'E:\Source\Packages\L4D.Engine.Reg.pas';
+  L4D.Engine.Reg in 'E:\Source\Packages\L4D.Engine.Reg.pas',
+  L4D.Debug.Logging in 'E:\Source\Common\L4D.Debug.Logging.pas',
+  L4D.Engine.MainIntf in 'E:\Source\Core\L4D.Engine.MainIntf.pas';
 
 end.

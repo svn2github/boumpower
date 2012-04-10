@@ -4,7 +4,7 @@
 			<MainSource>LKSL.dpk</MainSource>
 			<ProjectVersion>12.3</ProjectVersion>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Release</Config>
+			<Config Condition="'$(Config)'==''">Debug</Config>
 			<Platform>Win32</Platform>
 			<AppType>Package</AppType>
 			<FrameworkType>None</FrameworkType>
@@ -55,11 +55,11 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="rtl.dcp"/>
-			<DCCReference Include="..\..\Source\Editors\LKSL.Editor.PropertyClassReferenceIntf.pas"/>
-			<DCCReference Include="..\..\Source\Managers\LKSL.Managed.Arrays.pas"/>
-			<DCCReference Include="..\..\Source\Packages\LKSL.Packages.AutoSuffix.pas"/>
-			<DCCReference Include="..\..\Source\Strings\LKSL.Strings.Conversion.pas"/>
-			<DCCReference Include="..\..\Source\Strings\LKSL.Strings.Utils.pas"/>
+			<DCCReference Include="F:\Source\Editors\LKSL.Editor.PropertyClassReferenceIntf.pas"/>
+			<DCCReference Include="F:\Source\Managers\LKSL.Managed.Arrays.pas"/>
+			<DCCReference Include="F:\Source\Packages\LKSL.Packages.AutoSuffix.pas"/>
+			<DCCReference Include="F:\Source\Strings\LKSL.Strings.Conversion.pas"/>
+			<DCCReference Include="F:\Source\Strings\LKSL.Strings.Utils.pas"/>
 			<None Include="F:\Source\Common\LKSL.inc"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>

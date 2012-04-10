@@ -8,6 +8,7 @@ uses
 
 begin
   Application.Initialize;
+  {$IFDEF DEBUG}ReportMemoryLeaksOnShutdown := True;{$ENDIF}
   Application.CreateForm(TfrmMain, frmMain);
   Application.Run;
 end.

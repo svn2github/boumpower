@@ -50,10 +50,10 @@
 			<DCC_UnitSearchPath>..\..\Source\Common;..\..\Source\Core;..\..\Source\Packages;..\..\Source\Wrappers;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-			<VerInfo_Keys>CompanyName=LaKraven Studios Ltd.;FileDescription=Lua4Delphi for Delphi XE2;FileVersion=2.0.0.0;InternalName=Lua4Delphi_DXE2;LegalCopyright=Copyright (C) 2009-2011, LaKraven Studios Ltd, All Rights Reserved;LegalTrademarks=&quot;Lua4Delphi&quot; and its logo are Trademarks of LaKraven Studios Ltd.;OriginalFilename=Lua4Delphi_DXE2.bpl;ProductName=Lua4Delphi;ProductVersion=2;Comments=</VerInfo_Keys>
+			<VerInfo_Keys>CompanyName=LaKraven Studios Ltd.;FileDescription=Lua4Delphi for Delphi XE2;FileVersion=2.0.0.0;InternalName=Lua4Delphi_DXE2;LegalCopyright=Copyright (C) 2009-2011, LaKraven Studios Ltd, All Rights Reserved;LegalTrademarks=&quot;Lua4Delphi&quot; and its logo are Trademarks of LaKraven Studios Ltd.;OriginalFilename=Lua4Delphi160.bpl;ProductName=Lua4Delphi;ProductVersion=2;Comments=</VerInfo_Keys>
 			<VerInfo_Locale>2057</VerInfo_Locale>
 			<DCC_UsePackage>rtl;LKSL;$(DCC_UsePackage)</DCC_UsePackage>
-			<DCC_DcpOutput>..\..\BPL\$(Platform)\$(Config)\DCP</DCC_DcpOutput>
+			<DCC_DcpOutput>..\..\BPL\$(Platform)\$(Config)\XE2\DCP</DCC_DcpOutput>
 			<DCC_BplOutput>..\..\BPL\$(Platform)\$(Config)</DCC_BplOutput>
 			<VerInfo_MajorVer>2</VerInfo_MajorVer>
 			<DCC_Description>Lua4Delphi for Delphi XE2</DCC_Description>
@@ -122,6 +122,8 @@
 			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Constants.pas"/>
 			<DCCReference Include="..\..\Source\Core\L4D.Engine.Main.pas"/>
 			<DCCReference Include="..\..\Source\Core\L4D.Engine.StaticLua51.pas"/>
+			<DCCReference Include="..\..\Source\Common\L4D.Debug.Logging.pas"/>
+			<DCCReference Include="..\..\Source\Core\L4D.Engine.MainIntf.pas"/>
 			<None Include="..\..\Source\Common\Lua4Delphi.inc"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
@@ -170,7 +172,9 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
-					<Excluded_Packages/>
+					<Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\pielib.bpl">Delphi Demo Component</Excluded_Packages>
+					</Excluded_Packages>
 				</Delphi.Personality>
 				<Deployment/>
 				<Platforms>

@@ -4,7 +4,7 @@
 			<MainSource>Lua4Delphi.dpk</MainSource>
 			<ProjectVersion>12.3</ProjectVersion>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Release</Config>
+			<Config Condition="'$(Config)'==''">Debug</Config>
 			<Platform>Win32</Platform>
 			<AppType>Package</AppType>
 			<FrameworkType>None</FrameworkType>
@@ -37,7 +37,7 @@
 			<GenDll>true</GenDll>
 			<DCC_DcpOutput>..\..\BPL\$(Platform)\$(Config)\XE\DCP</DCC_DcpOutput>
 			<DCC_E>false</DCC_E>
-			<DCC_DcuOutput>..\..\DCU\XE2\$(Platform)\$(Config)</DCC_DcuOutput>
+			<DCC_DcuOutput>..\..\DCU\XE\$(Platform)\$(Config)</DCC_DcuOutput>
 			<DCC_K>false</DCC_K>
 			<DCC_F>false</DCC_F>
 		</PropertyGroup>
@@ -48,7 +48,6 @@
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
-			<DCC_UnitSearchPath>C:\LKSL\Source\Common;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
 			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
@@ -70,7 +69,10 @@
 			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Lua51.pas"/>
 			<DCCReference Include="..\..\Source\Lua\L4D.Lua.StaticLua51.pas"/>
 			<DCCReference Include="..\..\Source\Packages\L4D.Engine.Reg.pas"/>
-			<None Include="E:\Source\Common\Lua4Delphi.inc"/>
+			<DCCReference Include="..\..\Source\Common\L4D.Debug.Logging.pas"/>
+			<DCCReference Include="..\..\Source\Core\L4D.Engine.MainIntf.pas"/>
+			<DCCReference Include="..\..\Source\Lua\L4D.Lua.Lua52.pas"/>
+			<None Include="..\..\Source\Common\Lua4Delphi.inc"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>

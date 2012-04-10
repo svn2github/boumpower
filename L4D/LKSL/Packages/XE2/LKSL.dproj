@@ -109,6 +109,7 @@
 			<DCCReference Include="..\..\Source\Strings\LKSL.Strings.Utils.pas"/>
 			<DCCReference Include="..\..\Source\Packages\LKSL.Packages.AutoSuffix.pas"/>
 			<DCCReference Include="..\..\Source\Editors\LKSL.Editor.PropertyClassReferenceIntf.pas"/>
+			<DCCReference Include="..\..\Source\Smart\LKSL.Smart.Interfaces.pas"/>
 			<None Include="..\..\Source\Common\LKSL.inc"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>

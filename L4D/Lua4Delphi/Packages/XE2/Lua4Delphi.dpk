@@ -44,7 +44,9 @@ contains
   L4D.Lua.StaticLua51 in '..\..\Source\Lua\L4D.Lua.StaticLua51.pas',
   L4D.Lua.Constants in '..\..\Source\Lua\L4D.Lua.Constants.pas',
   L4D.Engine.Main in '..\..\Source\Core\L4D.Engine.Main.pas',
-  L4D.Engine.StaticLua51 in '..\..\Source\Core\L4D.Engine.StaticLua51.pas';
+  L4D.Engine.StaticLua51 in '..\..\Source\Core\L4D.Engine.StaticLua51.pas',
+  L4D.Debug.Logging in '..\..\Source\Common\L4D.Debug.Logging.pas',
+  L4D.Engine.MainIntf in '..\..\Source\Core\L4D.Engine.MainIntf.pas';
 
 end.
 

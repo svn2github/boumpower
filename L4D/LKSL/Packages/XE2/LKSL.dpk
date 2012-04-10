@@ -36,6 +36,7 @@ contains
   LKSL.Strings.Conversion in '..\..\Source\Strings\LKSL.Strings.Conversion.pas',
   LKSL.Strings.Utils in '..\..\Source\Strings\LKSL.Strings.Utils.pas',
   LKSL.Packages.AutoSuffix in '..\..\Source\Packages\LKSL.Packages.AutoSuffix.pas',
-  LKSL.Editor.PropertyClassReferenceIntf in '..\..\Source\Editors\LKSL.Editor.PropertyClassReferenceIntf.pas';
+  LKSL.Editor.PropertyClassReferenceIntf in '..\..\Source\Editors\LKSL.Editor.PropertyClassReferenceIntf.pas',
+  LKSL.Smart.Interfaces in '..\..\Source\Smart\LKSL.Smart.Interfaces.pas';
 
 end.

@@ -21,6 +21,8 @@
   Released: 5th February 2012
 
   Changelog:
+    12th March 2012:
+      - Fixed the "lua_pop" macro method
     5th February 2012:
       - Released
 }
@@ -76,7 +78,7 @@ type
         procedure lua_newtable(L: PLuaState); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         procedure lua_pop(L: PLuaState; n: Integer); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         procedure lua_pushcfunction(L: PLuaState; f: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-        function lua_pushliteral(L: PLuaState; s: PAnsiChar): PAnsiChar; overload; virtual; abstract;
+        function lua_pushliteral(L: PLuaState; s: PAnsiChar): PAnsiChar; overload; inline; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function lua_pushlstring(L: PLuaState; const s: PAnsiChar; ls: Cardinal): PAnsiChar; overload; virtual; abstract;
         procedure lua_register(L: PLuaState; name: PAnsiChar; f: TLuaDelphiFunction); overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function lua_tostring(L: PLuaState; idx: Integer): PAnsiChar; overload; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
@@ -444,6 +446,7 @@ implementation
     lua_pushcfunction(L, ALibFunc);
     lua_pushstring(L, PAnsiChar(ALibName));
     Result := (lua_pcall(L, 1, 0, 0));
+    lua_pop(L, 1);
   end;
 
 function TLuaBase.luaL_checkint(L: PLuaState; narg: Integer): Integer;
@@ -545,12 +548,17 @@ function TLuaBase.luaL_checkint(L: PLuaState; narg: Integer): Integer;
 
   procedure TLuaBase.lua_pop(L: PLuaState; n: Integer);
   begin
-    lua_settop(L, {-(n)-1} n + 1);
+    lua_settop(L, (-n)-1);
   end;
 
   procedure TLuaBase.lua_pushcfunction(L: PLuaState; f: TLuaDelphiFunction);
   begin
     lua_pushcclosure(L, f, 0);
+  end;
+
+  function TLuaBase.lua_pushliteral(L: PLuaState; s: PAnsiChar): PAnsiChar;
+  begin
+    Result := lua_pushlstring(L, s, Length(s));
   end;
 
   procedure TLuaBase.lua_register(L: PLuaState; name: PAnsiChar; f: TLuaDelphiFunction);
@@ -563,7 +571,6 @@ function TLuaBase.luaL_checkint(L: PLuaState; narg: Integer): Integer;
   begin
     Result := lua_tolstring(L, idx, nil);
   end;
-
 {$ENDREGION}
 
 {$REGION 'TLuaCommon - Lua Common Type (with Localizers)'}
@@ -575,6 +582,7 @@ function TLuaBase.luaL_checkint(L: PLuaState; narg: Integer): Integer;
     SetLuaLibRefs;
     FLuaState := luaL_newstate;
     lua_settop(0);
+    lua_pop(lua_gettop);
   end;
 
   constructor TLuaCommon.Create(const ALuaState: PLuaState);

@@ -71,7 +71,7 @@ object frmMain: TfrmMain
       Height = 265.000000000000000000
       StyleLookup = 'tcTopStyle1'
       TabOrder = 2
-      TabIndex = 1
+      TabIndex = 0
       TabHeight = 20.000000000000000000
       object tabCode: TTabItem
         Width = 73.000000000000000000
@@ -90,15 +90,80 @@ object frmMain: TfrmMain
           StyleLookup = 'memCodeStyle1'
           TabOrder = 0
           UseSmallScrollBars = True
-          Text = 
-            '-- Executes the "print" method defined in the Delphi app'#13#10'print(' +
-            '"Hello World, from Lua")'#13#10'-- Executes "print" (from Delphi), pas' +
-            'sing the formatted evaluation of Pi'#13#10'print(string.format("Pi = %' +
-            '.16f", math.pi))'#13#10#13#10'-- Assign some Global Values'#13#10'Foo = "Hello"'#13 +
-            #10'Bar = "World"'#13#10'Leet = 1337'#13#10'Power = 9001'#13#10#13#10'-- Executes "print"' +
-            ' (from Delphi), passing multiple concatenated values'#13#10'print(Foo.' +
-            '.Bar, Leet..Power)'#13#10#13#10'-- Raise an error (to be displayed as spec' +
-            'ified by our Delphi app)'#13#10'error("All ur base r belong to us!")'
+          Lines.Strings = (
+            '-- Executes the "print" method defined in the Delphi app'
+            'print("Hello World, from Lua")'
+            
+              '-- Executes "print" (from Delphi), passing the formatted evaluat' +
+              'ion of Pi'
+            'print(string.format("Pi = %.16f", math.pi))'
+            ''
+            '-- Assign some Global Values'
+            'Foo = "Hello"'
+            'Bar = "World"'
+            'Leet = 1337'
+            'Power = 9001'
+            ''
+            
+              '-- Executes "print" (from Delphi), passing multiple concatenated' +
+              ' values'
+            'print(Foo..Bar, Leet..Power)'
+            ''
+            '--Executes "TableTest" and prints all the fields and values'
+            'Result = TableTest()'
+            ''
+            'for key, value in pairs(Result) do'
+            '  print("Key: " .. key .. " = " .. tostring(value))'
+            'end'
+            ''
+            
+              '-- Recursively parse a Table, constructing a String of each fiel' +
+              'd key and value!'
+            'function table_print (tt, indent, done)'
+            '  local Result = ""'
+            '  done = done or {}'
+            '  indent = indent or 0'
+            '  if type(tt) == "table" then'
+            '    for key, value in pairs (tt) do'
+            '      Result = Result .. (string.rep (" ", indent)) -- indent it'
+            '      if type (value) == "table" and not done [value] then'
+            '        done [value] = true'
+            
+              '        Result = Result .. (string.format("[%s] => table\n", tos' +
+              'tring (key)));'
+            
+              '        Result = Result .. (string.rep (" ", indent+4)) -- inden' +
+              't it'
+            '        Result = Result .. ("(\n");'
+            '        Result = Result .. table_print (value, indent + 7, done)'
+            
+              '        Result = Result .. (string.rep (" ", indent+4)) -- inden' +
+              't it'
+            '        Result = Result .. (")\n");'
+            '      else'
+            '        Result = Result .. (string.format("[%s] => %s\n",'
+            '            tostring (key), tostring(value)))'
+            '      end'
+            '    end'
+            '  else'
+            '    Result = Result .. (tt .. "\n")'
+            '  end'
+            '  return "\n" .. Result;'
+            'end'
+            ''
+            
+              '-- Print the recursive parse of "ATable" (a Global Table Value r' +
+              'egistered by the Host Application)'
+            '--print(table_print(ATable, 5))'
+            ''
+            'function Add(a, b, c)'
+            '  return (a + b + c)'
+            'end'
+            ''
+            
+              '-- Raise an error (to be displayed as specified by our Delphi ap' +
+              'p)'
+            '--error("All ur base r belong to us!")')
           KeyboardType = vktDefault
         end
         object pnlTop: TPanel
@@ -122,6 +187,22 @@ object frmMain: TfrmMain
             OnClick = btnLoadFromFileClick
             TabOrder = 1
             Text = 'Load Lua File'
+          end
+          object Button1: TButton
+            Position.Point = '(238,5)'
+            Width = 105.000000000000000000
+            Height = 22.000000000000000000
+            OnClick = Button1Click
+            TabOrder = 2
+            Text = 'Call Lua Method'
+          end
+          object Button2: TButton
+            Position.Point = '(350,5)'
+            Width = 105.000000000000000000
+            Height = 22.000000000000000000
+            OnClick = Button2Click
+            TabOrder = 3
+            Text = 'Read Table'
           end
         end
       end
