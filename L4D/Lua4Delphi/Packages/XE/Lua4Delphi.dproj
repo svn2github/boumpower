@@ -37,7 +37,7 @@
 			<GenDll>true</GenDll>
 			<DCC_DcpOutput>..\..\BPL\$(Platform)\$(Config)\XE\DCP</DCC_DcpOutput>
 			<DCC_E>false</DCC_E>
-			<DCC_DcuOutput>..\..\DCU\XE2\$(Platform)\$(Config)</DCC_DcuOutput>
+			<DCC_DcuOutput>..\..\DCU\XE\$(Platform)\$(Config)</DCC_DcuOutput>
 			<DCC_K>false</DCC_K>
 			<DCC_F>false</DCC_F>
 		</PropertyGroup>

@@ -583,7 +583,7 @@ implementation
   function L4D_CallDelphiFunction(L: PLuaState): Integer; cdecl;
   var
     LLua: TL4DEngine;
-    LMethod: PL4DDelphiFunction;
+    LMethod: PL4DMethod;
     LMethodStack: TL4DMethodStack;
   begin
     LLua := TL4DEngine.Create(LuaLinkType, L);
@@ -591,8 +591,8 @@ implementation
       LMethodStack := TL4DMethodStack.Create(LLua);
       try
         LMethodStack.FPushCount := 0;
-        LMethod := PL4DDelphiFunction(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
-        TL4DDelphiFunction(LMethod^)(LMethodStack);
+        LMethod := PL4DMethod(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
+        LMethod^.FMethod(LMethodStack);
         Result := LMethodStack.FPushCount;
       finally
         LMethodStack.Free;
@@ -605,7 +605,6 @@ implementation
   function L4D_CallClassFunction(L: PLuaState): Integer; cdecl;
   var
     LLua: TL4DEngine;
-//    LMethod: PL4DDelphiObjectFunction;
     LMethod: PL4DMethodObject;
     LMethodStack: TL4DMethodStack;
   begin
@@ -616,10 +615,6 @@ implementation
         LMethodStack.FPushCount := 0;
         LMethod := PL4DMethodObject(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
         LMethod^.FMethod(LMethodStack);
-{
-        LMethod := PL4DDelphiObjectFunction(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
-        TL4DDelphiObjectFunction(LMethod^)(LMethodStack);
-}
         Result := LMethodStack.FPushCount;
       finally
         LMethodStack.Free;

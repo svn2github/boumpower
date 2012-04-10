@@ -29,10 +29,10 @@ requires
   rtl;
 
 contains
-  LKSL.Editor.PropertyClassReferenceIntf in 'F:\Source\Editors\LKSL.Editor.PropertyClassReferenceIntf.pas',
-  LKSL.Managed.Arrays in 'F:\Source\Managers\LKSL.Managed.Arrays.pas',
-  LKSL.Packages.AutoSuffix in 'F:\Source\Packages\LKSL.Packages.AutoSuffix.pas',
-  LKSL.Strings.Conversion in 'F:\Source\Strings\LKSL.Strings.Conversion.pas',
-  LKSL.Strings.Utils in 'F:\Source\Strings\LKSL.Strings.Utils.pas';
+  LKSL.Editor.PropertyClassReferenceIntf in '..\..\Source\Editors\LKSL.Editor.PropertyClassReferenceIntf.pas',
+  LKSL.Managed.Arrays in '..\..\Source\Managers\LKSL.Managed.Arrays.pas',
+  LKSL.Packages.AutoSuffix in '..\..\Source\Packages\LKSL.Packages.AutoSuffix.pas',
+  LKSL.Strings.Conversion in '..\..\Source\Strings\LKSL.Strings.Conversion.pas',
+  LKSL.Strings.Utils in '..\..\Source\Strings\LKSL.Strings.Utils.pas';
 
 end.
