@@ -21,6 +21,9 @@
   Released: 22nd February 2012
 
   Changelog:
+    13th March 2012:
+      - Added "IL4D<interface>Internal" as appropriate to separate inner workings from public view
+      - Added access to IL4DEngine interface to all Stack Managers!
     12th March 2012:
       - Refactored a lot related to Stacks, Values and Tables
       - Removed unnecessary methods related to Methods (such as Offset getter/setter).
@@ -110,8 +113,9 @@ type
   IL4DStack = interface
   ['{B4A38302-6D60-4217-B8A8-792FE4999888}']
     function GetCount: Integer;
+    function GetEngine: IL4DEngine;
     property Count: Integer read GetCount;
-    //procedure OnPushTable(const ATable: IL4DTable);
+    property Engine: IL4DEngine read GetEngine;
   end;
 
   {
@@ -262,12 +266,19 @@ type
   end;
 
   {
+    IL4DTableValueInternal
+  }
+  IL4DTableValueInternal = interface
+  ['{2F117FB3-92F6-4B05-AD30-AFF8EFCA2715}']
+    procedure SetIndex(const AIndex: Integer);
+    procedure SetKey(const AKey: AnsiString);
+  end;
+
+  {
     IL4DTableValue
   }
   IL4DTableValue = interface(IL4DStackValue)
   ['{6782A114-18C5-4E1F-8FA3-E9E175735961}']
-    procedure SetIndex(const AIndex: Integer);
-    procedure SetKey(const AKey: AnsiString);
     property AsAnsiString: AnsiString read GetAsAnsiString;
     property AsBoolean: Boolean read GetAsBoolean;
     property AsChar: Char read GetAsChar;
@@ -301,19 +312,26 @@ type
   end;
 
   {
+    IL4DTableInternal
+  }
+  IL4DTableInternal = interface
+  ['{2929F799-A7F2-48A8-8DB0-1C6DBFD9141F}']
+    function GetName: AnsiString;
+    procedure PushTable;
+    procedure SetIndex(const AIndex: Integer); overload;
+    procedure SetName(const AName: AnsiString); overload;
+    procedure SetOnPushTable(const AEvent: TL4DTableChangeEvent); overload;
+  end;
+
+  {
     IL4DTable
   }
   IL4DTable = interface(IL4DStackCombo)
   ['{FCFD27AC-D5EC-42A4-81EF-E1288A6A1EB6}']
     procedure Close;
-    function GetName: AnsiString;
     function GetValueByIndex(const AIndex: Integer): IL4DTableValue;
     function GetValueByName(const AName: AnsiString): IL4DTableValue;
     procedure Push;
-    procedure PushTable;
-    procedure SetIndex(const AIndex: Integer); overload;
-    procedure SetName(const AName: AnsiString); overload;
-    procedure SetOnPushTable(const AEvent: TL4DTableChangeEvent); overload;
     property Value[const AIndex: Integer]: IL4DTableValue read GetValueByIndex; default;
     property Value[const AName: AnsiString]: IL4DTableValue read GetValueByName; default;
   end;
@@ -323,7 +341,6 @@ type
   }
   IL4DMethodResultStackValue = interface(IL4DStackValue)
   ['{97D4EEDC-D104-42C0-8C5D-DC098ED87B0B}']
-    procedure SetIndex(const AIndex: Integer);
     property AsAnsiString: AnsiString read GetAsAnsiString;
     property AsBoolean: Boolean read GetAsBoolean;
     property AsChar: Char read GetAsChar;
@@ -363,6 +380,7 @@ type
   ['{443213D7-773C-413A-8680-CFEF834CCC15}']
     procedure Cleanup;
     function GetValue(const AIndex: Integer): IL4DMethodResultStackValue;
+    property Count: Integer read GetCount;
     property Value[const AIndex: Integer]: IL4DMethodResultStackValue read GetValue; default;
   end;
 
@@ -404,11 +422,18 @@ type
   end;
 
   {
+    IL4DMethodInternal
+  }
+  IL4DMethodStackInternal = interface
+  ['{06D1CD69-EBF5-4260-A724-B34AB7363AA3}']
+    function GetPushCount: Integer;
+  end;
+
+  {
     IL4DMethodStack
   }
   IL4DMethodStack = interface(IL4DStackIndexed)
   ['{424F2054-837C-4CAA-AE38-386E247A52CD}']
-    function GetPushCount: Integer;
     function GetValue(const AIndex: Integer): IL4DMethodStackValue;
     property Value[const AIndex: Integer]: IL4DMethodStackValue read GetValue; default;
   end;
@@ -483,10 +508,10 @@ type
   end;
 
   {
-    IL4DEngine
+    IL4DEngineInternal
   }
-  IL4DEngine = interface
-  ['{E9C6CD0C-0CE0-4073-AA1B-217520E93929}']
+  IL4DEngineInternal = interface
+  ['{F3E9410B-C1C6-4533-BCF6-FD04085F8062}']
     function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): IL4DMethodResultStack;
     function GetAsAnsiString(const AIndex: Integer): AnsiString;
     function GetAsBoolean(const AIndex: Integer): Boolean;
@@ -527,6 +552,15 @@ type
     procedure PushWideString(const AValue: WideString);
     procedure Remove(const AIndex: Integer);
     function SafeLuaExecute(const ANumArgs: Integer = 0; const ANumResults: Integer = 0; const AErrorFunc: Integer = 0): Integer; // Handles exceptions when executing Lua code
+  end;
+
+  {
+    IL4DEngine
+  }
+  IL4DEngine = interface
+  ['{E9C6CD0C-0CE0-4073-AA1B-217520E93929}']
+    function GetLua: TLuaCommon;
+    property Lua: TLuaCommon read GetLua;
   end;
 
 implementation

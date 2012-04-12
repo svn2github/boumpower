@@ -99,7 +99,7 @@ begin
     LState := L4DLogger.Active;
     L4DLogger.Active := False;
     for I := 1 to Lua4Delphi1.Engine.Lua.lua_gettop do
-      LTypes := LTypes + Format(TYPE_STR, [-I, Lua4Delphi1.Engine.GetLuaTypeName(-I)]);
+      LTypes := LTypes + Format(TYPE_STR, [-I, (Lua4Delphi1.Engine as IL4DEngineInternal).GetLuaTypeName(-I)]);
     L4DLogger.AddCustomMessage(Format(COUNT_STR, [Lua4Delphi1.Engine.Lua.lua_Gettop, LTypes]));
     L4DLogger.Active := LState;
   {$ENDIF}
@@ -201,13 +201,16 @@ end;
 procedure TfrmMain.Button1Click(Sender: TObject);
 begin
   with Lua4Delphi1.Globals['Add'].CallFunction([10, 1337, 3.14159]) do
+  begin
     memOutput.Lines.Add(IntToStr(Count) + ' - ' + Value[1].AsString);
+    Cleanup;
+  end;
 end;
 
 procedure TfrmMain.Button2Click(Sender: TObject);
 begin
   {$IFDEF L4D_API_LOGGING}L4DLogger.Active := True;{$ENDIF}
- with Lua4Delphi1.Globals['ATable'].AsTable do
+  with Lua4Delphi1.Globals['ATable'].AsTable do
   begin
     with Value['a'].AsTable do
     begin
@@ -215,14 +218,14 @@ begin
       begin
         with Value['c'].AsTable do
         begin
-          ShowMessage(Value['Field1'].AsString);
-          ShowMessage(Value['Field2'].AsString);
+          memOutput.Lines.Add(Value['Field1'].AsString);
+          memOutput.Lines.Add(Value['Field2'].AsString);
           Close; // Must be called to correctly align the Lua stack
         end;
-        ShowMessage(Value['a'].AsString);
+        memOutput.Lines.Add(Value['a'].AsString);
         Close; // Must be called to correctly align the Lua stack
       end;
-      ShowMessage(Value['a'].AsString);
+      memOutput.Lines.Add(Value['a'].AsString);
       Close; // As this is the end of the method, we need not necessarily call "Close" here, but it's best to call it anyway!
     end;
   end;

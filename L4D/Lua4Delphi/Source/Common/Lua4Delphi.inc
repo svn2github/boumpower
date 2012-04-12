@@ -21,12 +21,14 @@
   Released: 5th February 2012
 
   Changelog:
+    13th March 2012:
+      - Added "L4D_VERxxx" define (by request)
     12th March 2012:
       - Added "L4D_API_LOGGING" define (disabled by default)
-    5th February 2012:
-      - Released
     6th February 2012:
       - Added "L4D_USE_INLINE" define
+    5th February 2012:
+      - Released
 }
 {$I LKSL.inc}
 
@@ -50,3 +52,12 @@
     {$INLINE AUTO} // Standard Behaviour (more stable)
   {$ENDIF}
 {$ENDIF}
+
+// Lua4Delphi library version
+// MUST ONLY BE MODIFIED BY LAKRAVEN STUDIOS LTD
+
+{$DEFINE L4D_VER200} // Initial Release (5th February 2012}
+{$DEFINE L4D_VER201} // Update 1
+{$DEFINE L4D_VER202} // Update 2
+{$DEFINE L4D_VER203} // Update 3
+{$DEFINE L4D_VER204} // Update 4 (13th March 2012)

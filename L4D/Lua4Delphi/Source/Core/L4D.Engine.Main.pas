@@ -21,6 +21,8 @@
   Released: 5th February 2012
 
   Changelog:
+    13th March 2012:
+      - Modified multiple classes to support Interfaces changes in MainIntf.pas
     12th March 2012:
       - HUGE number of bugs fixed
       - Table Reading/Writing now work properly
@@ -168,7 +170,7 @@ type
       - A reader for Lua Table/Metatable Values
   }
   {$REGION 'TL4DTableValue - A reader for Lua Table/Metatable Values'}
-    TL4DTableValue = class(TInterfacedObject, IL4DTableValue)
+    TL4DTableValue = class(TInterfacedObject, IL4DTableValueInternal, IL4DTableValue)
     private
       FIndex: Integer;
       FKey: AnsiString;
@@ -221,7 +223,7 @@ type
       CRITICAL: DO NOT MODIFY THIS TYPE IN ANY WAY!
   }
   {$REGION 'TL4DTable - Composer/Reader for Lua Tables/Metatables'}
-    TL4DTable = class(TL4DEngineMember, IL4DTable)
+    TL4DTable = class(TL4DEngineMember, IL4DTableInternal, IL4DTable)
     private
       FClosed: Boolean;
       FFieldIndex: Integer;
@@ -306,9 +308,6 @@ type
     private
       FIndex: Integer;
       FStack: TL4DMethodResultStack;
-      {$REGION 'IL4DMethodResultStackValue'}
-        procedure SetIndex(const AIndex: Integer);
-      {$ENDREGION}
       {$REGION 'IL4DStackValue'}
         function GetAsAnsiString: AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsBoolean: Boolean; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
@@ -416,7 +415,7 @@ type
     TL4DMethodStack
   }
   {$REGION 'TL4DMethodStack - Method Stack Type'}
-    TL4DMethodStack = class(TL4DEngineMember, IL4DMethodStack)
+    TL4DMethodStack = class(TL4DEngineMember, IL4DMethodStackInternal, IL4DMethodStack)
     private
       FPushCount: Integer;
       function GetCount: Integer; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
@@ -577,7 +576,7 @@ type
       CRITICAL: DO NOT MODIFY THIS TYPE IN ANY WAY!
   }
   {$REGION 'TL4DEngine - Sits Lua4Delphi methods on top of Lua API'}
-    TL4DEngine = class(TInterfacedObject, IL4DEngine)
+    TL4DEngine = class(TInterfacedObject, IL4DEngineInternal, IL4DEngine)
     private
       FDesignMode: Boolean;
       FGlobals: TL4DGlobalStack;
@@ -588,7 +587,7 @@ type
       FOptions: TL4DOptions;
       FOnException: TL4DExceptionEvent;
       FOnLuaError: TL4DLuaErrorEvent;
-      {$REGION 'IL4DEngine'}
+      {$REGION 'IL4DEngineInternal'}
         // Lua4Delphi Custom Macros
         function CallFunction(AParameters: array of const; const AResultCount: Integer = LUA_MULTRET): IL4DMethodResultStack;
         function GetAsAnsiString(const AIndex: Integer): AnsiString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
@@ -605,6 +604,8 @@ type
         function GetAsTable(const AIndex: Integer): IL4DTable; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsWideString(const AIndex: Integer): WideString; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function GetAsVariant(const AIndex: Integer): Variant; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
+        function GetLuaType(const AIndex: Integer): TL4DStackValueType; //inline;
+        function GetLuaTypeName(const AIndex: Integer): String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function LoadLuaCode(const ACode, AName: WideString; const AAutoExecute: Boolean = True): Boolean;
         function LoadLuaFile(const AFileName: WideString; const AAutoExecute: Boolean = True): Boolean;
         function NewTable: IL4DTable;
@@ -629,17 +630,18 @@ type
         procedure Remove(const AIndex: Integer); {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
         function SafeLuaExecute(const ANumArgs: Integer = 0; const ANumResults: Integer = 0; const AErrorFunc: Integer = 0): Integer; // Handles exceptions when executing Lua code
       {$ENDREGION}
+      {$REGION 'IL4DEngine'}
+        function GetLua: TLuaCommon;
+      {$ENDREGION}
     public
       // Base Methods
       constructor Create(ALuaType: TLuaBaseType); overload;
       constructor Create(ALuaType: TLuaBaseType; const ALuaState: PLuaState); overload;
       destructor Destroy; override;
-      {$REGION 'IL4DEngine'}
-        function GetLuaType(const AIndex: Integer): TL4DStackValueType; //inline;
-        function GetLuaTypeName(const AIndex: Integer): String; {$IFDEF L4D_USE_INLINE}inline;{$ENDIF}
-      {$ENDREGION}
       property Globals: TL4DGlobalStack read FGlobals write FGlobals;
-      property Lua: TLuaCommon read FLua write FLua;
+      {$REGION 'IL4DEngine'}
+        property Lua: TLuaCommon read GetLua;
+      {$ENDREGION}
       property Options: TL4DOptions read FOptions write FOptions;
       property OnException: TL4DExceptionEvent read FOnException write FOnException;
       property OnLuaError: TL4DLuaErrorEvent read FOnLuaError write FOnLuaError;
@@ -769,7 +771,7 @@ var
     LMethodStack := TL4DMethodStack.Create(LLua);
     LMethod := PL4DMethod(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
     LMethod^.FMethod(LMethodStack);
-    Result := LMethodStack.GetPushCount;
+    Result := (LMethodStack as IL4DMethodStackInternal).GetPushCount;
   end;
 
   function L4D_CallClassFunction(L: PLuaState): Integer; cdecl;
@@ -782,7 +784,7 @@ var
     LMethodStack := TL4DMethodStack.Create(LLua);
     LMethod := PL4DMethodObject(LLua.FLua.lua_touserdata(LUA_GLOBALSINDEX - 1));
     LMethod^.FMethod(LMethodStack);
-    Result := LMethodStack.GetPushCount;
+    Result := (LMethodStack as IL4DMethodStackInternal).GetPushCount;
   end;
 {$ENDREGION}
 
@@ -997,12 +999,6 @@ var
   begin
     Result := FStack.FLua.GetLuaTypeName(FIndex);
   end;
-
-  procedure TL4DMethodResultStackValue.SetIndex(const AIndex: Integer);
-  begin
-    FIndex := AIndex;
-  end;
-
 {$ENDREGION}
 
 {$REGION 'TL4DMethodResultStack - Method Result Stack Type'}
@@ -1295,14 +1291,14 @@ var
   begin
     FLua.FLua.lua_getfield(-1, PAnsiChar(AName));
     Result := TL4DTableValue.Create(Self, -1);
-    Result.SetKey(AName);
+    (Result as IL4DTableValueInternal).SetKey(AName);
   end;
 
   function TL4DTable.NewTable(const AKey: AnsiString): IL4DTable;
   begin
     FLua.PushAnsiString(AKey);
     Result := FLua.NewTable;
-    Result.SetOnPushTable(OnPushTable);
+    (Result as IL4DTableInternal).SetOnPushTable(OnPushTable);
   end;
 
   procedure TL4DTable.OnPushTable(const ATable: IL4DTable);
@@ -1314,7 +1310,7 @@ var
   begin
     FLua.PushInteger(FFieldIndex);
     Result := FLua.NewTable;
-    Result.SetOnPushTable(OnPushTable);
+    (Result as IL4DTableInternal).SetOnPushTable(OnPushTable);
     Inc(FFieldIndex);
   end;
 
@@ -1322,7 +1318,6 @@ var
   begin
     FLua.PushInteger(FFieldIndex);
     FLua.PushAnsiChar(AValue);
-//    FLua.FLua.lua_settable(FIndex);
     FLua.FLua.lua_rawset(FIndex);
     Inc(FFieldIndex);
   end;
@@ -1591,7 +1586,6 @@ var
 
   procedure TL4DTable.PushTable;
   begin
-//    FLua.FLua.lua_rawset(FIndex);
     if Assigned(FOnPushTable) then
       FOnPushTable(Self);
   end;
@@ -2189,13 +2183,13 @@ var
   function TL4DGlobalStack.NewTable(const AKey: AnsiString): IL4DTable;
   begin
     Result := FLua.NewTable;
-    Result.SetName(AKey);
-    Result.SetOnPushTable(OnPushTable);
+    (Result as IL4DTableInternal).SetName(AKey);
+    (Result as IL4DTableInternal).SetOnPushTable(OnPushTable);
   end;
 
   procedure TL4DGlobalStack.OnPushTable(const ATable: IL4DTable);
   begin
-    SetGlobal(ATable.GetName);
+    SetGlobal((ATable as IL4DTableInternal).GetName);
   end;
 
   procedure TL4DGlobalStack.PushAnsiChar(const AKey: AnsiString; const AValue: AnsiChar);
@@ -2303,7 +2297,6 @@ var
   procedure TL4DGlobalStack.SetGlobal(const AKey: AnsiString);
   begin
       FLua.FLua.lua_setglobal(PAnsiChar(AKey));
-//      FLua.Pop(1);
   end;
 {$ENDREGION}
 
@@ -2524,7 +2517,6 @@ var
   function TL4DEngine.GetAsTable(const AIndex: Integer): IL4DTable;
   begin
     Result := TL4DTable.Create(Self, False);
-//    FLua.lua_gettable(AIndex);
   end;
 
   function TL4DEngine.GetAsVariant(const AIndex: Integer): Variant;
@@ -2546,6 +2538,11 @@ var
   function TL4DEngine.GetAsWideString(const AIndex: Integer): WideString;
   begin
     Result := GetAsString(AIndex);
+  end;
+
+  function TL4DEngine.GetLua: TLuaCommon;
+  begin
+    Result := FLua;
   end;
 
   function TL4DEngine.GetLuaType(const AIndex: Integer): TL4DStackValueType;
@@ -2582,7 +2579,7 @@ var
   begin
     Result := TL4DTable.Create(Self, True);
     FLua.lua_newtable;
-    Result.SetIndex(FLua.lua_gettop);
+    (Result as IL4DTableInternal).SetIndex(FLua.lua_gettop);
   end;
 
   procedure TL4DEngine.Pop(const ANumber: Integer);
